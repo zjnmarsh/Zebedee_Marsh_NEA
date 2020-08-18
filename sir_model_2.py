@@ -74,6 +74,11 @@ def SIR_model(s0, i0, r0, beta, gamma, t):
     result = odeint(eqns, y0, t, args=(beta, gamma))
     solution = np.array(result)
     print(solution)
+    plt.figure(figsize=[6,4])
+    plt.plot(t, solution[:, 0], label="S(t)")
+    plt.plot(t, solution[:, 1], label="I(t)")
+    plt.plot(t, solution[:, 2], label="R(t)")
+    plt.show()
 
 
 SIR_model(999, 1, 0, 0.2, 0.1, 160)
