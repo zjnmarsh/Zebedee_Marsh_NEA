@@ -1,4 +1,4 @@
-class cellular_automata:
+class cells:
 
     def __init__(self, c, p, s, i, r):
         self.carrying_capacity = c    # maximum population of a cell
