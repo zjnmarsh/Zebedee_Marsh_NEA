@@ -2,6 +2,7 @@ from scipy.integrate import odeint
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def SIR_model(s0, i0, r0, beta, gamma, t):
     """
     :param s: number of susceptible people
@@ -23,9 +24,11 @@ def SIR_model(s0, i0, r0, beta, gamma, t):
         return dsdt, didt, drdt
 
     result = odeint(eqns, y0, t, args=(beta, gamma))
-    print(result)
+    # print(result)
+    print("--------------")
     solution = np.array(result)
     # print(solution)
+    np.savetxt("foo.csv", solution, delimiter = ",")
     plt.figure(figsize=[6,4])
     plt.plot(t, solution[:, 0], label="S(t)")
     plt.plot(t, solution[:, 1], label="I(t)")
@@ -33,4 +36,4 @@ def SIR_model(s0, i0, r0, beta, gamma, t):
     plt.show()
 
 
-SIR_model(999, 1, 0, 0.2, 0.1, 160)
+SIR_model(999, 1, 0, 0.5, 0.1, 160)
