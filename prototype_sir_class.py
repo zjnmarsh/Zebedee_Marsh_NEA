@@ -41,4 +41,20 @@ class SIR_model:
 
 
 sir_model = SIR_model()
-sir_model.SIR_model(999, 1, 0, 0.2, 0.1, 160)
+# sir_model.SIR_model(999, 1, 0, 0.2, 0.1, 160)
+
+
+class QueueSimulation:
+
+    def __init__(self, n, s_list, i_list, r_list, b_list, g_list):
+        self.n = n  # number of simulations to be run
+        self.parameters = []
+        for i in range(n):
+            self.parameters.extend((s_list[i], i_list[i], r_list[i], b_list[i], g_list[i]))
+
+    def foo(self):
+        pass
+
+
+queue = QueueSimulation(2, [999, 599], [1, 3], [0, 0], [0.2, 0.4], [0.1,0.1])
+queue.foo()
