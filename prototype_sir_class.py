@@ -8,7 +8,7 @@ class SIR_model:
     def __init__(self):
         pass
 
-    def SIR_model(self, s0, i0, r0, beta, gamma, t):
+    def SIR_model(self, s0, i0, r0, beta, gamma, t, f, *args, **kwargs):
         """
         :param s: number of susceptible people
         :param i: number of infected people
@@ -17,6 +17,8 @@ class SIR_model:
         :param g: recovery rate of an individual
         :param t: how long the simulation should run for
         """
+
+        plt.figure(f)
         t = np.linspace(0, t,
                         t * 10)  # creates a time array at the points where the differential equations will be calculated, (start, end, number of timepoints)
         N = s0 + i0 + r0  # total population
@@ -37,24 +39,30 @@ class SIR_model:
         plt.plot(t, solution[:, 0], label="S(t)")
         plt.plot(t, solution[:, 1], label="I(t)")
         plt.plot(t, solution[:, 2], label="R(t)")
-        plt.show()
+        # plt.show()
 
 
-sir_model = SIR_model()
-# sir_model.SIR_model(999, 1, 0, 0.2, 0.1, 160)
-
+# sir_model = SIR_model()
+# sir_model.SIR_model(999, 1, 0, 0.2, 0.1, 160, 1)
+# plt.show()
 
 class QueueSimulation:
 
-    def __init__(self, n, s_list, i_list, r_list, b_list, g_list):
+    def __init__(self, n, s_list, i_list, r_list, b_list, g_list, t):
         self.n = n  # number of simulations to be run
         self.parameters = []
         for i in range(n):
-            self.parameters.extend((s_list[i], i_list[i], r_list[i], b_list[i], g_list[i]))
+            self.parameters.append([s_list[i], i_list[i], r_list[i], b_list[i], g_list[i], t, i+1])
+        print(self.parameters)
 
-    def foo(self):
-        pass
+    def run_simulation(self):
+        sir_model = SIR_model()
+        for i in range(self.n):
+            sir_model.SIR_model(*self.parameters[i])
+        plt.show()
 
 
-queue = QueueSimulation(2, [999, 599], [1, 3], [0, 0], [0.2, 0.4], [0.1,0.1])
-queue.foo()
+
+
+queue = QueueSimulation(2, [999, 599], [1, 3], [0, 0], [0.2, 0.4], [0.1,0.1], 100)
+queue.run_simulation()
