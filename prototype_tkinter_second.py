@@ -29,8 +29,8 @@ class Main_Window:
         # self.app = SIR_Window(self.new_window)
 
         root2 = tk.Tk()
-        root2.title('Main Window')
-        root2.geometry('600x400')
+        root2.title('SIR Model')
+        root2.geometry('1400x900')
 
         new_window = SIR_Window(root2)
         root2.mainloop()
@@ -56,7 +56,7 @@ class SIR_Window:
         self.frame.rowconfigure(1, weight=1)
 
     def close(self):
-        pass
+        self.master.destroy()
 
 
 root = tk.Tk()
