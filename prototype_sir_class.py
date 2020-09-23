@@ -2,12 +2,12 @@ from scipy.integrate import odeint
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import random
 
 
 class SIR_model:
 
     def __init__(self):
-        # self.y0 = (0,0,0)
         pass
 
     def SIR_model(self, s0, i0, r0, beta, gamma, t, f, *args, **kwargs):
@@ -21,19 +21,13 @@ class SIR_model:
         :param f: how many graphs should be calculated simultaneously
         """
 
-        plt.figure(f) # names the graph
-        # t = np.linspace(0, t,
-        #                 t * 10)  # creates a time array at the points where the differential equations will be calculated, (start, end, number of timepoints)
+        plt.figure(f)  # names the graph
         N = s0 + i0 + r0  # total population
-        # self.y0 = (s0, i0, r0)  # initial conditions
 
-        # print(t)
         timearray = list(range(1, int(t)))  # creates time array
-        # timearray = np.arange(1, int(t), 0.5)
 
-        # def eqns(y0, t, beta, gamma):
         def eqns(param):
-            # e = 0.75
+            # e = random.uniform(0, 1)
             e = 0
             S, I, R = param
             dsdt = (-(beta * S * I) / N) + (e * R)  # rate of change of susceptible individuals
@@ -54,39 +48,26 @@ class SIR_model:
             return solver_result
 
         solver_result = solver()
-        print(solver_result)
 
-        def export_to_excel():
+        # print(solver_result)
+
+        def export_to_excel():  # exports calculated results to excel
             data = {'Time': timearray,
                     'S': solver_result[0],
                     'I': solver_result[1],
                     'R': solver_result[2]}
 
-            df = pd.DataFrame(data, columns = ['Time', 'S', 'I', 'R'])
+            df = pd.DataFrame(data, columns=['Time', 'S', 'I', 'R'])
             name = "output" + str(f) + ".xlsx"
             df.to_excel(name, sheet_name='output')
-
-
-        # result = odeint(eqns, y0, t, args=(beta, gamma))
 
         export_to_excel()
         plt.plot(timearray, solver_result[0], label="S(t)")
         plt.plot(timearray, solver_result[1], label="I(t)")
         plt.plot(timearray, solver_result[2], label="R(t)")
 
+        # change beta and gamma
 
-        # solution = np.array(result)
-        # # print(solution)
-        # plt.figure(figsize=[6, 4])
-        # plt.plot(t, solution[:, 0], label="S(t)")
-        # plt.plot(t, solution[:, 1], label="I(t)")
-        # plt.plot(t, solution[:, 2], label="R(t)")
-        # # plt.show()
-
-
-# sir_model = SIR_model()
-# sir_model.SIR_model(999, 1, 0, 0.2, 0.1, 160, 1)
-# plt.show()
 
 class QueueSimulation:
 
@@ -104,8 +85,8 @@ class QueueSimulation:
         plt.show()
 
 
-queue = QueueSimulation(2, [999, 599], [1, 3], [0, 0], [0.2, 0.4], [0.1,0.1], 100)
+# queue = QueueSimulation(2, [999, 599], [1, 3], [0, 0], [0.2, 0.4], [0.1, 0.1], 100)
 # queue = QueueSimulation(1, [999], [1], [0], [0.4], [0.1], 200)
-# queue = QueueSimulation(1, [1], [0.01], [0], [0.4], [0.1], 100)
+queue = QueueSimulation(1, [1], [0.01], [0], [0.4], [0.1], 100)
 
 queue.run_simulation()
