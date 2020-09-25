@@ -6,8 +6,10 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import random
 
+from tkinter import filedialog
 
-class Main_Window:
+
+class gui_Main_Window:
 
     def __init__(self, master):
         self.master = master
@@ -37,11 +39,11 @@ class Main_Window:
         root2 = tk.Tk()
         root2.title('SIR Model')
         # root2.geometry('1400x900')
-        new_window = SIR_Window(root2)
+        new_window = gui_First_SIR_Window(root2)
         root2.mainloop()
 
 
-class SIR_Window:
+class gui_First_SIR_Window:
     """Class asking user to enter how many graphs they want"""
 
     def __init__(self, master):
@@ -49,15 +51,17 @@ class SIR_Window:
         self.frame = ttk.Frame(master, padding=5)
 
         self.lbl_name = ttk.Label(self.frame, text='This is the SIR model')
-        self.num_sim = ttk.Entry(self.frame)
-        self.num_sim.insert(0, 1)
+        # self.num_sim = ttk.Entry(self.frame)
+        # self.num_sim.insert(0, 1)
+        self.btn_open_file = ttk.Button(self.frame, text='Load File', command=self.open_file)
         self.btn_input_param = ttk.Button(self.frame, text='Enter Parameters', command=self.input)
         self.btn_close = ttk.Button(self.frame, text='Close', command=self.close)
 
         self.frame.grid(row=0, column=0, sticky='nsew')
 
         self.lbl_name.grid(column=0, row=0, columnspan=2, sticky='n')
-        self.num_sim.grid(column=0, row=1)
+        # self.num_sim.grid(column=0, row=1)
+        self.btn_open_file.grid(column=0, row=1)
         self.btn_input_param.grid(column=1, row=1)
         self.btn_close.grid(column=0, row=2, sticky='s')
 
@@ -70,19 +74,25 @@ class SIR_Window:
     def close(self):
         self.master.destroy()
 
+    def open_file(self):
+        filename = filedialog.askopenfilename()
+        df = pd.read_excel(filename)
+        # print(df)
+
+
     def input(self):
-        self.number_of_simulations = int(self.num_sim.get())
+        # self.number_of_simulations = int(self.num_sim.get())
         # print(self.number_of_simulations)
 
+        self.number_of_simulations = 1
         root3 = tk.Tk()
         root3.title('Input Parameters')
-        input_window = SIR_Param(root3, self.number_of_simulations)
+        input_window = gui_SIR_Param(root3, self.number_of_simulations)
         root3.mainloop()
 
 
 
-
-class SIR_Param:
+class gui_SIR_Param:
     """Class for entering SIR parameters"""
 
     def __init__(self, master, num_sim):
@@ -150,6 +160,7 @@ class SIR_Param:
         # print(param_list)
         queue = QueueSimulation(1, param_list[0], param_list[1], param_list[2], param_list[3], param_list[4], 100)
         queue.run_simulation()
+
 
 class QueueSimulation:
 
@@ -235,7 +246,7 @@ root = tk.Tk()
 root.title('Main Window')
 # root.geometry('600x400')
 # root.geometry('400x400')
-window = Main_Window(root)
+window = gui_Main_Window(root)
 # window = SIR_Param(root)
 
 root.mainloop()
