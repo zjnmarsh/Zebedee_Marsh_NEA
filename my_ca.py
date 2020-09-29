@@ -2,6 +2,7 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 class cell:
     def __init__(self, x, y):
         self.x = x
@@ -52,59 +53,63 @@ class cell:
         instructions[rand]()  # like a switch case condition - for good time complexity
 
 
+class cellular_automata:
+    def __init__(self, no_cells):
+        self.number_cells = no_cells # needs to create cell objects based on user input
 
-cell1 = cell(4,5)
-cell2 = cell(7,2)
-cell3 = cell(9,4)
-
-
-def update_cells():
-
-    loc_x = []
-    loc_y = []
-
-    cell1.movement()
-    loc_x.append(cell1.location()[0])
-    loc_y.append(cell1.location()[1])
-    cell2.movement()
-    loc_x.append(cell2.location()[0])
-    loc_y.append(cell2.location()[1])
-    cell3.movement()
-    loc_x.append(cell3.location()[0])
-    loc_y.append(cell3.location()[1])
-
-    return loc_x, loc_y
+        self.cell1 = cell(4,5)
+        self.cell2 = cell(7,2)
+        self.cell3 = cell(9,4)
 
 
-# np_x = np.array([])
-# np_y = np.array([])
+    def update_position(self):
 
-x_coordinates = []
-y_coordinates = []
+        loc_x = []
+        loc_y = []
 
-for i in range(10):
-    x_list, y_list = update_cells()  # arrays with positions for new generation
-    print(x_list)
-    print(y_list)
+        self.cell1.movement()
+        loc_x.append(self.cell1.location()[0])
+        loc_y.append(self.cell1.location()[1])
+        self.cell2.movement()
+        loc_x.append(self.cell2.location()[0])
+        loc_y.append(self.cell2.location()[1])
+        self.cell3.movement()
+        loc_x.append(self.cell3.location()[0])
+        loc_y.append(self.cell3.location()[1])
 
-    x_coordinates.append(x_list)
-    y_coordinates.append(y_list)
-
-    # np_x = np.concatenate((np_x, x_list))
-    # np_y = np.concatenate((np_y, y_list))
-
-
-print(x_coordinates)
-print(y_coordinates)
+        return loc_x, loc_y
 
 
+        # np_x = np.array([])
+        # np_y = np.array([])
 
-for i in range(10):
-    plt.xlim(-20,20)
-    plt.ylim(-2, 20)
-    plt.scatter(x_coordinates[i], y_coordinates[i])
-    plt.draw()
-    plt.pause(1)
-    plt.clf()
+    def new_generation(self):
+        x_coordinates = []
+        y_coordinates = []
+
+        for i in range(10):
+            x_list, y_list = self.update_position()  # arrays with positions for new generation
+            print(x_list)
+            print(y_list)
+
+            x_coordinates.append(x_list)
+            y_coordinates.append(y_list)
+
+            # np_x = np.concatenate((np_x, x_list))
+            # np_y = np.concatenate((np_y, y_list))
+
+            # print(x_coordinates)
+            # print(y_coordinates)
 
 
+        for i in range(10):
+            plt.xlim(-20,20)
+            plt.ylim(-20, 20)
+            plt.scatter(x_coordinates[i], y_coordinates[i])
+            plt.draw()
+            plt.pause(1)
+            plt.clf()
+
+
+ca = cellular_automata(5)
+ca.new_generation()
