@@ -1,6 +1,8 @@
 import random
+import numpy as np
+import matplotlib.pyplot as plt
 
-class person:
+class cell:
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -51,9 +53,9 @@ class person:
 
 
 
-cell1 = person(4,5)
-cell2 = person(7,2)
-cell3 = person(9,4)
+cell1 = cell(4,5)
+cell2 = cell(7,2)
+cell3 = cell(9,4)
 
 
 def update_cells():
@@ -73,13 +75,36 @@ def update_cells():
 
     return loc_x, loc_y
 
-# for i in range(10):
-#     update_cells()
+
+# np_x = np.array([])
+# np_y = np.array([])
+
+x_coordinates = []
+y_coordinates = []
+
+for i in range(10):
+    x_list, y_list = update_cells()  # arrays with positions for new generation
+    print(x_list)
+    print(y_list)
+
+    x_coordinates.append(x_list)
+    y_coordinates.append(y_list)
+
+    # np_x = np.concatenate((np_x, x_list))
+    # np_y = np.concatenate((np_y, y_list))
+
+
+print(x_coordinates)
+print(y_coordinates)
 
 
 
-# for i in range(10):
-#     x_list, y_list = update_cells()
-
+for i in range(10):
+    plt.xlim(-20,20)
+    plt.ylim(-2, 20)
+    plt.scatter(x_coordinates[i], y_coordinates[i])
+    plt.draw()
+    plt.pause(1)
+    plt.clf()
 
 
