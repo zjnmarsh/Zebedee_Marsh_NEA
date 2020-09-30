@@ -2,6 +2,7 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 import time
+from matplotlib.animation import FuncAnimation
 
 
 class cell:
@@ -19,6 +20,7 @@ class cell:
         def nothing():
             pass
 
+        """
         def north():
             self.y -= 1
 
@@ -46,6 +48,35 @@ class cell:
         def northwest():
             self.x -= 1
             self.y -= 1
+        """
+
+        def north():
+            self.y -= 5
+
+        def northeast():
+            self.x += 5
+            self.y -= 5
+
+        def east():
+            self.x += 5
+
+        def southeast():
+            self.x += 5
+            self.y += 5
+
+        def south():
+            self.y += 5
+
+        def southwest():
+            self.x -= 5
+            self.y += 5
+
+        def west():
+            self.x -= 5
+
+        def northwest():
+            self.x -= 5
+            self.y -= 5
 
         instructions = {
             0: nothing,
@@ -65,6 +96,7 @@ class cell:
 
 class cellular_automata:
     """Main class to run function"""
+
     def __init__(self, no_cells, generations, size_x, size_y):
         """Creates list of how every many cells the user inputs so a list will look like ['cell1','cell2','cell3'...]. Each
         element in that list will then be used as a dictionary key where the definition will be a cell object"""
@@ -77,29 +109,19 @@ class cellular_automata:
         for i in range(no_cells):
             self.cell_list.append(("cell" + str(i)))
         for element in self.cell_list:
-            self.cell_object_dict[element] = cell(0, 0)  # need to create random coordinates
+            rand_x, rand_y = self.rand_coordinate_generator()
+            self.cell_object_dict[element] = cell(rand_x, rand_y)  # need to create random coordinates
 
-        # print(self.cell_object_list)
-
-        # self.cell1 = cell(4,5)
-        # self.cell2 = cell(7,2)
-        # self.cell3 = cell(9,4)
-        # print(self.cell1)
+    def rand_coordinate_generator(self):
+        """Generates random coordinates for cells being generated"""
+        rand_x = random.randint(0, self.size_x)
+        rand_y = random.randint(0, self.size_y)
+        return rand_x, rand_y
 
     def update_position(self):
-
+        """For each cell object, movement function will be called to see where the cell will move, and the x coordinate list and y coordinate list will be returned"""
         loc_x = []
         loc_y = []
-
-        # self.cell1.movement()
-        # loc_x.append(self.cell1.location()[0])
-        # loc_y.append(self.cell1.location()[1])
-        # self.cell2.movement()
-        # loc_x.append(self.cell2.location()[0])
-        # loc_y.append(self.cell2.location()[1])
-        # self.cell3.movement()
-        # loc_x.append(self.cell3.location()[0])
-        # loc_y.append(self.cell3.location()[1])
 
         for cell_obj_name in self.cell_list:  # for each cell object name ie. 'cell1', 'cell2' etc, use the name as a dictionary key and run movement function and get location
             self.cell_object_dict[cell_obj_name].movement()
@@ -108,43 +130,37 @@ class cellular_automata:
 
         return loc_x, loc_y
 
-        # np_x = np.array([])
-        # np_y = np.array([])
+    def cells_touch(self):
+        pass
 
     def new_generation(self):
+        """Main definition for running program. For the number of generations to simulate, call self.update_position() to get new coordinate lists"""
         x_coordinates = []
         y_coordinates = []
 
-        for i in range(self.generations):  # for the number generations, append new x and y coordinates for however many cells
-            x_list, y_list = self.update_position()  # arrays with positions for new generation
-            # print(x_list)
-            # print(y_list)
+        for i in range(
+                self.generations):
+            x_list, y_list = self.update_position()
+
+            # check if cells touch here, then can adjust objects if need
 
             x_coordinates.append(x_list)
             y_coordinates.append(y_list)
 
-            # np_x = np.concatenate((np_x, x_list))
-            # np_y = np.concatenate((np_y, y_list))
-
         x = np.array(x_coordinates)
         y = np.array(y_coordinates)
 
-        # print(x_coordinates)
-        # print(y_coordinates)
-
-        print(x[0])
-
+        # fig, ax = plt.subplots()
+        plt.figure("graph")
 
         for i in range(self.generations):
-            plt.xlim(-self.size_x, self.size_x)
-            plt.ylim(-self.size_y, self.size_y)
-            plt.scatter(x_coordinates[i], y_coordinates[i])
+            plt.xlim(0, self.size_x)
+            plt.ylim(0, self.size_y)
+            plt.scatter(x[i], y[i])
             plt.draw()
             plt.pause(0.00000001)
             plt.clf()
 
 
-
-
-ca = cellular_automata(100, 100, 50, 30)
+ca = cellular_automata(100, 1000, 600, 300)
 ca.new_generation()
