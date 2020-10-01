@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 from matplotlib.animation import FuncAnimation
-
+#import pandas as pd
 
 class cell:
     """Each cell will be a class instance of this class"""
@@ -85,6 +85,7 @@ class cellular_automata:
         self.cell_object_dict = {}
         self.size_x = size_x
         self.size_y = size_y
+        self.full_list = []
         for i in range(no_cells):
             self.cell_list.append(("cell" + str(i)))
 
@@ -105,7 +106,32 @@ class cellular_automata:
             x, y, infected = self.cell_object_dict[cell_object].cell_test_function()
             cell_list.append([cell_object, x, y, infected])
         np_cell_list = np.array(cell_list)
+
+        self.full_list.append(cell_list)
+
         return np_cell_list
+
+    # def export_to_excel(self):
+    #     name = []
+    #     x = []
+    #     y = []
+    #     inf = []
+    #     # for generation in self.full_list:
+    #     #     # name.append(generation[0])
+    #     #     print(generation[0])
+    #     #     print(generation[1])
+    #     for generation in range(len(self.full_list)):
+    #         for cell in range(len(self.full_list)):
+    #             print(self.full_list[generation][cell][1])
+    #             name.append(self.full_list[generation][cell][0])
+    #             x.append(self.full_list[generation][cell][1])
+    #             y.append(self.full_list[generation][cell][2])
+    #             inf.append(self.full_list[generation][cell][3])
+    #
+    #     print(name)
+    #     print(x)
+    #     print(y)
+    #     print(inf)
 
     def rand_coordinate_generator(self):
         """Generates random coordinates for cells being generated"""
@@ -123,13 +149,21 @@ class cellular_automata:
             loc_x.append(self.cell_object_dict[cell_obj_name].location()[0])
             loc_y.append(self.cell_object_dict[cell_obj_name].location()[1])
 
-        print(self.ca_test_function())
+        self.ca_test_function()
 
         return loc_x, loc_y
 
-    def cells_touch(self, x_coord, y_coord, infection_radius):
-        # for cell_iter in range(len(self.cell_list)):
-        pass
+    def cells_touch(self):
+        infected_locations = [] # list of tuples of infected cells
+        for cell_name in self.cell_list:
+            if self.cell_object_dict[cell_name].infected:
+                infected_locations.append(self.cell_object_dict[cell_name].location())
+            else:
+                sus_x, sus_y = self.cell_object_dict[cell_name].location() # location of susceptible cell
+                for infected_tuple in infected_locations:
+                    if (sus_x - infected_tuple[0])**2 + (sus_y - infected_tuple[1]) <= self.infection_radius**2: # equation of a circle
+                        self.cell_object_dict[cell_name].infected = True  # need to chance for chance
+
 
     def new_generation(self):
         """Main definition for running program. For the number of generations to simulate, call self.update_position() to get new coordinate lists"""
@@ -142,13 +176,15 @@ class cellular_automata:
             x_list, y_list = self.update_position()
 
             # check if cells touch here, then can adjust objects if need
-            # self.cells_touch(x_list, y_list, self.infection_radius)
+            # self.cells_touch()
 
             x_coordinates.append(x_list)
             y_coordinates.append(y_list)
 
         x = np.array(x_coordinates)
         y = np.array(y_coordinates)
+
+        # self.export_to_excel()
 
         # fig, ax = plt.subplots()
         plt.figure("graph")
@@ -159,10 +195,11 @@ class cellular_automata:
             plt.scatter(x[i], y[i])
             plt.draw()
             plt.pause(0.00000001)
+            # plt.pause(1)
             plt.clf()
 
-# self, no_cells, generations, size_x, size_y, infection_radius, infected
-ca = cellular_automata(5, 5, 10, 10, 2, 2)
+# self, no_cells, generations, size_x, size_y, infection_radius, infected-1
+ca = cellular_automata(5, 5, 10, 10, 2, 3)
 
 # ca = cellular_automata(100, 1000, 600, 300, 5, 5)
 ca.new_generation()
