@@ -5,6 +5,7 @@ import time
 from matplotlib.animation import FuncAnimation
 import pandas as pd
 
+
 class cell:
     """Each cell will be a class instance of this class"""
 
@@ -20,6 +21,8 @@ class cell:
     def location(self):
         # print(self.x, self.y)
         return self.x, self.y
+
+
 
     def movement(self):
         def nothing():
@@ -71,6 +74,7 @@ class cell:
         instructions[rand]()  # like a switch case condition - for constant time complexity
         # print(self.x, self.y)
 
+
 class cellular_automata:
     """Main class to run function"""
 
@@ -78,6 +82,7 @@ class cellular_automata:
         """Creates list of how every many cells the user inputs so a list will look like ['cell1','cell2','cell3'...]. Each
         element in that list will then be used as a dictionary key where the definition will be a class instance of cell. Each
         class instance will be created with a random x and y coordinate, and an infected status."""
+        self.number_of_cells = no_cells
         self.number_of_infected = infected
         self.infection_radius = infection_radius
         self.generations = generations
@@ -117,26 +122,11 @@ class cellular_automata:
         y = []
         inf = []
 
-
-        # for generation in range(len(self.full_list)):
-        #     for cell in range(len(self.full_list)):
-        #         name.append(self.full_list[generation][cell][0])
-        #         x.append(self.full_list[generation][cell][1])
-        #         y.append(self.full_list[generation][cell][2])
-        #         inf.append(self.full_list[generation][cell][3])
-
         for generation in range(len(self.full_list)):
             gen_inf = []
-            for cell in range(len(self.full_list)):
+            for cell in range(self.number_of_cells):
                 gen_inf.append(self.full_list[generation][cell][3])
             inf.append(gen_inf)
-
-        # print(np.array(inf))
-
-        # data = {'Cell name': name,
-        #         'X': x,
-        #         'Y': y,
-        #         'Infected': inf}
 
         data = {'Cell name': self.cell_list}  # dictionary containing cell names and infection statius
         for generation in range(len(self.full_list)):
@@ -146,7 +136,6 @@ class cellular_automata:
         df = pd.DataFrame(data)
         name = "ca_output.xlsx"
         df.to_excel(name, sheet_name='output')
-
 
     def rand_coordinate_generator(self):
         """Generates random coordinates for cells being generated"""
@@ -158,27 +147,30 @@ class cellular_automata:
         """For each cell object, movement function will be called to see where the cell will move, and the x coordinate list and y coordinate list will be returned"""
         loc_x = []
         loc_y = []
+        infected = []
 
         for cell_obj_name in self.cell_list:  # for each cell object name ie. 'cell1', 'cell2' etc, use the name as a dictionary key and run movement function and get location
             self.cell_object_dict[cell_obj_name].movement()
             loc_x.append(self.cell_object_dict[cell_obj_name].location()[0])
             loc_y.append(self.cell_object_dict[cell_obj_name].location()[1])
+            infected.append(self.cell_object_dict[cell_obj_name].infected)
 
         self.collect_data()
 
-        return loc_x, loc_y
+        return loc_x, loc_y, infected
 
     def cells_touch(self):
-        infected_locations = [] # list of tuples of infected cells
+        """If another cell in in a certain radius of an infected cell, it will become infected. To be changed"""
+        infected_locations = []  # list of tuples of infected cells
         for cell_name in self.cell_list:
             if self.cell_object_dict[cell_name].infected:
                 infected_locations.append(self.cell_object_dict[cell_name].location())
             else:
-                sus_x, sus_y = self.cell_object_dict[cell_name].location() # location of susceptible cell
+                sus_x, sus_y = self.cell_object_dict[cell_name].location()  # location of susceptible cell
                 for infected_tuple in infected_locations:
-                    if (sus_x - infected_tuple[0])**2 + (sus_y - infected_tuple[1]) <= self.infection_radius**2: # equation of a circle
+                    if (sus_x - infected_tuple[0]) ** 2 + (
+                            sus_y - infected_tuple[1]) <= self.infection_radius ** 2:  # equation of a circle
                         self.cell_object_dict[cell_name].infected = True  # need to chance for chance
-
 
     def new_generation(self):
         """Main definition for running program. For the number of generations to simulate, call self.update_position() to get new coordinate lists"""
@@ -186,12 +178,35 @@ class cellular_automata:
         x_coordinates = []
         y_coordinates = []
 
+        x_sus_full = []
+        y_sus_full = []
+        x_inf_full = []
+        y_inf_full = []
+
         for i in range(
                 self.generations):
-            x_list, y_list = self.update_position()
+            x_list, y_list, infected = self.update_position()
 
             # check if cells touch here, then can adjust objects if need
             self.cells_touch()
+
+            # infected and susceptible cells go in separate lists for plotting
+            x_sus = []
+            y_sus = []
+            x_inf = []
+            y_inf = []
+            for inf in range(len(self.cell_list)):
+                if infected[inf]:
+                    x_inf.append(x_list[inf])
+                    y_inf.append(y_list[inf])
+                else:
+                    x_sus.append(x_list[inf])
+                    y_sus.append(y_list[inf])
+
+            x_sus_full.append(x_sus)
+            y_sus_full.append(y_sus)
+            x_inf_full.append(x_inf)
+            y_inf_full.append(y_inf)
 
             x_coordinates.append(x_list)
             y_coordinates.append(y_list)
@@ -207,14 +222,26 @@ class cellular_automata:
         for i in range(self.generations):
             plt.xlim(0, self.size_x)
             plt.ylim(0, self.size_y)
-            plt.scatter(x[i], y[i])
+            plt.scatter(x_sus_full[i], y_sus_full[i], c='b')
+            plt.scatter(x_inf_full[i], y_inf_full[i], c='r')
             plt.draw()
-            plt.pause(0.00000001)
-            # plt.pause(1)
+            plt.pause(0.000001)
             plt.clf()
+
+
+        # for i in range(self.generations):
+        #     plt.xlim(0, self.size_x)
+        #     plt.ylim(0, self.size_y)
+        #     plt.scatter(x[i], y[i])
+        #     plt.draw()
+        #     plt.pause(0.00000001)
+        #     # plt.pause(1)
+        #     plt.clf()
+
 
 # self, no_cells, generations, size_x, size_y, infection_radius, infected-1
 # ca = cellular_automata(5, 5, 10, 10, 2, 3)
 
-ca = cellular_automata(100, 100, 600, 300, 10, 5)
+ca = cellular_automata(100, 250, 250, 300, 10, 2)
+# ca = cellular_automata(1000 , 200 , 500 ,500, 5, 2)
 ca.new_generation()
