@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 from matplotlib.animation import FuncAnimation
-#import pandas as pd
+import pandas as pd
 
 class cell:
     """Each cell will be a class instance of this class"""
@@ -25,7 +25,7 @@ class cell:
         def nothing():
             pass
 
-        mvmt = 1
+        mvmt = 5
 
         def north():
             self.y -= mvmt
@@ -99,7 +99,7 @@ class cellular_automata:
             self.cell_object_dict[element] = cell(rand_x, rand_y,
                                                   infected_status)  # creates a dictionary of cell objects || Need to create function to generate randomly infected cells
 
-    def ca_test_function(self):
+    def collect_data(self):
         """Test function to get information on a cell"""
         cell_list = []
         for cell_object in self.cell_object_dict:
@@ -111,27 +111,42 @@ class cellular_automata:
 
         return np_cell_list
 
-    # def export_to_excel(self):
-    #     name = []
-    #     x = []
-    #     y = []
-    #     inf = []
-    #     # for generation in self.full_list:
-    #     #     # name.append(generation[0])
-    #     #     print(generation[0])
-    #     #     print(generation[1])
-    #     for generation in range(len(self.full_list)):
-    #         for cell in range(len(self.full_list)):
-    #             print(self.full_list[generation][cell][1])
-    #             name.append(self.full_list[generation][cell][0])
-    #             x.append(self.full_list[generation][cell][1])
-    #             y.append(self.full_list[generation][cell][2])
-    #             inf.append(self.full_list[generation][cell][3])
-    #
-    #     print(name)
-    #     print(x)
-    #     print(y)
-    #     print(inf)
+    def export_to_excel(self):
+        name = []
+        x = []
+        y = []
+        inf = []
+
+
+        # for generation in range(len(self.full_list)):
+        #     for cell in range(len(self.full_list)):
+        #         name.append(self.full_list[generation][cell][0])
+        #         x.append(self.full_list[generation][cell][1])
+        #         y.append(self.full_list[generation][cell][2])
+        #         inf.append(self.full_list[generation][cell][3])
+
+        for generation in range(len(self.full_list)):
+            gen_inf = []
+            for cell in range(len(self.full_list)):
+                gen_inf.append(self.full_list[generation][cell][3])
+            inf.append(gen_inf)
+
+        # print(np.array(inf))
+
+        # data = {'Cell name': name,
+        #         'X': x,
+        #         'Y': y,
+        #         'Infected': inf}
+
+        data = {'Cell name': self.cell_list}  # dictionary containing cell names and infection statius
+        for generation in range(len(self.full_list)):
+            name = "generation" + str(generation)
+            data[name] = inf[generation]
+
+        df = pd.DataFrame(data)
+        name = "ca_output.xlsx"
+        df.to_excel(name, sheet_name='output')
+
 
     def rand_coordinate_generator(self):
         """Generates random coordinates for cells being generated"""
@@ -149,7 +164,7 @@ class cellular_automata:
             loc_x.append(self.cell_object_dict[cell_obj_name].location()[0])
             loc_y.append(self.cell_object_dict[cell_obj_name].location()[1])
 
-        self.ca_test_function()
+        self.collect_data()
 
         return loc_x, loc_y
 
@@ -176,7 +191,7 @@ class cellular_automata:
             x_list, y_list = self.update_position()
 
             # check if cells touch here, then can adjust objects if need
-            # self.cells_touch()
+            self.cells_touch()
 
             x_coordinates.append(x_list)
             y_coordinates.append(y_list)
@@ -184,7 +199,7 @@ class cellular_automata:
         x = np.array(x_coordinates)
         y = np.array(y_coordinates)
 
-        # self.export_to_excel()
+        self.export_to_excel()
 
         # fig, ax = plt.subplots()
         plt.figure("graph")
@@ -199,7 +214,7 @@ class cellular_automata:
             plt.clf()
 
 # self, no_cells, generations, size_x, size_y, infection_radius, infected-1
-ca = cellular_automata(5, 5, 10, 10, 2, 3)
+# ca = cellular_automata(5, 5, 10, 10, 2, 3)
 
-# ca = cellular_automata(100, 1000, 600, 300, 5, 5)
+ca = cellular_automata(100, 100, 600, 300, 10, 5)
 ca.new_generation()
