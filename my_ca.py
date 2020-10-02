@@ -1,3 +1,5 @@
+# might have to adjust class so cell locations generated on demand
+
 import random
 import numpy as np
 import matplotlib.pyplot as plt
@@ -28,7 +30,7 @@ class cell:
         def nothing():
             pass
 
-        mvmt = 5
+        mvmt = 1
 
         def north():
             self.y -= mvmt
@@ -74,6 +76,17 @@ class cell:
         instructions[rand]()  # like a switch case condition - for constant time complexity
         # print(self.x, self.y)
 
+class counter:
+    def __init__(self):
+        self.count = 0
+
+    def increase(self):
+        self.count += 1
+
+    def get_count(self):
+        return self.count
+
+mycount = counter()
 
 class cellular_automata:
     """Main class to run function"""
@@ -185,6 +198,8 @@ class cellular_automata:
 
         for i in range(
                 self.generations):
+            print("Generating generation " + str(i))
+
             x_list, y_list, infected = self.update_position()
 
             # check if cells touch here, then can adjust objects if need
@@ -216,32 +231,43 @@ class cellular_automata:
 
         self.export_to_excel()
 
+        # print(x_coordinates)
+        # print(y_coordinates)
+
         # fig, ax = plt.subplots()
-        plt.figure("graph")
+        # plt.figure("graph")
+        # plt.figure(figsize=(10,6), dpi=100)
 
-        for i in range(self.generations):
-            plt.xlim(0, self.size_x)
-            plt.ylim(0, self.size_y)
-            plt.scatter(x_sus_full[i], y_sus_full[i], c='b')
-            plt.scatter(x_inf_full[i], y_inf_full[i], c='r')
-            plt.draw()
-            plt.pause(0.000001)
-            plt.clf()
-
-
+        # Current draw function
         # for i in range(self.generations):
+        #
         #     plt.xlim(0, self.size_x)
         #     plt.ylim(0, self.size_y)
-        #     plt.scatter(x[i], y[i])
+        #     plt.scatter(x_sus_full[i], y_sus_full[i], c='b')
+        #     plt.scatter(x_inf_full[i], y_inf_full[i], c='r')
         #     plt.draw()
-        #     plt.pause(0.00000001)
-        #     # plt.pause(1)
+        #     plt.pause(0.000001)
         #     plt.clf()
 
+        def animate(i):
+            mycount.increase()
+            if mycount.get_count() > self.generations:
+                print("End of simulation")
+                time.sleep(10000)
+            else:
+                plt.cla()
+                plt.scatter(x_sus_full[i], y_sus_full[i], color='blue')
+                plt.scatter(x_inf_full[i], y_inf_full[i], color='red')
+
+        ani = FuncAnimation(plt.gcf(), animate, interval=1)
+        plt.tight_layout()
+        plt.show()
 
 # self, no_cells, generations, size_x, size_y, infection_radius, infected-1
-# ca = cellular_automata(5, 5, 10, 10, 2, 3)
 
-ca = cellular_automata(100, 250, 250, 300, 10, 2)
-# ca = cellular_automata(1000 , 200 , 500 ,500, 5, 2)
+
+# ca = cellular_automata(5, 5, 10, 10, 2, 3)
+# ca = cellular_automata(100, 1000, 250, 300, 10, 2)
+# ca = cellular_automata(100, 250, 250, 300, 10, 2)
+ca = cellular_automata(1000, 400, 500,500, 5, 2)
 ca.new_generation()
