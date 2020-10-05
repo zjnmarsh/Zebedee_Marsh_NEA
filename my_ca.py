@@ -24,8 +24,6 @@ class cell:
         # print(self.x, self.y)
         return self.x, self.y
 
-
-
     def movement(self):
         def nothing():
             pass
@@ -76,6 +74,7 @@ class cell:
         instructions[rand]()  # like a switch case condition - for constant time complexity
         # print(self.x, self.y)
 
+
 class counter:
     def __init__(self):
         self.count = 0
@@ -86,7 +85,9 @@ class counter:
     def get_count(self):
         return self.count
 
+
 mycount = counter()
+
 
 class cellular_automata:
     """Main class to run function"""
@@ -118,18 +119,20 @@ class cellular_automata:
                                                   infected_status)  # creates a dictionary of cell objects || Need to create function to generate randomly infected cells
 
     def collect_data(self):
-        """Test function to get information on a cell"""
+        """For each generation, appends a list with cell name, x coordinate, y coordinate and infection status to a master list
+        This function is needed for exporting to excel"""
         cell_list = []
         for cell_object in self.cell_object_dict:
             x, y, infected = self.cell_object_dict[cell_object].cell_test_function()
             cell_list.append([cell_object, x, y, infected])
         np_cell_list = np.array(cell_list)
 
-        self.full_list.append(cell_list)
+        self.full_list.append(cell_list)  # full list of cells and their status assigned to this variable
 
         return np_cell_list
 
     def export_to_excel(self):
+        """Exports cell name and cell infection status with each new generation"""
         name = []
         x = []
         y = []
@@ -198,7 +201,9 @@ class cellular_automata:
 
         for i in range(
                 self.generations):
-            print("Generating generation " + str(i))
+
+            if i % 50 == 0:
+                print("Generating generation " + str(i))
 
             x_list, y_list, infected = self.update_position()
 
@@ -226,28 +231,7 @@ class cellular_automata:
             x_coordinates.append(x_list)
             y_coordinates.append(y_list)
 
-        x = np.array(x_coordinates)
-        y = np.array(y_coordinates)
-
         self.export_to_excel()
-
-        # print(x_coordinates)
-        # print(y_coordinates)
-
-        # fig, ax = plt.subplots()
-        # plt.figure("graph")
-        # plt.figure(figsize=(10,6), dpi=100)
-
-        # Current draw function
-        # for i in range(self.generations):
-        #
-        #     plt.xlim(0, self.size_x)
-        #     plt.ylim(0, self.size_y)
-        #     plt.scatter(x_sus_full[i], y_sus_full[i], c='b')
-        #     plt.scatter(x_inf_full[i], y_inf_full[i], c='r')
-        #     plt.draw()
-        #     plt.pause(0.000001)
-        #     plt.clf()
 
         def animate(i):
             mycount.increase()
@@ -259,9 +243,13 @@ class cellular_automata:
                 plt.scatter(x_sus_full[i], y_sus_full[i], color='blue')
                 plt.scatter(x_inf_full[i], y_inf_full[i], color='red')
 
+        plt.xlim(0, self.size_x)
+        plt.ylim(0, self.size_y)
+
         ani = FuncAnimation(plt.gcf(), animate, interval=1)
         plt.tight_layout()
         plt.show()
+
 
 # self, no_cells, generations, size_x, size_y, infection_radius, infected-1
 
@@ -269,5 +257,5 @@ class cellular_automata:
 # ca = cellular_automata(5, 5, 10, 10, 2, 3)
 # ca = cellular_automata(100, 1000, 250, 300, 10, 2)
 # ca = cellular_automata(100, 250, 250, 300, 10, 2)
-ca = cellular_automata(1000, 400, 500,500, 5, 2)
+ca = cellular_automata(250, 20, 500, 500, 5, 2)
 ca.new_generation()
