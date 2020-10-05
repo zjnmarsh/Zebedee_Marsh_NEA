@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import time
 from matplotlib.animation import FuncAnimation
 import pandas as pd
+import matplotlib
 
 
 class cell:
@@ -28,7 +29,7 @@ class cell:
         def nothing():
             pass
 
-        mvmt = 1
+        mvmt = 5
 
         def north():
             self.y -= mvmt
@@ -234,6 +235,10 @@ class cellular_automata:
         self.export_to_excel()
 
         def animate(i):
+            # plt.xlim(0, self.size_x)
+            # plt.ylim(0, self.size_y)
+            plt.xlim(0, 600)
+            plt.ylim(0, 600)
             mycount.increase()
             if mycount.get_count() > self.generations:
                 print("End of simulation")
@@ -246,7 +251,10 @@ class cellular_automata:
         plt.xlim(0, self.size_x)
         plt.ylim(0, self.size_y)
 
-        ani = FuncAnimation(plt.gcf(), animate, interval=1)
+        ani = FuncAnimation(plt.gcf(), animate, interval=100)
+
+        ani.save('video.mp4', writer='ffmpeg', fps=60, dpi=250)
+
         plt.tight_layout()
         plt.show()
 
@@ -255,7 +263,7 @@ class cellular_automata:
 
 
 # ca = cellular_automata(5, 5, 10, 10, 2, 3)
-# ca = cellular_automata(100, 1000, 250, 300, 10, 2)
+ca = cellular_automata(500, 1000, 1000, 1000, 10, 2)
 # ca = cellular_automata(100, 250, 250, 300, 10, 2)
-ca = cellular_automata(250, 20, 500, 500, 5, 2)
+# ca = cellular_automata(250, 250, 500, 500, 5, 2)
 ca.new_generation()
