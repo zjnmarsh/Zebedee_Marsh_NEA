@@ -202,6 +202,7 @@ class cellular_automata:
                             sus_y - infected_tuple[1]) <= self.infection_radius ** 2:  # equation of a circle
                         self.cell_object_dict[cell_name].infected = True  # need to chance for chance
 
+
     def cell_recovery(self):
         for cell_name in self.cell_list:
             cell_obj = self.cell_object_dict[cell_name]
@@ -211,21 +212,21 @@ class cellular_automata:
     def new_generation(self):
         """Main definition for running program. For the number of generations to simulate, call self.update_position() to get new coordinate lists"""
 
-        x_coordinates = []
-        y_coordinates = []
+        # x_coordinates = []
+        # y_coordinates = []
 
-        # coordinates = []
+        coordinates = []
 
-        x_sus_full = []
-        y_sus_full = []
-        x_inf_full = []
-        y_inf_full = []
-        x_rec_full = []
-        y_rec_full = []
+        # x_sus_full = []
+        # y_sus_full = []
+        # x_inf_full = []
+        # y_inf_full = []
+        # x_rec_full = []
+        # y_rec_full = []
 
-        # sus_full = []
-        # inf_full = []
-        # rec_full = []
+        sus_full = []
+        inf_full = []
+        rec_full = []
 
         for i in range(
                 self.generations):
@@ -242,55 +243,55 @@ class cellular_automata:
             self.cell_recovery()
 
             # infected and susceptible cells go in separate lists for plotting
-            x_sus = []
-            y_sus = []
-            x_inf = []
-            y_inf = []
-            x_rec = []
-            y_rec = []
+            # x_sus = []
+            # y_sus = []
+            # x_inf = []
+            # y_inf = []
+            # x_rec = []
+            # y_rec = []
 
-            # gen_sus = []
-            # gen_inf = []
-            # gen_rec = []
+            gen_sus = []
+            gen_inf = []
+            gen_rec = []
 
-
-            for inf in range(len(self.cell_list)):
-                # print(inf)
-                if infected[inf]:
-                    x_inf.append(x_list[inf])
-                    y_inf.append(y_list[inf])
-                elif recovered[inf]:
-                    x_rec.append(x_list[inf])
-                    y_rec.append(y_list[inf])
-                else:
-                    x_sus.append(x_list[inf])
-                    y_sus.append(y_list[inf])
 
             # for inf in range(len(self.cell_list)):
+            #     # print(inf)
             #     if infected[inf]:
-            #         gen_inf.append([x_list[inf], y_list[inf]])
+            #         x_inf.append(x_list[inf])
+            #         y_inf.append(y_list[inf])
             #     elif recovered[inf]:
-            #         gen_rec.append([x_list[inf], y_list[inf]])
+            #         x_rec.append(x_list[inf])
+            #         y_rec.append(y_list[inf])
             #     else:
-            #         gen_sus.append([x_list[inf], y_list[inf]])
+            #         x_sus.append(x_list[inf])
+            #         y_sus.append(y_list[inf])
+
+            for inf in range(len(self.cell_list)):
+                if infected[inf]:
+                    gen_inf.append([x_list[inf], y_list[inf]])
+                elif recovered[inf]:
+                    gen_rec.append([x_list[inf], y_list[inf]])
+                else:
+                    gen_sus.append([x_list[inf], y_list[inf]])
 
 
 
-            x_sus_full.append(x_sus)
-            y_sus_full.append(y_sus)
-            x_inf_full.append(x_inf)
-            y_inf_full.append(y_inf)
-            x_rec_full.append(x_rec)
-            y_rec_full.append(y_rec)
+            # x_sus_full.append(x_sus)
+            # y_sus_full.append(y_sus)
+            # x_inf_full.append(x_inf)
+            # y_inf_full.append(y_inf)
+            # x_rec_full.append(x_rec)
+            # y_rec_full.append(y_rec)
 
-            # sus_full.append(gen_sus)
-            # inf_full.append(gen_inf)
-            # rec_full.append(gen_rec)
+            sus_full.append(gen_sus)
+            inf_full.append(gen_inf)
+            rec_full.append(gen_rec)
 
-            x_coordinates.append(x_list)
-            y_coordinates.append(y_list)
+            # x_coordinates.append(x_list)
+            # y_coordinates.append(y_list)
 
-            # coordinates.append([x_list, y_list])
+            coordinates.append([x_list, y_list])
 
             # print(sus_full)
 
@@ -310,22 +311,22 @@ class cellular_automata:
             else:
                 plt.cla()
 
-                # x_sus_full = [cell[0] for cell in sus_full[i]]
-                # y_sus_full = [cell[1] for cell in sus_full[i]]
-                # x_inf_full = [cell[0] for cell in inf_full[i]]
-                # y_inf_full = [cell[1] for cell in inf_full[i]]
-                # x_rec_full = [cell[0] for cell in rec_full[i]]
-                # y_rec_full = [cell[1] for cell in rec_full[i]]
+                x_sus_full = [cell[0] for cell in sus_full[i]]
+                y_sus_full = [cell[1] for cell in sus_full[i]]
+                x_inf_full = [cell[0] for cell in inf_full[i]]
+                y_inf_full = [cell[1] for cell in inf_full[i]]
+                x_rec_full = [cell[0] for cell in rec_full[i]]
+                y_rec_full = [cell[1] for cell in rec_full[i]]
 
                 # print(x_sus_full)
                 # print(y_sus_full)
 
-                plt.scatter(x_sus_full[i], y_sus_full[i], color='blue')
-                plt.scatter(x_inf_full[i], y_inf_full[i], color='red')
-                plt.scatter(x_rec_full[i], y_rec_full[i], color='purple')
-                # plt.scatter(x_sus_full, y_sus_full, color='blue')
-                # plt.scatter(x_inf_full, y_inf_full, color='red')
-                # plt.scatter(x_rec_full, y_rec_full, color='purple')
+                # plt.scatter(x_sus_full[i], y_sus_full[i], color='blue')
+                # plt.scatter(x_inf_full[i], y_inf_full[i], color='red')
+                # plt.scatter(x_rec_full[i], y_rec_full[i], color='purple')
+                plt.scatter(x_sus_full, y_sus_full, color='blue')
+                plt.scatter(x_inf_full, y_inf_full, color='red')
+                plt.scatter(x_rec_full, y_rec_full, color='purple')
 
 
 
