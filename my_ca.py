@@ -17,7 +17,7 @@ class cell:
         self.y = y
         self.infected = infected
         self.recovered = False
-        self.recover_count = 5 # default - can be changed
+        self.recover_count = 10 # default - can be changed - time until infected cell recovers
         # self.infection_rate = i
 
     def cell_test_function(self):
@@ -32,13 +32,14 @@ class cell:
         if self.recover_count <= 0:
             self.recovered = True
             self.infected = False
+            self.recover_count = 10
 
     def movement(self):
         def nothing():
             pass
 
         # mvmt = 5
-        mvmt = random.randint(0, 10)
+        mvmt = random.randint(0, 50)
 
         def north():
             self.y -= mvmt
@@ -115,7 +116,7 @@ class cellular_automata:
         self.size_x = size_x
         self.size_y = size_y
         self.full_list = []
-        self.r_i = r_i
+        self.r_i = r_i # recovered can be infected
         for i in range(no_cells):
             self.cell_list.append(("cell" + str(i)))
 
@@ -172,7 +173,7 @@ class cellular_automata:
         return rand_x, rand_y
 
     def update_position(self):
-        """For each cell object, movement function will be called to see where the cell will move, and the x coordinate list and y coordinate list will be returned"""
+        """For each cell object, movement function will be called to see where the cell will move, and the x coordinate list and y coordinate list will be returned of the new generation"""
         loc_x = []
         loc_y = []
         infected = []
@@ -192,22 +193,58 @@ class cellular_automata:
     def cells_touch(self):  # need to change to put all infected in a list, THEN compare susceptible otherwise not proper
         """If another cell in in a certain radius of an infected cell, it will become infected. To be changed"""
         infected_locations = []  # list of tuples of infected cells
+        recovered_obj = []
+        susceptible_obj = []
         for cell_name in self.cell_list:
             if self.cell_object_dict[cell_name].infected:
                 infected_locations.append(self.cell_object_dict[cell_name].location())
+            # else:
+            #     sus_x, sus_y = self.cell_object_dict[cell_name].location()  # location of susceptible cell
+            #     for infected_tuple in infected_locations:
+            #         if (sus_x - infected_tuple[0]) ** 2 + (
+            #                 sus_y - infected_tuple[1]) <= self.infection_radius ** 2:  # equation of a circle
+            #             self.cell_object_dict[cell_name].infected = True  # need to chance for chance
+            elif self.cell_object_dict[cell_name].recovered:
+                recovered_obj.append(self.cell_object_dict[cell_name])
             else:
-                sus_x, sus_y = self.cell_object_dict[cell_name].location()  # location of susceptible cell
-                for infected_tuple in infected_locations:
-                    if (sus_x - infected_tuple[0]) ** 2 + (
-                            sus_y - infected_tuple[1]) <= self.infection_radius ** 2:  # equation of a circle
-                        self.cell_object_dict[cell_name].infected = True  # need to chance for chance
+                susceptible_obj.append(self.cell_object_dict[cell_name])
+
+        # print(infected_locations)
+
+        # def touch(cell_name):
+        #     sus_x, sus_y = self.cell_object_dict[cell_name].location()  # location of susceptible cell
+        #     for infected_tuple in infected_locations:
+        #         if (sus_x - infected_tuple[0]) ** 2 + (sus_y - infected_tuple[1]) <= self.infection_radius ** 2:  # equation of a circle
+        #             self.cell_object_dict[cell_name].infected = True  # need to chance for chance
+
+        # print(infected_locations)
+
+        def touch(cell_obj):
+            sus_x, sus_y = cell_obj.location()
+            for infected_tuple in infected_locations:
+                if (sus_x - infected_tuple[0]) ** 2 + (sus_y - infected_tuple[1]) <= self.infection_radius ** 2:  # equation of a circle
+                    # self.cell_object_dict[cell_name].infected = True  # need to chance for chance
+                    # PROBLEM
+                    cell_obj.infected = True
+                    print(f'{cell_obj} has been infected')
+                    # cell is infected, LISTS ARE NOT UPDATED
+
+        if self.r_i:  # if recovered can be infected
+            for recovered in recovered_obj:
+                touch(recovered)
+        for susceptible in susceptible_obj:
+            touch(susceptible)
 
 
     def cell_recovery(self):
+        """Cells automatically recover after a certain period of time"""
         for cell_name in self.cell_list:
             cell_obj = self.cell_object_dict[cell_name]
             if cell_obj.recovered == False and cell_obj.infected == True:
                 cell_obj.recover_generation()
+            elif cell_obj.recovered == True and cell_obj.infected:
+                cell_obj.recover_generation()
+
 
     def new_generation(self):
         """Main definition for running program. For the number of generations to simulate, call self.update_position() to get new coordinate lists"""
@@ -237,7 +274,7 @@ class cellular_automata:
             x_list, y_list, infected, recovered = self.update_position()
 
             # check if cells touch here, then can adjust objects if need
-            self.cells_touch()
+            self.cells_touch() # adjusts the objects, not any list
 
             # recovery function
             self.cell_recovery()
@@ -268,14 +305,17 @@ class cellular_automata:
             #         y_sus.append(y_list[inf])
 
             for inf in range(len(self.cell_list)):
-                if infected[inf]:
+                if infected[inf]:  # if True
                     gen_inf.append([x_list[inf], y_list[inf]])
                 elif recovered[inf]:
                     gen_rec.append([x_list[inf], y_list[inf]])
                 else:
                     gen_sus.append([x_list[inf], y_list[inf]])
 
-
+            print(gen_inf)
+            print(gen_rec)
+            print(gen_sus)
+            print("--------------")
 
             # x_sus_full.append(x_sus)
             # y_sus_full.append(y_sus)
@@ -344,9 +384,12 @@ class cellular_automata:
 # self, no_cells, generations, size_x, size_y, infection_radius, infected-1, recovered can be infected
 
 
-# ca = cellular_automata(5, 5, 10, 10, 2, 3)
+# ca = cellular_automata(5, 10, 10, 10, 2, 3, True)
 # ca = cellular_automata(500, 1000, 1000, 1000, 10, 2, True)
 # ca = cellular_automata(100, 250, 250, 300, 10, 2)
 # ca = cellular_automata(250, 250, 500, 500, 5, 2)
-ca = cellular_automata(50, 100, 100, 100, 2, 5, True)
+# ca = cellular_automata(500, 100, 100, 100, 20, 10, True)
+ca = cellular_automata(100, 100, 250, 250, 3, 5, False)
+
 ca.new_generation()
+
