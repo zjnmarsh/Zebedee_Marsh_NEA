@@ -12,12 +12,12 @@ import matplotlib
 class cell:
     """Each cell will be a class instance of this class"""
 
-    def __init__(self, x, y, infected):
+    def __init__(self, x, y, infected, d_r):
         self.x = x
         self.y = y
         self.infected = infected
         self.recovered = False
-        self.recover_count = 10 # default - can be changed - time until infected cell recovers
+        self.recover_count = d_r # default - can be changed - time until infected cell recovers
         # self.infection_rate = i
 
     def cell_test_function(self):
@@ -103,10 +103,13 @@ mycount = counter()
 class cellular_automata:
     """Main class to run function"""
 
-    def __init__(self, no_cells, generations, size_x, size_y, infection_radius, infected, r_i):
+    def __init__(self, no_cells, generations, size_x, size_y, infection_radius, infected, r_i, d_r):
         """Creates list of how every many cells the user inputs so a list will look like ['cell1','cell2','cell3'...]. Each
         element in that list will then be used as a dictionary key where the definition will be a class instance of cell. Each
-        class instance will be created with a random x and y coordinate, and an infected status."""
+        class instance will be created with a random x and y coordinate, and an infected status.
+        r_i : recovered can be infected
+        d_r : days until recovery
+        """
         self.number_of_cells = no_cells
         self.number_of_infected = infected
         self.infection_radius = infection_radius
@@ -128,7 +131,7 @@ class cellular_automata:
                 infected_status = True
             rand_x, rand_y = self.rand_coordinate_generator()
             self.cell_object_dict[element] = cell(rand_x, rand_y,
-                                                  infected_status)  # creates a dictionary of cell objects
+                                                  infected_status, d_r)  # creates a dictionary of cell objects
 
     def collect_data(self):
         """For each generation, appends a list with cell name, x coordinate, y coordinate and infection status to a master list
@@ -198,26 +201,11 @@ class cellular_automata:
         for cell_name in self.cell_list:
             if self.cell_object_dict[cell_name].infected:
                 infected_locations.append(self.cell_object_dict[cell_name].location())
-            # else:
-            #     sus_x, sus_y = self.cell_object_dict[cell_name].location()  # location of susceptible cell
-            #     for infected_tuple in infected_locations:
-            #         if (sus_x - infected_tuple[0]) ** 2 + (
-            #                 sus_y - infected_tuple[1]) <= self.infection_radius ** 2:  # equation of a circle
-            #             self.cell_object_dict[cell_name].infected = True  # need to chance for chance
             elif self.cell_object_dict[cell_name].recovered:
                 recovered_obj.append(self.cell_object_dict[cell_name])
             else:
                 susceptible_obj.append(self.cell_object_dict[cell_name])
 
-        # print(infected_locations)
-
-        # def touch(cell_name):
-        #     sus_x, sus_y = self.cell_object_dict[cell_name].location()  # location of susceptible cell
-        #     for infected_tuple in infected_locations:
-        #         if (sus_x - infected_tuple[0]) ** 2 + (sus_y - infected_tuple[1]) <= self.infection_radius ** 2:  # equation of a circle
-        #             self.cell_object_dict[cell_name].infected = True  # need to chance for chance
-
-        # print(infected_locations)
 
         def touch(cell_obj):
             sus_x, sus_y = cell_obj.location()
@@ -249,17 +237,7 @@ class cellular_automata:
     def new_generation(self):
         """Main definition for running program. For the number of generations to simulate, call self.update_position() to get new coordinate lists"""
 
-        # x_coordinates = []
-        # y_coordinates = []
-
         coordinates = []
-
-        # x_sus_full = []
-        # y_sus_full = []
-        # x_inf_full = []
-        # y_inf_full = []
-        # x_rec_full = []
-        # y_rec_full = []
 
         sus_full = []
         inf_full = []
@@ -279,30 +257,10 @@ class cellular_automata:
             # recovery function
             self.cell_recovery()
 
-            # infected and susceptible cells go in separate lists for plotting
-            # x_sus = []
-            # y_sus = []
-            # x_inf = []
-            # y_inf = []
-            # x_rec = []
-            # y_rec = []
-
             gen_sus = []
             gen_inf = []
             gen_rec = []
 
-
-            # for inf in range(len(self.cell_list)):
-            #     # print(inf)
-            #     if infected[inf]:
-            #         x_inf.append(x_list[inf])
-            #         y_inf.append(y_list[inf])
-            #     elif recovered[inf]:
-            #         x_rec.append(x_list[inf])
-            #         y_rec.append(y_list[inf])
-            #     else:
-            #         x_sus.append(x_list[inf])
-            #         y_sus.append(y_list[inf])
 
             for inf in range(len(self.cell_list)):
                 if infected[inf]:  # if True
@@ -317,19 +275,11 @@ class cellular_automata:
             print(gen_sus)
             print("--------------")
 
-            # x_sus_full.append(x_sus)
-            # y_sus_full.append(y_sus)
-            # x_inf_full.append(x_inf)
-            # y_inf_full.append(y_inf)
-            # x_rec_full.append(x_rec)
-            # y_rec_full.append(y_rec)
 
             sus_full.append(gen_sus)
             inf_full.append(gen_inf)
             rec_full.append(gen_rec)
 
-            # x_coordinates.append(x_list)
-            # y_coordinates.append(y_list)
 
             coordinates.append([x_list, y_list])
 
@@ -340,8 +290,6 @@ class cellular_automata:
         # list comprehension
 
         def animate(i):
-            # plt.xlim(0, self.size_x)
-            # plt.ylim(0, self.size_y)
             plt.xlim(0, 600)
             plt.ylim(0, 600)
             mycount.increase()
@@ -358,12 +306,7 @@ class cellular_automata:
                 x_rec_full = [cell[0] for cell in rec_full[i]]
                 y_rec_full = [cell[1] for cell in rec_full[i]]
 
-                # print(x_sus_full)
-                # print(y_sus_full)
 
-                # plt.scatter(x_sus_full[i], y_sus_full[i], color='blue')
-                # plt.scatter(x_inf_full[i], y_inf_full[i], color='red')
-                # plt.scatter(x_rec_full[i], y_rec_full[i], color='purple')
                 plt.scatter(x_sus_full, y_sus_full, color='blue')
                 plt.scatter(x_inf_full, y_inf_full, color='red')
                 plt.scatter(x_rec_full, y_rec_full, color='purple')
@@ -389,7 +332,7 @@ class cellular_automata:
 # ca = cellular_automata(100, 250, 250, 300, 10, 2)
 # ca = cellular_automata(250, 250, 500, 500, 5, 2)
 # ca = cellular_automata(500, 100, 100, 100, 20, 10, True)
-ca = cellular_automata(100, 100, 250, 250, 3, 5, False)
+ca = cellular_automata(100, 100, 250, 250, 3, 5, False, 10)
 
 ca.new_generation()
 
