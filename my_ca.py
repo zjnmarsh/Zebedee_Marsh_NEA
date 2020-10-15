@@ -12,12 +12,15 @@ import matplotlib
 class cell:
     """Each cell will be a class instance of this class"""
 
-    def __init__(self, x, y, infected, d_r):
+    def __init__(self, x, y, infected, d_r, d_i):
         self.x = x
         self.y = y
         self.infected = infected
         self.recovered = False
         self.recover_count = d_r # default - can be changed - time until infected cell recovers
+        self.immune = False
+        self.immune_count = d_i
+        self.original_immune = d_i
         # self.infection_rate = i
 
     def cell_test_function(self):
@@ -33,6 +36,15 @@ class cell:
             self.recovered = True
             self.infected = False
             self.recover_count = 10
+            if ca.use_immunity == True:
+                self.immune = True
+
+    def immunity_generation(self):
+        if self.immune == True:
+            self.immune_count -= 1
+            if self.immune_count <= 0:
+                self.immune = False
+                self.immune_count = self.original_immune
 
     def movement(self):
         def nothing():
@@ -103,13 +115,14 @@ mycount = counter()
 class cellular_automata:
     """Main class to run function"""
 
-    def __init__(self, no_cells, generations, size_x, size_y, infection_radius, infected, r_i, d_r):
+    def __init__(self, no_cells, generations, size_x, size_y, infection_radius, infected, r_i, d_r, immunity, d_i):
         """Creates list of how every many cells the user inputs so a list will look like ['cell1','cell2','cell3'...]. Each
         element in that list will then be used as a dictionary key where the definition will be a class instance of cell. Each
         class instance will be created with a random x and y coordinate, and an infected status.
         r_i : recovered can be infected
         d_r : days until recovery
         """
+        self.use_immunity = immunity
         self.number_of_cells = no_cells
         self.number_of_infected = infected
         self.infection_radius = infection_radius
@@ -131,7 +144,7 @@ class cellular_automata:
                 infected_status = True
             rand_x, rand_y = self.rand_coordinate_generator()
             self.cell_object_dict[element] = cell(rand_x, rand_y,
-                                                  infected_status, d_r)  # creates a dictionary of cell objects
+                                                  infected_status, d_r, d_i)  # creates a dictionary of cell objects
 
     def collect_data(self):
         """For each generation, appends a list with cell name, x coordinate, y coordinate and infection status to a master list
@@ -181,6 +194,7 @@ class cellular_automata:
         loc_y = []
         infected = []
         recovered = []
+        immune = []
 
         for cell_obj_name in self.cell_list:  # for each cell object name ie. 'cell1', 'cell2' etc, use the name as a dictionary key and run movement function and get location
             self.cell_object_dict[cell_obj_name].movement()
@@ -188,10 +202,16 @@ class cellular_automata:
             loc_y.append(self.cell_object_dict[cell_obj_name].location()[1])
             infected.append(self.cell_object_dict[cell_obj_name].infected)
             recovered.append(self.cell_object_dict[cell_obj_name].recovered)
+            immune.append(self.cell_object_dict[cell_obj_name].immune)
 
-        self.collect_data()
+        print(infected)
+        print(recovered)
+        print(immune)
+        print("------------")
 
-        return loc_x, loc_y, infected, recovered
+        self.collect_data() # this function could be moved into the new generation class function
+
+        return loc_x, loc_y, infected, recovered, immune
 
     def cells_touch(self):  # need to change to put all infected in a list, THEN compare susceptible otherwise not proper
         """If another cell in in a certain radius of an infected cell, it will become infected. To be changed"""
@@ -202,10 +222,9 @@ class cellular_automata:
             if self.cell_object_dict[cell_name].infected:
                 infected_locations.append(self.cell_object_dict[cell_name].location())
             elif self.cell_object_dict[cell_name].recovered:
-                recovered_obj.append(self.cell_object_dict[cell_name])
+                recovered_obj.append(self.cell_object_dict[cell_name]) # holds recovered both with and without immunity
             else:
                 susceptible_obj.append(self.cell_object_dict[cell_name])
-
 
         def touch(cell_obj):
             sus_x, sus_y = cell_obj.location()
@@ -214,14 +233,16 @@ class cellular_automata:
                     # self.cell_object_dict[cell_name].infected = True  # need to chance for chance
                     # PROBLEM
                     cell_obj.infected = True
-                    print(f'{cell_obj} has been infected')
+                    # print(f'{cell_obj} has been infected')
                     # cell is infected, LISTS ARE NOT UPDATED
 
-        if self.r_i:  # if recovered can be infected
+        if self.r_i:  # if recovered can be infected - doesn't change immunity status but is currently dependent on it - CHANGE
             for recovered in recovered_obj:
-                touch(recovered)
+                if not recovered.immune:
+                    touch(recovered)
         for susceptible in susceptible_obj:
-            touch(susceptible)
+            if not susceptible.immune:
+                touch(susceptible)
 
 
     def cell_recovery(self):
@@ -234,6 +255,12 @@ class cellular_automata:
                 cell_obj.recover_generation()
 
 
+    def cell_immunity(self):
+        for cell_name in self.cell_list:
+            cell_obj = self.cell_object_dict[cell_name]
+            if cell_obj.recovered == True and cell_obj.immune == True:
+                cell_obj.immunity_generation()
+
     def new_generation(self):
         """Main definition for running program. For the number of generations to simulate, call self.update_position() to get new coordinate lists"""
 
@@ -242,6 +269,7 @@ class cellular_automata:
         sus_full = []
         inf_full = []
         rec_full = []
+        imm_full = []
 
         for i in range(
                 self.generations):
@@ -249,7 +277,7 @@ class cellular_automata:
             if i % 50 == 0:
                 print("Generating generation " + str(i))
 
-            x_list, y_list, infected, recovered = self.update_position()
+            x_list, y_list, infected, recovered, immune = self.update_position()
 
             # check if cells touch here, then can adjust objects if need
             self.cells_touch() # adjusts the objects, not any list
@@ -257,35 +285,51 @@ class cellular_automata:
             # recovery function
             self.cell_recovery()
 
+            # immunity function
+            if self.use_immunity:
+                self.cell_immunity()
+
             gen_sus = []
             gen_inf = []
             gen_rec = []
+            gen_imm = []
 
+            if self.use_immunity:
+                for inf in range(len(self.cell_list)):
+                    if infected[inf]:  # if True
+                        gen_inf.append([x_list[inf], y_list[inf]])
+                    elif immune[inf]:
+                        gen_imm.append([x_list[inf], y_list[inf]])
+                    elif recovered[inf]:
+                        gen_rec.append([x_list[inf], y_list[inf]])
+                    else:
+                        gen_sus.append([x_list[inf], y_list[inf]])
+            else:
+                for inf in range(len(self.cell_list)):
+                    if infected[inf]:  # if True
+                        gen_inf.append([x_list[inf], y_list[inf]])
+                    elif recovered[inf]:
+                        gen_rec.append([x_list[inf], y_list[inf]])
+                    else:
+                        gen_sus.append([x_list[inf], y_list[inf]])
 
-            for inf in range(len(self.cell_list)):
-                if infected[inf]:  # if True
-                    gen_inf.append([x_list[inf], y_list[inf]])
-                elif recovered[inf]:
-                    gen_rec.append([x_list[inf], y_list[inf]])
-                else:
-                    gen_sus.append([x_list[inf], y_list[inf]])
-
-            print(gen_inf)
-            print(gen_rec)
-            print(gen_sus)
-            print("--------------")
+            # print(gen_inf)
+            # print(gen_rec)
+            # print(gen_sus)
+            # print("--------------")
 
 
             sus_full.append(gen_sus)
             inf_full.append(gen_inf)
             rec_full.append(gen_rec)
-
+            if self.use_immunity:
+                imm_full.append(gen_imm)
 
             coordinates.append([x_list, y_list])
 
             # print(sus_full)
 
-        self.export_to_excel()
+        # self.export_to_excel()
 
         # list comprehension
 
@@ -305,11 +349,17 @@ class cellular_automata:
                 y_inf_full = [cell[1] for cell in inf_full[i]]
                 x_rec_full = [cell[0] for cell in rec_full[i]]
                 y_rec_full = [cell[1] for cell in rec_full[i]]
+                if self.use_immunity:
+                    x_imm_full = [cell[0] for cell in imm_full[i]]
+                    y_imm_full = [cell[1] for cell in imm_full[i]]
+
 
 
                 plt.scatter(x_sus_full, y_sus_full, color='blue')
                 plt.scatter(x_inf_full, y_inf_full, color='red')
                 plt.scatter(x_rec_full, y_rec_full, color='purple')
+                if self.use_immunity:
+                    plt.scatter(x_imm_full, y_imm_full, color='gray')
 
 
 
@@ -324,7 +374,7 @@ class cellular_automata:
         plt.show()
 
 
-# self, no_cells, generations, size_x, size_y, infection_radius, infected-1, recovered can be infected
+# self, no_cells, generations, size_x, size_y, infection_radius, infected-1, recovered can be infected, days until recovered, use immunity,days of immunity
 
 
 # ca = cellular_automata(5, 10, 10, 10, 2, 3, True)
@@ -332,7 +382,7 @@ class cellular_automata:
 # ca = cellular_automata(100, 250, 250, 300, 10, 2)
 # ca = cellular_automata(250, 250, 500, 500, 5, 2)
 # ca = cellular_automata(500, 100, 100, 100, 20, 10, True)
-ca = cellular_automata(100, 100, 250, 250, 3, 5, False, 10)
+ca = cellular_automata(100, 100, 250, 250, 3, 5, False, 10, False, 10)
 
 ca.new_generation()
 
