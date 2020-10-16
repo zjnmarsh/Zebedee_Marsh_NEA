@@ -17,7 +17,7 @@ class cell:
         self.y = y
         self.infected = infected
         self.recovered = False
-        self.recover_count = d_r # default - can be changed - time until infected cell recovers
+        self.recover_count = d_r  # default - can be changed - time until infected cell recovers
         self.immune = False
         self.immune_count = d_i
         self.original_immune = d_i
@@ -132,7 +132,7 @@ class cellular_automata:
         self.size_x = size_x
         self.size_y = size_y
         self.full_list = []
-        self.r_i = r_i # recovered can be infected
+        self.r_i = r_i  # recovered can be infected
         for i in range(no_cells):
             self.cell_list.append(("cell" + str(i)))
 
@@ -204,16 +204,17 @@ class cellular_automata:
             recovered.append(self.cell_object_dict[cell_obj_name].recovered)
             immune.append(self.cell_object_dict[cell_obj_name].immune)
 
-        print(infected)
-        print(recovered)
-        print(immune)
-        print("------------")
+        # print(infected)
+        # print(recovered)
+        # print(immune)
+        # print("------------")
 
-        self.collect_data() # this function could be moved into the new generation class function
+        self.collect_data()  # this function could be moved into the new generation class function
 
         return loc_x, loc_y, infected, recovered, immune
 
-    def cells_touch(self):  # need to change to put all infected in a list, THEN compare susceptible otherwise not proper
+    def cells_touch(
+            self):  # need to change to put all infected in a list, THEN compare susceptible otherwise not proper
         """If another cell in in a certain radius of an infected cell, it will become infected. To be changed"""
         infected_locations = []  # list of tuples of infected cells
         recovered_obj = []
@@ -222,14 +223,15 @@ class cellular_automata:
             if self.cell_object_dict[cell_name].infected:
                 infected_locations.append(self.cell_object_dict[cell_name].location())
             elif self.cell_object_dict[cell_name].recovered:
-                recovered_obj.append(self.cell_object_dict[cell_name]) # holds recovered both with and without immunity
+                recovered_obj.append(self.cell_object_dict[cell_name])  # holds recovered both with and without immunity
             else:
                 susceptible_obj.append(self.cell_object_dict[cell_name])
 
         def touch(cell_obj):
             sus_x, sus_y = cell_obj.location()
             for infected_tuple in infected_locations:
-                if (sus_x - infected_tuple[0]) ** 2 + (sus_y - infected_tuple[1]) <= self.infection_radius ** 2:  # equation of a circle
+                if (sus_x - infected_tuple[0]) ** 2 + (
+                        sus_y - infected_tuple[1]) <= self.infection_radius ** 2:  # equation of a circle
                     # self.cell_object_dict[cell_name].infected = True  # need to chance for chance
                     # PROBLEM
                     cell_obj.infected = True
@@ -244,7 +246,6 @@ class cellular_automata:
             if not susceptible.immune:
                 touch(susceptible)
 
-
     def cell_recovery(self):
         """Cells automatically recover after a certain period of time"""
         for cell_name in self.cell_list:
@@ -253,7 +254,6 @@ class cellular_automata:
                 cell_obj.recover_generation()
             elif cell_obj.recovered == True and cell_obj.infected:
                 cell_obj.recover_generation()
-
 
     def cell_immunity(self):
         for cell_name in self.cell_list:
@@ -271,6 +271,10 @@ class cellular_automata:
         rec_full = []
         imm_full = []
 
+        lg_values = [[], [], []]
+
+        time_array = list(range(0, self.generations))
+
         for i in range(
                 self.generations):
 
@@ -280,7 +284,7 @@ class cellular_automata:
             x_list, y_list, infected, recovered, immune = self.update_position()
 
             # check if cells touch here, then can adjust objects if need
-            self.cells_touch() # adjusts the objects, not any list
+            self.cells_touch()  # adjusts the objects, not any list
 
             # recovery function
             self.cell_recovery()
@@ -294,6 +298,7 @@ class cellular_automata:
             gen_rec = []
             gen_imm = []
 
+            # puts cells in list depending on their status and whether immunity is used
             if self.use_immunity:
                 for inf in range(len(self.cell_list)):
                     if infected[inf]:  # if True
@@ -318,12 +323,18 @@ class cellular_automata:
             # print(gen_sus)
             # print("--------------")
 
-
             sus_full.append(gen_sus)
             inf_full.append(gen_inf)
             rec_full.append(gen_rec)
             if self.use_immunity:
                 imm_full.append(gen_imm)
+
+            lg_values[0].append(len(gen_sus))
+            lg_values[1].append(len(gen_inf))
+            lg_values[2].append((len(gen_rec) + len(gen_imm)))
+
+            # curr_lg_val = [[],[],[]]
+            # time_arr = []
 
             coordinates.append([x_list, y_list])
 
@@ -333,9 +344,28 @@ class cellular_automata:
 
         # list comprehension
 
-        def animate(i):
-            plt.xlim(0, 600)
-            plt.ylim(0, 600)
+        # print(np.array(lg_values))
+        #
+        # print(lg_values[0])
+        # print(lg_values[1])
+        # print(lg_values[2])
+
+        # fig = plt.figure(1)
+        # ax1 = fig.add_subplot(131, xlim = (0, self.size_x), ylim = (0, self.size_y))
+        # ax1.set_title('Cellular Automata')
+
+        # ax2 = fig.add_subplot(133)
+
+        fig, axs = plt.subplots(2)
+        fig.suptitle('Cellular Automata')
+
+        """
+        def animate(i):  #  need to adjust to work with two graphs
+
+            plt.figure(1)
+
+            # plt.xlim(0, 600)
+            # plt.ylim(0, 600)
             mycount.increase()
             if mycount.get_count() > self.generations:
                 print("End of simulation")
@@ -349,22 +379,54 @@ class cellular_automata:
                 y_inf_full = [cell[1] for cell in inf_full[i]]
                 x_rec_full = [cell[0] for cell in rec_full[i]]
                 y_rec_full = [cell[1] for cell in rec_full[i]]
-                if self.use_immunity:
-                    x_imm_full = [cell[0] for cell in imm_full[i]]
-                    y_imm_full = [cell[1] for cell in imm_full[i]]
-
+                # if self.use_immunity:
+                #     x_imm_full = [cell[0] for cell in imm_full[i]]
+                #     y_imm_full = [cell[1] for cell in imm_full[i]]
 
 
                 plt.scatter(x_sus_full, y_sus_full, color='blue')
                 plt.scatter(x_inf_full, y_inf_full, color='red')
                 plt.scatter(x_rec_full, y_rec_full, color='purple')
                 if self.use_immunity:
-                    plt.scatter(x_imm_full, y_imm_full, color='gray')
+                    plt.scatter([cell[0] for cell in imm_full[i]], [cell[1] for cell in imm_full[i]], color='gray')
 
 
+            plt.figure(2)
+            plt.plot(time_array[0:i], lg_values[0][0:i], label="Susceptible")
+            # print(time_array[0:i])
+            # print(lg_values[0][0:i])
+            # print("---------")
+            """
 
-        plt.xlim(0, self.size_x)
-        plt.ylim(0, self.size_y)
+        def animate(i):  # need to adjust to work with two graphs
+            # https://stackoverflow.com/questions/42621036/how-to-use-funcanimation-to-update-and-animate-multiple-figures-with-matplotlib
+
+            mycount.increase()
+            if mycount.get_count() > self.generations:
+                print("End of simulation")
+                time.sleep(10000)
+            else:
+                axs[0].cla()
+
+                x_sus_full = [cell[0] for cell in sus_full[i]]
+                y_sus_full = [cell[1] for cell in sus_full[i]]
+                x_inf_full = [cell[0] for cell in inf_full[i]]
+                y_inf_full = [cell[1] for cell in inf_full[i]]
+                x_rec_full = [cell[0] for cell in rec_full[i]]
+                y_rec_full = [cell[1] for cell in rec_full[i]]
+
+                axs[0].scatter(x_sus_full, y_sus_full, color='blue')
+                axs[0].scatter(x_inf_full, y_inf_full, color='red')
+                axs[0].scatter(x_rec_full, y_rec_full, color='purple')
+                if self.use_immunity:
+                    axs[0].scatter([cell[0] for cell in imm_full[i]], [cell[1] for cell in imm_full[i]], color='gray')
+
+            axs[1].plot(time_array[0:i], lg_values[0][0:i], label="Susceptible", color="blue")
+            axs[1].plot(time_array[0:i], lg_values[1][0:i], label="Infected", color="red")
+            axs[1].plot(time_array[0:i], lg_values[2][0:i], label="recovered", color="purple")
+
+        # plt.xlim(0, self.size_x)
+        # plt.ylim(0, self.size_y)
 
         ani = FuncAnimation(plt.gcf(), animate, interval=100)
 
@@ -382,7 +444,6 @@ class cellular_automata:
 # ca = cellular_automata(100, 250, 250, 300, 10, 2)
 # ca = cellular_automata(250, 250, 500, 500, 5, 2)
 # ca = cellular_automata(500, 100, 100, 100, 20, 10, True)
-ca = cellular_automata(100, 100, 250, 250, 3, 5, False, 10, False, 10)
+ca = cellular_automata(100, 500, 500, 500, 1, 5, True, 15, False, 15)
 
 ca.new_generation()
-
