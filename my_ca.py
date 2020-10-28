@@ -117,13 +117,15 @@ mycount = counter()
 class cellular_automata:
     """Main class to run function"""
 
-    def __init__(self, no_cells, generations, size_x, size_y, infection_radius, infected, r_i, d_r, immunity, d_i):
+    def __init__(self, no_cells, generations, size_x, size_y, infection_radius, infected, r_i, d_r, immunity, d_i,
+                 user_file):
         """Creates list of how every many cells the user inputs so a list will look like ['cell1','cell2','cell3'...]. Each
         element in that list will then be used as a dictionary key where the definition will be a class instance of cell. Each
         class instance will be created with a random x and y coordinate, and an infected status.
         r_i : recovered can be infected
         d_r : days until recovery
         """
+        self.user_file = user_file
         self.use_immunity = immunity
         self.number_of_cells = no_cells
         self.number_of_infected = infected
@@ -186,7 +188,6 @@ class cellular_automata:
     #     name = "ca_output.xlsx"
     #     df.to_excel(name, sheet_name='output')
 
-
     def rand_coordinate_generator(self):
         """Generates random coordinates for cells being generated"""
         rand_x = random.randint(0, self.size_x)
@@ -207,16 +208,16 @@ class cellular_automata:
             file.write(str(time_array) + "\n")
 
     def import_data(self):
-        filename = "cs_output.txt"
+        filename = "ca_output.txt"
         with open(filename, 'r') as file:
             lines = [line.rstrip('\n') for line in file]
 
         if lines[-1] == "":
             del lines[-1]
 
-        result = [item.strip('][').split(', ') for item in lines]
+        result = [json.loads(item) for item in lines]
+        print(result)
         return result
-
 
     def update_position(self):
         """For each cell object, movement function will be called to see where the cell will move, and the x coordinate list and y coordinate list will be returned of the new generation"""
@@ -305,74 +306,84 @@ class cellular_automata:
 
         time_array = list(range(0, self.generations))
 
-        # if user chosing own file will not need - put in function later
-        for i in range(
-                self.generations):
+        if not self.user_file:
+            # if user chosing own file will not need - put in function later
+            for i in range(
+                    self.generations):
 
-            if i % 50 == 0:
-                print("Generating generation " + str(i))
+                if i % 50 == 0:
+                    print("Generating generation " + str(i))
 
-            x_list, y_list, infected, recovered, immune = self.update_position()
+                x_list, y_list, infected, recovered, immune = self.update_position()
 
-            # check if cells touch here, then can adjust objects if need
-            self.cells_touch()  # adjusts the objects, not any list
+                # check if cells touch here, then can adjust objects if need
+                self.cells_touch()  # adjusts the objects, not any list
 
-            # recovery function
-            self.cell_recovery()
+                # recovery function
+                self.cell_recovery()
 
-            # immunity function
-            if self.use_immunity:
-                self.cell_immunity()
+                # immunity function
+                if self.use_immunity:
+                    self.cell_immunity()
 
-            gen_sus = []
-            gen_inf = []
-            gen_rec = []
-            gen_imm = []
+                gen_sus = []
+                gen_inf = []
+                gen_rec = []
+                gen_imm = []
 
-            # puts cells in list depending on their status and whether immunity is used
-            if self.use_immunity:
-                for inf in range(len(self.cell_list)):
-                    if infected[inf]:  # if True
-                        gen_inf.append([x_list[inf], y_list[inf]])
-                    elif immune[inf]:
-                        gen_imm.append([x_list[inf], y_list[inf]])
-                    elif recovered[inf]:
-                        gen_rec.append([x_list[inf], y_list[inf]])
-                    else:
-                        gen_sus.append([x_list[inf], y_list[inf]])
-            else:
-                for inf in range(len(self.cell_list)):
-                    if infected[inf]:  # if True
-                        gen_inf.append([x_list[inf], y_list[inf]])
-                    elif recovered[inf]:
-                        gen_rec.append([x_list[inf], y_list[inf]])
-                    else:
-                        gen_sus.append([x_list[inf], y_list[inf]])
+                # puts cells in list depending on their status and whether immunity is used
+                if self.use_immunity:
+                    for inf in range(len(self.cell_list)):
+                        if infected[inf]:  # if True
+                            gen_inf.append([x_list[inf], y_list[inf]])
+                        elif immune[inf]:
+                            gen_imm.append([x_list[inf], y_list[inf]])
+                        elif recovered[inf]:
+                            gen_rec.append([x_list[inf], y_list[inf]])
+                        else:
+                            gen_sus.append([x_list[inf], y_list[inf]])
+                else:
+                    for inf in range(len(self.cell_list)):
+                        if infected[inf]:  # if True
+                            gen_inf.append([x_list[inf], y_list[inf]])
+                        elif recovered[inf]:
+                            gen_rec.append([x_list[inf], y_list[inf]])
+                        else:
+                            gen_sus.append([x_list[inf], y_list[inf]])
 
-            # print(gen_inf)
-            # print(gen_rec)
-            # print(gen_sus)
-            # print("--------------")
+                # print(gen_inf)
+                # print(gen_rec)
+                # print(gen_sus)
+                # print("--------------")
 
-            sus_full.append(gen_sus)
-            inf_full.append(gen_inf)
-            rec_full.append(gen_rec)
-            if self.use_immunity:
-                imm_full.append(gen_imm)
+                sus_full.append(gen_sus)
+                inf_full.append(gen_inf)
+                rec_full.append(gen_rec)
+                if self.use_immunity:
+                    imm_full.append(gen_imm)
 
-            lg_values[0].append(len(gen_sus))
-            lg_values[1].append(len(gen_inf))
-            lg_values[2].append((len(gen_rec) + len(gen_imm)))
+                lg_values[0].append(len(gen_sus))
+                lg_values[1].append(len(gen_inf))
+                lg_values[2].append((len(gen_rec) + len(gen_imm)))
 
+                # coordinates.append([x_list, y_list])
 
-            # coordinates.append([x_list, y_list])
-
-            # print(sus_full)
+                # print(sus_full)
 
         # self.export_to_excel() # will soon be redundant
-        self.export_data(sus_full, inf_full, rec_full, imm_full, lg_values, time_array) # not currently working
+        if not self.user_file:
+            self.export_data(sus_full, inf_full, rec_full, imm_full, lg_values, time_array)  # WORKING NOW
 
         # if using own values, assign them here
+        if self.user_file:
+            sus_full, inf_full, rec_full, imm_full, lg_values, time_array = self.import_data()
+            print("Imported data!")
+            print(sus_full)
+            print(inf_full)
+            print(rec_full)
+            print(imm_full)
+            print(lg_values)
+            print(time_array)
 
         fig, axs = plt.subplots(2)
         fig.suptitle('Cellular Automata')
@@ -455,15 +466,16 @@ class cellular_automata:
         plt.show()
 
 
-# self, no_cells, generations, size_x, size_y, infection_radius, infected-1, recovered can be infected, days until recovered, use immunity,days of immunity
+# self, no_cells, generations, size_x, size_y, infection_radius, infected-1, recovered can be infected, days until recovered, use immunity,days of immunity, use_own_file
 
+# if user uses own file, use some default values
 
 # ca = cellular_automata(5, 10, 10, 10, 2, 3, True)
 # ca = cellular_automata(500, 1000, 1000, 1000, 10, 2, True)
 # ca = cellular_automata(100, 250, 250, 300, 10, 2)
 # ca = cellular_automata(250, 250, 500, 500, 5, 2)
 # ca = cellular_automata(500, 100, 100, 100, 20, 10, True)
-ca = cellular_automata(100, 500, 500, 500, 1, 5, True, 15, False, 15)
+# ca = cellular_automata(100, 500, 500, 500, 1, 5, True, 15, False, 15, True)
+ca = cellular_automata(10, 25, 50, 50, 3, 3, True, 5, True, 5, True)
 
 ca.new_generation()
-
