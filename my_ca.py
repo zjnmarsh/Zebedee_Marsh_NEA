@@ -7,6 +7,8 @@ import time
 from matplotlib.animation import FuncAnimation
 import pandas as pd
 import matplotlib
+import csv
+import json
 
 
 class cell:
@@ -146,47 +148,75 @@ class cellular_automata:
             self.cell_object_dict[element] = cell(rand_x, rand_y,
                                                   infected_status, d_r, d_i)  # creates a dictionary of cell objects
 
-    def collect_data(self):
-        """For each generation, appends a list with cell name, x coordinate, y coordinate and infection status to a master list
-        This function is needed for exporting to excel"""
-        cell_list = []
-        for cell_object in self.cell_object_dict:
-            x, y, infected = self.cell_object_dict[cell_object].cell_test_function()
-            cell_list.append([cell_object, x, y, infected])
-        np_cell_list = np.array(cell_list)
+    # def collect_data(self):
+    #     """For each generation, appends a list with cell name, x coordinate, y coordinate and infection status to a master list
+    #     This function is needed for exporting to excel
+    #     INDEPENDENT WITH export_to_excel"""
+    #     cell_list = []
+    #     for cell_object in self.cell_object_dict:
+    #         x, y, infected = self.cell_object_dict[cell_object].cell_test_function()
+    #         cell_list.append([cell_object, x, y, infected])
+    #     np_cell_list = np.array(cell_list)
+    #
+    #     self.full_list.append(cell_list)  # full list of cells and their status assigned to this variable
+    #
+    #     return np_cell_list
+    #
+    # def export_to_excel(self):
+    #     """Exports cell name and cell infection status with each new generation. RELIANT ON COLLECT_DATA
+    #     INDEPENDENT WITH collect_data"""
+    #     name = []
+    #     x = []
+    #     y = []
+    #     inf = []
+    #     rec = []
+    #
+    #     for generation in range(len(self.full_list)):
+    #         gen_inf = []
+    #         for cell in range(self.number_of_cells):
+    #             gen_inf.append(self.full_list[generation][cell][3])
+    #         inf.append(gen_inf)
+    #
+    #     data = {'Cell name': self.cell_list}  # dictionary containing cell names and infection statius
+    #     for generation in range(len(self.full_list)):
+    #         name = "generation" + str(generation)
+    #         data[name] = inf[generation]
+    #
+    #     df = pd.DataFrame(data)
+    #     name = "ca_output.xlsx"
+    #     df.to_excel(name, sheet_name='output')
 
-        self.full_list.append(cell_list)  # full list of cells and their status assigned to this variable
-
-        return np_cell_list
-
-    def export_to_excel(self):
-        """Exports cell name and cell infection status with each new generation"""
-        name = []
-        x = []
-        y = []
-        inf = []
-        rec = []
-
-        for generation in range(len(self.full_list)):
-            gen_inf = []
-            for cell in range(self.number_of_cells):
-                gen_inf.append(self.full_list[generation][cell][3])
-            inf.append(gen_inf)
-
-        data = {'Cell name': self.cell_list}  # dictionary containing cell names and infection statius
-        for generation in range(len(self.full_list)):
-            name = "generation" + str(generation)
-            data[name] = inf[generation]
-
-        df = pd.DataFrame(data)
-        name = "ca_output.xlsx"
-        df.to_excel(name, sheet_name='output')
 
     def rand_coordinate_generator(self):
         """Generates random coordinates for cells being generated"""
         rand_x = random.randint(0, self.size_x)
         rand_y = random.randint(0, self.size_y)
         return rand_x, rand_y
+
+    def export_data(self, sus_full, inf_full, rec_full, imm_full, lg_values, time_array):
+        """Should export data in a format that it can be analysed and reused
+        gen_imm empty when not using immunity, but shouldn't be a problem"""
+
+        filename = "ca_output.txt"
+        with open(filename, 'w') as file:
+            file.write(str(sus_full) + "\n")
+            file.write(str(inf_full) + "\n")
+            file.write(str(rec_full) + "\n")
+            file.write(str(imm_full) + "\n")
+            file.write(str(lg_values) + "\n")
+            file.write(str(time_array) + "\n")
+
+    def import_data(self):
+        filename = "cs_output.txt"
+        with open(filename, 'r') as file:
+            lines = [line.rstrip('\n') for line in file]
+
+        if lines[-1] == "":
+            del lines[-1]
+
+        result = [item.strip('][').split(', ') for item in lines]
+        return result
+
 
     def update_position(self):
         """For each cell object, movement function will be called to see where the cell will move, and the x coordinate list and y coordinate list will be returned of the new generation"""
@@ -209,7 +239,7 @@ class cellular_automata:
         # print(immune)
         # print("------------")
 
-        self.collect_data()  # this function could be moved into the new generation class function
+        # self.collect_data()  # this function could be moved into the new generation class function
 
         return loc_x, loc_y, infected, recovered, immune
 
@@ -264,7 +294,7 @@ class cellular_automata:
     def new_generation(self):
         """Main definition for running program. For the number of generations to simulate, call self.update_position() to get new coordinate lists"""
 
-        coordinates = []
+        # coordinates = []
 
         sus_full = []
         inf_full = []
@@ -275,6 +305,7 @@ class cellular_automata:
 
         time_array = list(range(0, self.generations))
 
+        # if user chosing own file will not need - put in function later
         for i in range(
                 self.generations):
 
@@ -333,28 +364,15 @@ class cellular_automata:
             lg_values[1].append(len(gen_inf))
             lg_values[2].append((len(gen_rec) + len(gen_imm)))
 
-            # curr_lg_val = [[],[],[]]
-            # time_arr = []
 
-            coordinates.append([x_list, y_list])
+            # coordinates.append([x_list, y_list])
 
             # print(sus_full)
 
-        # self.export_to_excel()
+        # self.export_to_excel() # will soon be redundant
+        self.export_data(sus_full, inf_full, rec_full, imm_full, lg_values, time_array) # not currently working
 
-        # list comprehension
-
-        # print(np.array(lg_values))
-        #
-        # print(lg_values[0])
-        # print(lg_values[1])
-        # print(lg_values[2])
-
-        # fig = plt.figure(1)
-        # ax1 = fig.add_subplot(131, xlim = (0, self.size_x), ylim = (0, self.size_y))
-        # ax1.set_title('Cellular Automata')
-
-        # ax2 = fig.add_subplot(133)
+        # if using own values, assign them here
 
         fig, axs = plt.subplots(2)
         fig.suptitle('Cellular Automata')
@@ -421,6 +439,7 @@ class cellular_automata:
                 if self.use_immunity:
                     axs[0].scatter([cell[0] for cell in imm_full[i]], [cell[1] for cell in imm_full[i]], color='gray')
 
+            # plots line graph
             axs[1].plot(time_array[0:i], lg_values[0][0:i], label="Susceptible", color="blue")
             axs[1].plot(time_array[0:i], lg_values[1][0:i], label="Infected", color="red")
             axs[1].plot(time_array[0:i], lg_values[2][0:i], label="recovered", color="purple")
@@ -447,3 +466,4 @@ class cellular_automata:
 ca = cellular_automata(100, 500, 500, 500, 1, 5, True, 15, False, 15)
 
 ca.new_generation()
+
