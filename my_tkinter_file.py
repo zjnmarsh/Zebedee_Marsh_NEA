@@ -5,6 +5,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import random
+import time
+from matplotlib.animation import FuncAnimation
+import matplotlib
+import csv
+import json
 
 from tkinter import filedialog
 
@@ -17,11 +22,13 @@ class gui_Main_Window:
 
         self.lbl_name = ttk.Label(self.frame, text='This is the main page')
         self.btn_SIR = ttk.Button(self.frame, text='SIR model', command=self.openSIR)
+        self.btn_CA = ttk.Button(self.frame, text='Cellular Automata', command=self.openCA)
 
         self.frame.grid(row=0, column=0, sticky='nsew')
 
         self.lbl_name.grid(column=1, row=0, columnspan=3, sticky='n')
         self.btn_SIR.grid(column=1, row=1, sticky='s')
+        self.btn_CA.grid(column=1, row=2, sticky='s')
 
         self.master.columnconfigure(0, weight=1)
         self.master.rowconfigure(0, weight=1)
@@ -40,6 +47,13 @@ class gui_Main_Window:
         root2.title('SIR Model')
         # root2.geometry('1400x900')
         new_window = gui_First_SIR_Window(root2)
+        root2.mainloop()
+
+    def openCA(self):
+        self.master.destroy()
+        root2 = tk.Tk()
+        root2.title('CA Model')
+        new_window = gui_First_CA_Window(root2)
         root2.mainloop()
 
 
@@ -79,7 +93,6 @@ class gui_First_SIR_Window:
         df = pd.read_excel(filename)
         # print(df)
 
-
     def input(self):
         # self.number_of_simulations = int(self.num_sim.get())
         # print(self.number_of_simulations)
@@ -89,7 +102,6 @@ class gui_First_SIR_Window:
         root3.title('Input Parameters')
         input_window = gui_SIR_Param(root3, self.number_of_simulations)
         root3.mainloop()
-
 
 
 class gui_SIR_Param:
@@ -116,7 +128,6 @@ class gui_SIR_Param:
         self.e_r = ttk.Entry(self.frame)
         self.e_tr = ttk.Entry(self.frame)
         self.e_re = ttk.Entry(self.frame)
-
 
         # gridding label variables
         self.lbl_name.grid(column=0, row=0, columnspan=2, sticky='n')
@@ -149,7 +160,7 @@ class gui_SIR_Param:
 
     def enter_param(self):
         # self.master.destroy()
-        param_list = [[],[],[],[],[]]
+        param_list = [[], [], [], [], []]
         # for i in range(self.number_of_simulations):
         param_list[0].append(float(self.e_s.get()))
         param_list[1].append(float(self.e_i.get()))
@@ -240,7 +251,144 @@ class SIR_model:
         plt.plot(timearray, solver_result[2], label="R(t)")
 
 
+# ----------------------------------------------------------------------
 
+class gui_First_CA_Window:
+
+    def __init__(self, master):
+        self.master = master
+        self.frame = ttk.Frame(master, padding=5)
+
+        self.lbl_name = ttk.Label(self.frame, text='This is the Cellular Automata model')
+        # self.num_sim = ttk.Entry(self.frame)
+        # self.num_sim.insert(0, 1)
+        self.btn_open_file = ttk.Button(self.frame, text='Load File', command=self.open_file)
+        self.btn_input_param = ttk.Button(self.frame, text='Enter Parameters', command=self.input)
+        self.btn_close = ttk.Button(self.frame, text='Close', command=self.close)
+
+        self.frame.grid(row=0, column=0, sticky='nsew')
+
+        self.lbl_name.grid(column=0, row=0, columnspan=2, sticky='n')
+        # self.num_sim.grid(column=0, row=1)
+        self.btn_open_file.grid(column=0, row=1)
+        self.btn_input_param.grid(column=1, row=1)
+        self.btn_close.grid(column=0, row=2, sticky='s')
+
+        self.master.columnconfigure(0, weight=1)
+        self.master.rowconfigure(0, weight=1)
+
+        self.frame.columnconfigure(1, weight=1)
+        self.frame.rowconfigure(1, weight=1)
+
+    def open_file(self):
+        # enter file stuff
+        pass
+
+    def input(self):
+        # manual user input
+        root3 = tk.Tk()
+        root3.title('Input Parameters')
+        input_windw = gui_CA_Param(root3)
+
+    def close(self):
+        self.master.destroy()
+
+
+class gui_CA_Param:
+    """Class for entering CA parameters"""
+
+    def __init__(self, master):
+        self.master = master
+        self.frame = ttk.Frame(master, padding=5)
+        self.frame.grid(row=0, column=0, sticky='nsew')
+
+        # label variables
+        self.lbl_name = ttk.Label(self.frame, text='Enter parameters for CA model')
+        self.no_cells = ttk.Label(self.frame, text='Number of cells')
+        self.gen = ttk.Label(self.frame, text='Generations')
+        self.size_x = ttk.Label(self.frame, text='Size x')
+        self.size_y = ttk.Label(self.frame, text='Size y')
+        self.inf_rad = ttk.Label(self.frame, text='Infection radius')
+        self.no_inf = ttk.Label(self.frame, text='Number of infected')
+        self.r_i = ttk.Label(self.frame, text='Recovered can be infected?')
+        self.d_r = ttk.Label(self.frame, text='Days until recovery')
+        self.use_imm = ttk.Label(self.frame, text='Use immunity')
+        self.d_i = ttk.Label(self.frame, text='Days of immunity')
+
+        var = tk.IntVar()
+        var2 = tk.IntVar()
+
+        # entry and checkbutton variables
+        self.e_no_cells = ttk.Entry(self.frame)
+        self.e_gen = ttk.Entry(self.frame)
+        self.e_size_x = ttk.Entry(self.frame)
+        self.e_size_y = ttk.Entry(self.frame)
+        self.e_inf_rad = ttk.Entry(self.frame)
+        self.e_no_inf = ttk.Entry(self.frame)
+        self.cb_r_i = ttk.Checkbutton(self.frame, variable=var)
+        self.e_d_r = ttk.Entry(self.frame)
+        self.cb_use_imm = ttk.Checkbutton(self.frame, variable=var2)
+        self.e_d_i = ttk.Entry(self.frame)
+
+        self.btn_enter = ttk.Button(self.frame, text='Enter', command=self.placeholder)
+
+        # grid label variables
+        self.lbl_name.grid(column=0, row=0, columnspan=2, sticky='n')
+        self.no_cells.grid(column=0, row=1, sticky='w')
+        self.gen.grid(column=0, row=2, sticky='w')
+        self.size_x.grid(column=0, row=3, sticky='w')
+        self.size_y.grid(column=0, row=4, sticky='w')
+        self.inf_rad.grid(column=0, row=5, sticky='w')
+        self.no_inf.grid(column=0, row=6, sticky='w')
+        self.r_i.grid(column=0, row=7, sticky='w')
+        self.d_r.grid(column=2, row=7, sticky='w')
+        self.use_imm.grid(column=0, row=8, sticky='w')
+        self.d_i.grid(column=2, row=8, sticky='w')
+
+        # grid entry variables
+        self.e_no_cells.grid(column=2, row=1, sticky='w')
+        self.e_gen.grid(column=2, row=2, sticky='w')
+        self.e_size_x.grid(column=2, row=3, sticky='w')
+        self.e_size_y.grid(column=2, row=4, sticky='w')
+        self.e_inf_rad.grid(column=2, row=5, sticky='w')
+        self.e_no_inf.grid(column=2, row=6, sticky='w')
+        self.cb_r_i.grid(column=1, row=7, sticky='w')
+        self.e_d_r.grid(column=3, row=7, sticky='w')
+        self.cb_use_imm.grid(column=1, row=8, sticky='w')
+        self.e_d_i.grid(column=3, row=8, sticky='w')
+
+        self.btn_enter.grid(column=0, row=9, columnspan=4, sticky='s')
+
+        # grid main column and tow
+        self.master.columnconfigure(0, weight=1)
+        self.master.rowconfigure(0, weight=1)
+
+        # weight elements for resizing
+        self.frame.columnconfigure(0, weight=1)
+        self.frame.rowconfigure(0, weight=1)
+        self.frame.rowconfigure(1, weight=1)
+        self.frame.rowconfigure(2, weight=1)
+        self.frame.rowconfigure(3, weight=1)
+        self.frame.rowconfigure(4, weight=1)
+        self.frame.rowconfigure(5, weight=1)
+        self.frame.rowconfigure(6, weight=1)
+
+    # def enter_param(self):
+    #     # self.master.destroy()
+    #     param_list = [[],[],[],[],[]]
+    #     # for i in range(self.number_of_simulations):
+    #     param_list[0].append(float(self.e_s.get()))
+    #     param_list[1].append(float(self.e_i.get()))
+    #     param_list[2].append(float(self.e_r.get()))
+    #     param_list[3].append(float(self.e_tr.get()))
+    #     param_list[4].append(float(self.e_re.get()))
+    #     # param_list.append()
+    #     # print(param_list)
+    #     queue = QueueSimulation(1, param_list[0], param_list[1], param_list[2], param_list[3], param_list[4], 100)
+    #     queue.run_simulation()
+
+    def placeholder(self):
+        pass
 
 root = tk.Tk()
 root.title('Main Window')
