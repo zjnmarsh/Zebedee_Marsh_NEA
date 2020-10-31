@@ -57,6 +57,9 @@ class gui_Main_Window:
         root2.mainloop()
 
 
+# ----------------------------------------------------------------------
+
+
 class gui_First_SIR_Window:
     """Class asking user to enter how many graphs they want"""
 
@@ -488,20 +491,6 @@ class cell:
         # print(self.x, self.y)
 
 
-class counter:
-    def __init__(self):
-        self.count = 0
-
-    def increase(self):
-        self.count += 1
-
-    def get_count(self):
-        return self.count
-
-
-mycount = counter()
-
-
 class cellular_automata:
     """Main class to run function"""
 
@@ -738,29 +727,25 @@ class cellular_automata:
         fig, axs = plt.subplots(2)
         fig.suptitle('Cellular Automata')
 
+        # animate_graph = Anim(self.generations, sus_full, inf_full, rec_full, imm_full, self.use_immunity, time_array, lg_values)
 
         def animate(i):  # need to adjust to work with two graphs
             # https://stackoverflow.com/questions/42621036/how-to-use-funcanimation-to-update-and-animate-multiple-figures-with-matplotlib
 
-            mycount.increase()
-            if mycount.get_count() > self.generations:
-                print("End of simulation")
-                time.sleep(10000)
-            else:
-                axs[0].cla()
+            axs[0].cla()
 
-                x_sus_full = [cell[0] for cell in sus_full[i]]
-                y_sus_full = [cell[1] for cell in sus_full[i]]
-                x_inf_full = [cell[0] for cell in inf_full[i]]
-                y_inf_full = [cell[1] for cell in inf_full[i]]
-                x_rec_full = [cell[0] for cell in rec_full[i]]
-                y_rec_full = [cell[1] for cell in rec_full[i]]
+            x_sus_full = [cell[0] for cell in sus_full[i]]
+            y_sus_full = [cell[1] for cell in sus_full[i]]
+            x_inf_full = [cell[0] for cell in inf_full[i]]
+            y_inf_full = [cell[1] for cell in inf_full[i]]
+            x_rec_full = [cell[0] for cell in rec_full[i]]
+            y_rec_full = [cell[1] for cell in rec_full[i]]
 
-                axs[0].scatter(x_sus_full, y_sus_full, color='blue')
-                axs[0].scatter(x_inf_full, y_inf_full, color='red')
-                axs[0].scatter(x_rec_full, y_rec_full, color='purple')
-                if self.use_immunity:
-                    axs[0].scatter([cell[0] for cell in imm_full[i]], [cell[1] for cell in imm_full[i]], color='gray')
+            axs[0].scatter(x_sus_full, y_sus_full, color='blue')
+            axs[0].scatter(x_inf_full, y_inf_full, color='red')
+            axs[0].scatter(x_rec_full, y_rec_full, color='purple')
+            if self.use_immunity:
+                axs[0].scatter([cell[0] for cell in imm_full[i]], [cell[1] for cell in imm_full[i]], color='gray')
 
             # plots line graph
             axs[1].plot(time_array[0:i], lg_values[0][0:i], label="Susceptible", color="blue")
@@ -770,7 +755,7 @@ class cellular_automata:
         # plt.xlim(0, self.size_x)
         # plt.ylim(0, self.size_y)
 
-        ani = FuncAnimation(plt.gcf(), animate, interval=100)
+        ani = FuncAnimation(plt.gcf(), animate, frames=self.generations, interval=100, repeat=False)
 
         # ani.save('video.mp4', writer='ffmpeg', fps=30, dpi=250)
 
@@ -778,15 +763,17 @@ class cellular_automata:
         plt.show()
 
 
+ca = cellular_automata(10, 25, 50, 50, 3, 3, True, 5, True, 5, False)
+ca.new_generation()
 
+# root = tk.Tk()
+# root.title('Main Window')
 
-
-root = tk.Tk()
-root.title('Main Window')
 # root.geometry('600x400')
 # root.geometry('400x400')
 # window = gui_Main_Window(root)
 # window = SIR_Param(root)
-window = gui_CA_Param(root)
 
-root.mainloop()
+# window = gui_CA_Param(root)
+
+# root.mainloop()
