@@ -288,14 +288,16 @@ class gui_First_CA_Window:
         # manual user input
         root3 = tk.Tk()
         root3.title('Input Parameters')
-        input_windw = gui_CA_Param(root3)
+        input_window = gui_CA_Param(root3)
 
     def close(self):
         self.master.destroy()
 
 
 class gui_CA_Param:
-    """Class for entering CA parameters"""
+    """Class for entering CA parameters
+    Need to make some entry boxes dependent on checkboxes
+    """
 
     def __init__(self, master):
         self.master = master
@@ -303,20 +305,21 @@ class gui_CA_Param:
         self.frame.grid(row=0, column=0, sticky='nsew')
 
         # label variables
-        self.lbl_name = ttk.Label(self.frame, text='Enter parameters for CA model')
-        self.no_cells = ttk.Label(self.frame, text='Number of cells')
-        self.gen = ttk.Label(self.frame, text='Generations')
-        self.size_x = ttk.Label(self.frame, text='Size x')
-        self.size_y = ttk.Label(self.frame, text='Size y')
-        self.inf_rad = ttk.Label(self.frame, text='Infection radius')
-        self.no_inf = ttk.Label(self.frame, text='Number of infected')
-        self.r_i = ttk.Label(self.frame, text='Recovered can be infected?')
-        self.d_r = ttk.Label(self.frame, text='Days until recovery')
-        self.use_imm = ttk.Label(self.frame, text='Use immunity')
-        self.d_i = ttk.Label(self.frame, text='Days of immunity')
+        self.l_lbl_name = ttk.Label(self.frame, text='Enter parameters for CA model')
+        self.l_no_cells = ttk.Label(self.frame, text='Number of cells')
+        self.l_gen = ttk.Label(self.frame, text='Generations')
+        self.l_size_x = ttk.Label(self.frame, text='Size x')
+        self.l_size_y = ttk.Label(self.frame, text='Size y')
+        self.l_inf_rad = ttk.Label(self.frame, text='Infection radius')
+        self.l_no_inf = ttk.Label(self.frame, text='Number of infected')
+        self.l_r_i = ttk.Label(self.frame, text='Recovered can be infected?')
+        self.l_d_r = ttk.Label(self.frame, text='Days until recovery')
+        self.l_use_imm = ttk.Label(self.frame, text='Use immunity')
+        self.l_d_i = ttk.Label(self.frame, text='Days of immunity')
 
-        var = tk.IntVar()
-        var2 = tk.IntVar()
+        # bool values for checkbuttons
+        self.b_r_i = tk.BooleanVar()
+        self.b_u_i = tk.BooleanVar()
 
         # entry and checkbutton variables
         self.e_no_cells = ttk.Entry(self.frame)
@@ -325,25 +328,25 @@ class gui_CA_Param:
         self.e_size_y = ttk.Entry(self.frame)
         self.e_inf_rad = ttk.Entry(self.frame)
         self.e_no_inf = ttk.Entry(self.frame)
-        self.cb_r_i = ttk.Checkbutton(self.frame, variable=var)
+        self.cb_r_i = ttk.Checkbutton(self.frame, variable=self.b_r_i)
         self.e_d_r = ttk.Entry(self.frame)
-        self.cb_use_imm = ttk.Checkbutton(self.frame, variable=var2)
+        self.cb_use_imm = ttk.Checkbutton(self.frame, variable=self.b_u_i)
         self.e_d_i = ttk.Entry(self.frame)
 
-        self.btn_enter = ttk.Button(self.frame, text='Enter', command=self.placeholder)
+        self.btn_enter = ttk.Button(self.frame, text='Enter', command=self.enter_param)
 
         # grid label variables
-        self.lbl_name.grid(column=0, row=0, columnspan=2, sticky='n')
-        self.no_cells.grid(column=0, row=1, sticky='w')
-        self.gen.grid(column=0, row=2, sticky='w')
-        self.size_x.grid(column=0, row=3, sticky='w')
-        self.size_y.grid(column=0, row=4, sticky='w')
-        self.inf_rad.grid(column=0, row=5, sticky='w')
-        self.no_inf.grid(column=0, row=6, sticky='w')
-        self.r_i.grid(column=0, row=7, sticky='w')
-        self.d_r.grid(column=2, row=7, sticky='w')
-        self.use_imm.grid(column=0, row=8, sticky='w')
-        self.d_i.grid(column=2, row=8, sticky='w')
+        self.l_lbl_name.grid(column=0, row=0, columnspan=2, sticky='n')
+        self.l_no_cells.grid(column=0, row=1, sticky='w')
+        self.l_gen.grid(column=0, row=2, sticky='w')
+        self.l_size_x.grid(column=0, row=3, sticky='w')
+        self.l_size_y.grid(column=0, row=4, sticky='w')
+        self.l_inf_rad.grid(column=0, row=5, sticky='w')
+        self.l_no_inf.grid(column=0, row=6, sticky='w')
+        self.l_r_i.grid(column=0, row=7, sticky='w')
+        self.l_d_r.grid(column=2, row=7, sticky='w')
+        self.l_use_imm.grid(column=0, row=8, sticky='w')
+        self.l_d_i.grid(column=2, row=8, sticky='w')
 
         # grid entry variables
         self.e_no_cells.grid(column=2, row=1, sticky='w')
@@ -373,28 +376,123 @@ class gui_CA_Param:
         self.frame.rowconfigure(5, weight=1)
         self.frame.rowconfigure(6, weight=1)
 
-    # def enter_param(self):
-    #     # self.master.destroy()
-    #     param_list = [[],[],[],[],[]]
-    #     # for i in range(self.number_of_simulations):
-    #     param_list[0].append(float(self.e_s.get()))
-    #     param_list[1].append(float(self.e_i.get()))
-    #     param_list[2].append(float(self.e_r.get()))
-    #     param_list[3].append(float(self.e_tr.get()))
-    #     param_list[4].append(float(self.e_re.get()))
-    #     # param_list.append()
-    #     # print(param_list)
-    #     queue = QueueSimulation(1, param_list[0], param_list[1], param_list[2], param_list[3], param_list[4], 100)
-    #     queue.run_simulation()
+    def enter_param(self):
+        # should call CA function in this
+        no_cells = int(self.e_no_cells.get())
+        generations = int(self.e_gen.get())
+        size_x = int(self.e_size_x.get())
+        size_y = int(self.e_size_y.get())
+        inf_rad = int(self.e_inf_rad.get())
+        no_inf = int(self.e_no_inf.get())
+        rec_inf = self.b_r_i.get()
+        days_rec = int(self.e_d_r.get())
+        use_imm = self.b_u_i.get()
+        days_imm = int(self.e_d_i.get())
 
-    def placeholder(self):
-        pass
+        self.master.destroy()
+        # print(rec_inf)
+        # print(use_imm)
+
+        ca = cellular_automata(no_cells, generations, size_x, size_y, inf_rad, no_inf, rec_inf, days_rec, use_imm,
+                               days_imm)
+        ca.new_generation()
+
+
+# class cell:
+#     """Each cell will be a class instance of this class"""
+#
+#     def __init__(self, x, y, infected, d_r, d_i):
+#         self.x = x
+#         self.y = y
+#         self.infected = infected
+#         self.recovered = False
+#         self.recover_count = d_r  # default - can be changed - time until infected cell recovers
+#         self.immune = False
+#         self.immune_count = d_i
+#         self.original_immune = d_i
+#         # self.infection_rate = i
+#
+#     def cell_test_function(self):
+#         return self.x, self.y, self.infected
+#
+#     def location(self):
+#         # print(self.x, self.y)
+#         return self.x, self.y
+#
+#     def recover_generation(self):
+#         self.recover_count -= 1
+#         if self.recover_count <= 0:
+#             self.recovered = True
+#             self.infected = False
+#             self.recover_count = 10
+#             if ca.use_immunity:
+#                 self.immune = True
+#
+#     def immunity_generation(self):
+#         if self.immune:
+#             self.immune_count -= 1
+#             if self.immune_count <= 0:
+#                 self.immune = False
+#                 self.immune_count = self.original_immune
+#
+#     def movement(self):
+#         def nothing():
+#             pass
+#
+#         # mvmt = 5
+#         mvmt = random.randint(0, 50)
+#
+#         def north():
+#             self.y -= mvmt
+#
+#         def northeast():
+#             self.x += mvmt
+#             self.y -= mvmt
+#
+#         def east():
+#             self.x += mvmt
+#
+#         def southeast():
+#             self.x += mvmt
+#             self.y += mvmt
+#
+#         def south():
+#             self.y += mvmt
+#
+#         def southwest():
+#             self.x -= mvmt
+#             self.y += mvmt
+#
+#         def west():
+#             self.x -= mvmt
+#
+#         def northwest():
+#             self.x -= mvmt
+#             self.y -= mvmt
+#
+#         instructions = {
+#             0: nothing,
+#             1: north,
+#             2: northeast,
+#             3: east,
+#             4: southeast,
+#             5: south,
+#             6: southwest,
+#             7: west,
+#             8: northwest
+#         }
+#
+#         rand = random.randint(0, 8)
+#         instructions[rand]()  # like a switch case condition - for constant time complexity
+#         # print(self.x, self.y)
+
 
 root = tk.Tk()
 root.title('Main Window')
 # root.geometry('600x400')
 # root.geometry('400x400')
-window = gui_Main_Window(root)
+# window = gui_Main_Window(root)
 # window = SIR_Param(root)
+window = gui_CA_Param(root)
 
 root.mainloop()
