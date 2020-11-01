@@ -42,7 +42,7 @@ class gui_Main_Window:
         # self.new_window = tk.Toplevel(self.master)
         # self.app = SIR_Window(self.new_window)
 
-        self.master.destroy()
+        # self.master.destroy()
         root2 = tk.Tk()
         root2.title('SIR Model')
         # root2.geometry('1400x900')
@@ -50,7 +50,7 @@ class gui_Main_Window:
         root2.mainloop()
 
     def openCA(self):
-        self.master.destroy()
+        # self.master.destroy()
         root2 = tk.Tk()
         root2.title('CA Model')
         new_window = gui_First_CA_Window(root2)
@@ -285,7 +285,22 @@ class gui_First_CA_Window:
 
     def open_file(self):
         # enter file stuff
-        pass
+        print("Opening file dialog")
+        file = filedialog.askopenfile(mode="r")
+        lines = [line.rstrip('\n') for line in file]
+        file.close()
+
+        if lines[-1] == "":
+            del lines[-1]
+
+        # result = [json.loads(item) for item in lines]
+        self.master.destroy()
+
+
+        ca = cellular_automata(0, 0, 0, 0, 0, 0, False, 0, False, 0, True, lines)
+        ca.new_generation()
+        self.master.destroy()
+
 
     def input(self):
         # manual user input
@@ -495,7 +510,7 @@ class cellular_automata:
     """Main class to run function"""
 
     def __init__(self, no_cells, generations, size_x, size_y, infection_radius, infected, r_i, d_r, immunity, d_i,
-                 user_file):
+                 user_file, *uf_param):
         """Creates list of how every many cells the user inputs so a list will look like ['cell1','cell2','cell3'...]. Each
         element in that list will then be used as a dictionary key where the definition will be a class instance of cell. Each
         class instance will be created with a random x and y coordinate, and an infected status.
@@ -514,6 +529,11 @@ class cellular_automata:
         self.size_y = size_y
         self.full_list = []
         self.r_i = r_i  # recovered can be infected
+
+        if 'uf_param' in locals():
+            self.uf_param = uf_param
+            self.lines = list(uf_param)[0]
+
         for i in range(no_cells):
             self.cell_list.append(("cell" + str(i)))
 
@@ -547,15 +567,12 @@ class cellular_automata:
             file.write(str(time_array) + "\n")
 
     def import_data(self):
-        filename = "ca_output.txt"
-        with open(filename, 'r') as file:
-            lines = [line.rstrip('\n') for line in file]
 
-        if lines[-1] == "":
-            del lines[-1]
+        if self.lines[-1] == "":
+            del self.lines[-1]
 
-        result = [json.loads(item) for item in lines]
-        print(result)
+        result = [json.loads(item) for item in self.lines]
+        # print(result)
         return result
 
     def update_position(self):
@@ -716,13 +733,14 @@ class cellular_automata:
         # if using own values, assign them here
         if self.user_file:
             sus_full, inf_full, rec_full, imm_full, lg_values, time_array = self.import_data()
+            self.generations = len(time_array)
             print("Imported data!")
-            print(sus_full)
-            print(inf_full)
-            print(rec_full)
-            print(imm_full)
-            print(lg_values)
-            print(time_array)
+            # print(sus_full)
+            # print(inf_full)
+            # print(rec_full)
+            # print(imm_full)
+            # print(lg_values)
+            # print(time_array)
 
         fig, axs = plt.subplots(2)
         fig.suptitle('Cellular Automata')
@@ -763,17 +781,19 @@ class cellular_automata:
         plt.show()
 
 
-ca = cellular_automata(10, 25, 50, 50, 3, 3, True, 5, True, 5, False)
-ca.new_generation()
+# ca = cellular_automata(10, 25, 50, 50, 3, 3, True, 5, True, 5, False)
+# ca.new_generation()
 
-# root = tk.Tk()
-# root.title('Main Window')
+root = tk.Tk()
+root.title('Main Window')
 
 # root.geometry('600x400')
 # root.geometry('400x400')
-# window = gui_Main_Window(root)
+
+window = gui_Main_Window(root)
 # window = SIR_Param(root)
 
+# window = gui_First_CA_Window(root)
 # window = gui_CA_Param(root)
 
-# root.mainloop()
+root.mainloop()
