@@ -3,12 +3,16 @@ import os.path
 
 
 def initial_setup():
+    """Sets up clean database with users table and ca_param table. Users table contains username and
+    whether user can see all parameters previously used, and ca_param table contains the history of
+    parameters used as well as the user who executed them"""
     conn = sqlite3.connect('my_database.db')
     c = conn.cursor()
-    c.execute("DROP TABLE users")
-    c.execute("DROP TABLE ca_param")
+    # c.execute("DROP TABLE users")
+    # c.execute("DROP TABLE ca_param")
     c.execute("CREATE TABLE users (username text PRIMARY KEY, see_all integer)")
     c.execute("""CREATE TABLE ca_param (
+                user string,
                 no_cells integer,
                 generations integer,
                 size_x integer,
@@ -20,8 +24,10 @@ def initial_setup():
                 use_immunity integer,
                 days_of_immunity integer    
                 )""")
-    conn.commit()
+    c.execute("INSERT INTO users VALUES (:username, :see_all)", {'username': 'admin', 'see_all': 1})
 
+    conn.commit()
+    conn.close()
     # if not os.path.isfile('my_database.db'):
     #     # print("Creating new table")
     #     new_table()
@@ -34,22 +40,46 @@ def initial_setup():
 
 
 def enter_username(in_user):
+    """If new username entered, it will create a record in the users table for that user, if username
+    entered already exists nothing happens. Username is returned"""
     conn = sqlite3.connect('my_database.db')
     c = conn.cursor()
-    # c.execute("INSERT INTO users VALUES (:username, :see_all) ON DUPLICATE KEY UPDATE id=id",
-    #           {'username': in_user, 'see_all': 0})
     c.execute("INSERT OR IGNORE INTO users VALUES (:username, :see_all)",
               {'username': in_user, 'see_all': 0})  # don't add if duplicate username
     conn.commit()
+    conn.close()
+    return in_user
 
+
+def ca_enter_param(in_user, up):
+    """Inserts new parameters entered by the user into the parameter database"""
+    conn = sqlite3.connect('my_database.db')
+    c = conn.cursor()
+    c.execute("""INSERT INTO ca_param VALUES (:user, :no_cells, :generations, :size_x, :size_y,
+                                            :infection_radius, :no_infected, :recovered_can_be_infected,
+                                            :days_until_recovered, :use_immunity, :days_of_immunity)""",
+              {'user': in_user, 'no_cells': up[0], 'generations': up[1], 'size_x': up[2], 'size_y': up[3],
+               'infection_radius': up[4], 'no_infected': up[5], 'recovered_can_be_infected': up[6],
+               'days_until_recovered': up[7], 'use_immunity': up[8], 'days_of_immunity': up[9]})
+    conn.commit()
+    conn.close()
+
+
+def return_history(in_user):
+    """Returns entered parameter history depending on current user"""
+    conn = sqlite3.connect('my_database.db')
+    c = conn.cursor()
+    c.execute("SELECT * FROM ca_param WHERE user=in_user")
+    conn.close()
+    return c.fetchall()
 
 # initial_setup()
 
-# enter_username("chase")
-
+# enter_username("Alice")
 
 # conn = sqlite3.connect('my_database.db')
 # c = conn.cursor()
 #
 # c.execute("SELECT * FROM users")
 # print(c.fetchall())
+
