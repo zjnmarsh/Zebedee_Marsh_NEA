@@ -10,7 +10,6 @@ from matplotlib.animation import FuncAnimation
 import matplotlib
 import csv
 import json
-
 from tkinter import filedialog
 
 
@@ -530,7 +529,7 @@ class cellular_automata:
         self.full_list = []
         self.r_i = r_i  # recovered can be infected
 
-        if 'uf_param' in locals():
+        if len(uf_param) != 0:
             self.uf_param = uf_param
             self.lines = list(uf_param)[0]
 
