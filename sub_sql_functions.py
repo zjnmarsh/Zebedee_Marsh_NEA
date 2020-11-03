@@ -11,6 +11,7 @@ def initial_setup():
     # c.execute("DROP TABLE users")
     # c.execute("DROP TABLE ca_param")
     c.execute("CREATE TABLE users (username text PRIMARY KEY, see_all integer)")
+
     c.execute("""CREATE TABLE ca_param (
                 user string,
                 no_cells integer,
@@ -26,17 +27,18 @@ def initial_setup():
                 )""")
     c.execute("INSERT INTO users VALUES (:username, :see_all)", {'username': 'admin', 'see_all': 1})
 
+    c.execute("""CREATE TABLE sir_param (
+                user string,
+                sus0 integer,
+                inf0 integer,
+                rec0 integer,
+                beta integer,
+                gamma integer,
+                time integer
+                )""")
+
     conn.commit()
     conn.close()
-    # if not os.path.isfile('my_database.db'):
-    #     # print("Creating new table")
-    #     new_table()
-    #
-    # if reset:
-    #     conn = sqlite3.connect('my_database.db')
-    #     c = conn.cursor()
-    #
-    #     new_table()
 
 
 def enter_username(in_user):
@@ -52,7 +54,7 @@ def enter_username(in_user):
 
 
 def ca_enter_param(in_user, up):
-    """Inserts new parameters entered by the user into the parameter database"""
+    """Inserts new parameters entered by the user into the CA parameter database"""
     conn = sqlite3.connect('my_database.db')
     c = conn.cursor()
     c.execute("""INSERT INTO ca_param VALUES (:user, :no_cells, :generations, :size_x, :size_y,
@@ -65,13 +67,25 @@ def ca_enter_param(in_user, up):
     conn.close()
 
 
-def return_history(in_user):
+def ca_return_history(in_user):
     """Returns entered parameter history depending on current user"""
     conn = sqlite3.connect('my_database.db')
     c = conn.cursor()
     c.execute("SELECT * FROM ca_param WHERE user=in_user")
     conn.close()
     return c.fetchall()
+
+
+def sir_enter_param(in_user, up):
+    """Inters new parameters entered by the user into the SIR parameter database"""
+    conn = sqlite3.connect('my_database.db')
+    c = conn.cursor()
+    c.execute("""INSERT INTO sir_param VALUES (:user, :sus0, :inf0, :rec0, :beta, :gamma, :time)""",
+              {'user': in_user, 'sus0': up[0], 'inf0': up[1], 'rec0': up[2], 'beta': up[3], 'gamma': up[4], 'time': up[5]
+               })
+    conn.commit()
+    conn.close()
+
 
 # initial_setup()
 
@@ -81,5 +95,11 @@ def return_history(in_user):
 # c = conn.cursor()
 #
 # c.execute("SELECT * FROM users")
+# print(c.fetchall())
+
+# ca_enter_param('chase', [10, 25, 50, 50, 3, 3, True, 5, True, 5])
+# ca_enter_param('chase', [1, 2, 5, 5, 1, 3, True, 5, True, 5])
+# ca_enter_param('Alice', [33, 5, 80, 30, 3, 3, True, 5, True, 5])
+# c.execute("SELECT * FROM ca_param")
 # print(c.fetchall())
 

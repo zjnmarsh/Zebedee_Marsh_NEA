@@ -215,12 +215,13 @@ class gui_SIR_Param:
             self.counter = 0
 
     def submit_param(self):
-
         # print(self.param_list)
         self.master.destroy()
-        queue = my_sir.QueueSimulation(self.number_of_simulations, self.param_list[0], self.param_list[1], self.param_list[2],
+        queue = my_sir.QueueSimulation(self.number_of_simulations, self.param_list[0], self.param_list[1],
+                                       self.param_list[2],
                                        self.param_list[3], self.param_list[4],
-                                       100)
+                                       100, current_user)
+
         queue.run_simulation()
 
 
