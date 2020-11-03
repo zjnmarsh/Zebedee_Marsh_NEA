@@ -14,6 +14,9 @@ from tkinter import filedialog
 
 import sub_SIR_model as my_sir
 import sub_CA_model as my_ca
+import sub_sql_functions as my_sql
+
+current_user = "None"
 
 
 class gui_Main_Window:
@@ -22,15 +25,19 @@ class gui_Main_Window:
         self.master = master
         self.frame = ttk.Frame(master, padding=5)
 
-        self.lbl_name = ttk.Label(self.frame, text='This is the main page')
-        self.btn_SIR = ttk.Button(self.frame, text='SIR model', command=self.openSIR)
-        self.btn_CA = ttk.Button(self.frame, text='Cellular Automata', command=self.openCA)
+        # self.lbl_name = ttk.Label(self.frame, text='This is the main page')
+        self.e_user = ttk.Entry(self.frame)
+        self.btn_login = ttk.Button(self.frame, text='Login', command=self.login)
+        self.btn_SIR = ttk.Button(self.frame, text='SIR model', command=self.openSIR, state=tk.DISABLED)
+        self.btn_CA = ttk.Button(self.frame, text='Cellular Automata', command=self.openCA, state=tk.DISABLED)
 
         self.frame.grid(row=0, column=0, sticky='nsew')
 
-        self.lbl_name.grid(column=1, row=0, columnspan=3, sticky='n')
-        self.btn_SIR.grid(column=1, row=1, sticky='s')
-        self.btn_CA.grid(column=1, row=2, sticky='s')
+        # self.lbl_name.grid(column=1, row=0, columnspan=3, sticky='n')
+        self.e_user.grid(column=1, row=0, sticky='n')
+        self.btn_login.grid(column=2, row=0, sticky='n')
+        self.btn_SIR.grid(column=1, row=1, columnspan=2, sticky='s')
+        self.btn_CA.grid(column=1, row=2, columnspan=2, sticky='s')
 
         self.master.columnconfigure(0, weight=1)
         self.master.rowconfigure(0, weight=1)
@@ -39,11 +46,6 @@ class gui_Main_Window:
         self.frame.rowconfigure(1, weight=1)
 
     def openSIR(self):
-        # self.new_window = tk.Toplevel(self.master)
-        # self.app = SIR_Window(self.new_window)
-        # self.new_window = tk.Toplevel(self.master)
-        # self.app = SIR_Window(self.new_window)
-
         # self.master.destroy()
         root2 = tk.Tk()
         root2.title('SIR Model')
@@ -58,6 +60,30 @@ class gui_Main_Window:
         new_window = gui_First_CA_Window(root2)
         root2.mainloop()
 
+    def login(self):
+        username = str(self.e_user.get())
+        my_sql.enter_username(username)
+        global current_user
+        current_user = username
+
+        self.btn_SIR['state'] = tk.NORMAL
+        self.btn_CA['state'] = tk.NORMAL
+        self.e_user.destroy()
+        self.btn_login.destroy()
+        self.lbl_name = ttk.Label(self.frame, text=f'Hello {current_user}')
+        self.lbl_name.grid(column=1, row=0)
+        self.btn_logout = ttk.Button(self.frame, text='logout', command=self.logout)
+        self.btn_logout.grid(column=2, row=0)
+
+    def logout(self):
+        print('logout')
+        self.e_user = ttk.Entry(self.frame)
+        self.btn_login = ttk.Button(self.frame, text='Login', command=self.login)
+        self.e_user.grid(column=1, row=0, sticky='n')
+        self.btn_login.grid(column=2, row=0, sticky='n')
+        self.btn_SIR['state'] = tk.DISABLED
+        self.btn_CA['state'] = tk.DISABLED
+
 
 # ---------------------------------------
 
@@ -69,7 +95,9 @@ class gui_First_SIR_Window:
         self.frame = ttk.Frame(master, padding=5)
 
         self.lbl_name = ttk.Label(self.frame, text='This is the SIR model')
-        # self.num_sim = ttk.Entry(self.frame)
+
+        self.lbl_num_sim = ttk.Label(self.frame, text='Number of simulations')
+        self.e_num_sim = ttk.Entry(self.frame)
         # self.num_sim.insert(0, 1)
         self.btn_open_file = ttk.Button(self.frame, text='Load File', command=self.open_file)
         self.btn_input_param = ttk.Button(self.frame, text='Enter Parameters', command=self.input)
@@ -78,10 +106,12 @@ class gui_First_SIR_Window:
         self.frame.grid(row=0, column=0, sticky='nsew')
 
         self.lbl_name.grid(column=0, row=0, columnspan=2, sticky='n')
+        self.lbl_num_sim.grid(column=0, row=1)
+        self.e_num_sim.grid(column=1, row=1)
         # self.num_sim.grid(column=0, row=1)
-        self.btn_open_file.grid(column=0, row=1)
-        self.btn_input_param.grid(column=1, row=1)
-        self.btn_close.grid(column=0, row=2, sticky='s')
+        self.btn_open_file.grid(column=0, row=2)
+        self.btn_input_param.grid(column=1, row=2)
+        self.btn_close.grid(column=0, row=3, sticky='s')
 
         self.master.columnconfigure(0, weight=1)
         self.master.rowconfigure(0, weight=1)
@@ -98,10 +128,10 @@ class gui_First_SIR_Window:
         # print(df)
 
     def input(self):
-        # self.number_of_simulations = int(self.num_sim.get())
-        # print(self.number_of_simulations)
+        self.number_of_simulations = int(self.e_num_sim.get())
+        print(self.number_of_simulations)
 
-        self.number_of_simulations = 1
+        # self.number_of_simulations = 1
         root3 = tk.Tk()
         root3.title('Input Parameters')
         input_window = gui_SIR_Param(root3, self.number_of_simulations)
@@ -112,6 +142,9 @@ class gui_SIR_Param:
     """Class for entering SIR parameters"""
 
     def __init__(self, master, num_sim):
+        self.param_list = [[], [], [], [], []]
+        self.counter = 0
+
         self.number_of_simulations = num_sim
         self.master = master
         self.frame = ttk.Frame(master, padding=5)
@@ -163,17 +196,30 @@ class gui_SIR_Param:
         self.frame.rowconfigure(6, weight=1)
 
     def enter_param(self):
-        # self.master.destroy()
-        param_list = [[], [], [], [], []]
-        # for i in range(self.number_of_simulations):
-        param_list[0].append(float(self.e_s.get()))
-        param_list[1].append(float(self.e_i.get()))
-        param_list[2].append(float(self.e_r.get()))
-        param_list[3].append(float(self.e_tr.get()))
-        param_list[4].append(float(self.e_re.get()))
-        # param_list.append()
-        # print(param_list)
-        queue = my_sir.QueueSimulation(1, param_list[0], param_list[1], param_list[2], param_list[3], param_list[4],
+        self.counter += 1
+
+        self.param_list[0].append(float(self.e_s.get()))
+        self.param_list[1].append(float(self.e_i.get()))
+        self.param_list[2].append(float(self.e_r.get()))
+        self.param_list[3].append(float(self.e_tr.get()))
+        self.param_list[4].append(float(self.e_re.get()))
+
+        self.e_s.delete(0, 'end')
+        self.e_i.delete(0, 'end')
+        self.e_r.delete(0, 'end')
+        self.e_tr.delete(0, 'end')
+        self.e_re.delete(0, 'end')
+
+        if self.counter == self.number_of_simulations:
+            self.submit_param()
+            self.counter = 0
+
+    def submit_param(self):
+
+        # print(self.param_list)
+        self.master.destroy()
+        queue = my_sir.QueueSimulation(self.number_of_simulations, self.param_list[0], self.param_list[1], self.param_list[2],
+                                       self.param_list[3], self.param_list[4],
                                        100)
         queue.run_simulation()
 
@@ -333,10 +379,15 @@ class gui_CA_Param:
         # print(rec_inf)
         # print(use_imm)
 
-        ca = my_ca.cellular_automata(no_cells, generations, size_x, size_y, inf_rad, no_inf, rec_inf, days_rec, use_imm,
-                                     days_imm, False)
-        # ca = my_ca.cellular_automata(50, 50, 200, 200, 5, 5, True, 14, True,
-        #                              3, False)
+        arguments = [no_cells, generations, size_x, size_y, inf_rad, no_inf, rec_inf, days_rec, use_imm,
+                     days_imm, False]
+
+        my_sql.ca_enter_param(current_user, arguments)
+
+        # ca = my_ca.cellular_automata(no_cells, generations, size_x, size_y, inf_rad, no_inf, rec_inf, days_rec, use_imm,
+        #                              days_imm, False)
+        ca = my_ca.cellular_automata(*arguments)  # arguments sent as separate parameters
+
         ca.new_generation()
 
 
