@@ -238,6 +238,7 @@ class gui_First_CA_Window:
         # self.num_sim.insert(0, 1)
         self.btn_open_file = ttk.Button(self.frame, text='Load File', command=self.open_file)
         self.btn_input_param = ttk.Button(self.frame, text='Enter Parameters', command=self.input)
+        self.btn_show_history = ttk.Button(self.frame, text='History', command=self.show_history)
         self.btn_close = ttk.Button(self.frame, text='Close', command=self.close)
 
         self.frame.grid(row=0, column=0, sticky='nsew')
@@ -246,7 +247,8 @@ class gui_First_CA_Window:
         # self.num_sim.grid(column=0, row=1)
         self.btn_open_file.grid(column=0, row=1)
         self.btn_input_param.grid(column=1, row=1)
-        self.btn_close.grid(column=0, row=2, sticky='s')
+        self.btn_show_history.grid(column=0, row=2)
+        self.btn_close.grid(column=1, row=2, sticky='s')
 
         self.master.columnconfigure(0, weight=1)
         self.master.rowconfigure(0, weight=1)
@@ -276,6 +278,11 @@ class gui_First_CA_Window:
         root3 = tk.Tk()
         root3.title('Input Parameters')
         input_window = gui_CA_Param(root3)
+
+    def show_history(self):
+        root3 = tk.Tk()
+        root3.title('History')
+        history_window = gui_CA_history(root3)
 
     def close(self):
         self.master.destroy()
@@ -392,6 +399,40 @@ class gui_CA_Param:
         ca.new_generation()
 
 
+class gui_CA_history:
+    """Class which shows history of the current user"""
+    def __init__(self, master):
+        self.master = master
+        self.frame = ttk.Frame(master, padding=5)
+        self.frame.grid(row=0, column=0, sticky='nsew')
+        self.user_history = my_sql.ca_return_history(current_user) # user_history is a list of tuples
+
+        self.lb_history = tk.Listbox(self.frame, width=50)
+        for i in range(len(self.user_history)):
+            to_insert = str(i) + "  " + str(self.user_history[i][1:])
+            self.lb_history.insert(i, to_insert)
+
+        self.lbl_title = ttk.Label(self.frame, text=f"History of {current_user}")
+        self.btn_exit = ttk.Button(self.frame, text="Exit", command=self.exit)
+        self.lbl_text = ttk.Label(self.frame, text="Enter number to simulate with same parameters")
+        self.e_sim_num = ttk.Entry(self.frame)
+        self.btn_use = ttk.Button(self.frame, text="Use values", command=self.use)
+
+        self.lbl_title.grid(column=1, row=1, columnspan=3)
+        self.lbl_text.grid(column=1, row=2, columnspan=3)
+        self.lb_history.grid(column=1, row=3)
+        self.e_sim_num.grid(column=2, row=3)
+        self.btn_use.grid(column=3, row=3)
+        self.btn_exit.grid(column=2, row=4, columnspan=2)
+
+    def exit(self):
+        self.master.destroy()
+
+    def use(self):
+        """User enter number and set of parameters are retrieved from the database"""
+        pass
+
+
 # ---------------------------------------
 
 
@@ -401,3 +442,4 @@ root.title('Main Window')
 window = gui_Main_Window(root)
 
 root.mainloop()
+

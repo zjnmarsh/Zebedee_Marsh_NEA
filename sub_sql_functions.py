@@ -71,8 +71,8 @@ def ca_return_history(in_user):
     """Returns entered parameter history depending on current user"""
     conn = sqlite3.connect('my_database.db')
     c = conn.cursor()
-    c.execute("SELECT * FROM ca_param WHERE user=in_user")
-    conn.close()
+    c.execute("SELECT * FROM ca_param WHERE user=:curr_user", {'curr_user': in_user})
+    # conn.close()
     return c.fetchall()
 
 
