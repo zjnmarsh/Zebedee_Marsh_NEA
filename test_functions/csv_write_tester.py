@@ -1,5 +1,6 @@
 # import csv
 import json
+import numpy as np
 
 a = [[1, 2, 3], [11, 22, 33], [4, 5, 6]]
 b = [["a","b","c"], ["ad","bd","cd"], ["afds","bfds","cfds"]]
@@ -15,13 +16,34 @@ b = [["a","b","c"], ["ad","bd","cd"], ["afds","bfds","cfds"]]
 #     file.write(str(a) + "\n")
 #     file.write(str(b))
 
-filename = "text.txt"
+
+
+filename = "../ca_output.txt"
 final = []
 with open(filename, 'r') as file:
     lines = [line.rstrip('\n') for line in file]
 
-if lines[-1] == "":
-    del lines[-1]
+# for item in lines:
+#     final.append(json.loads(item))
+
+listy = [json.loads(item) for item in lines]
+
+# for listx in final:
+#     print(listx)
+
+
+
+#
+#
+# if lines[-1] == "":
+#     del lines[-1]
+#
+# ok = [item.strip('][').split(', ') for item in lines]
+#
+# print(ok[0])
+
+
+
 #
 # print(lines)
 #
@@ -31,10 +53,16 @@ if lines[-1] == "":
 # print(final)
 
 # print(json.loads(lines[2]))
-res = lines[2].strip('][').split(', ')
+# res = lines[2].strip('][').split(', ')
 # print(res)
 
-print([item.strip('][').split(', ') for item in lines])
+
+
+# threenum, num, booleans = ok
+#
+# print(threenum)
+# print(num)
+# print(booleans)
 
 # print(json.loads(lines[0]))
 

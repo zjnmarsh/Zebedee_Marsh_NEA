@@ -1,6 +1,4 @@
-#!/bin/sh
-'''exec' "/Users/zebedeemarsh/Google Drive/CompSci/CS Zebedee Marsh/Project/venv/bin/python" "$0" "$@"
-' '''
+#!/Users/zebedeemarsh/Documents/Project/venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
