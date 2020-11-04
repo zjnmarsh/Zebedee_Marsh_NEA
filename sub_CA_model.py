@@ -1,3 +1,6 @@
+# pylint: disable=unused-variable
+# pylint: enable=too-many-lines
+
 import matplotlib.pyplot as plt
 import random
 from matplotlib.animation import FuncAnimation

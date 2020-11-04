@@ -400,12 +400,15 @@ class gui_CA_Param:
 
 
 class gui_CA_history:
-    """Class which shows history of the current user"""
+
     def __init__(self, master):
         self.master = master
         self.frame = ttk.Frame(master, padding=5)
         self.frame.grid(row=0, column=0, sticky='nsew')
         self.user_history = my_sql.ca_return_history(current_user) # user_history is a list of tuples
+        # print(self.user_history)
+        # print(self.user_history[0][1:])
+
 
         self.lb_history = tk.Listbox(self.frame, width=50)
         for i in range(len(self.user_history)):
@@ -430,7 +433,13 @@ class gui_CA_history:
 
     def use(self):
         """User enter number and set of parameters are retrieved from the database"""
-        pass
+        sim_number = int(self.e_sim_num.get())
+        sim_param = list(self.user_history[sim_number][1:])
+        print(sim_param)
+        sim_param.append(False)
+        ca = my_ca.cellular_automata(*sim_param)
+        ca.new_generation()
+
 
 
 # ---------------------------------------
@@ -442,4 +451,3 @@ root.title('Main Window')
 window = gui_Main_Window(root)
 
 root.mainloop()
-
