@@ -7,6 +7,7 @@
 \usepackage{color}
 \usepackage{graphicx}
 \usepackage{subcaption}
+\usepackage{verbatim}
 \graphicspath{ {images/} }
 
 \definecolor{dkgreen}{rgb}{0,0.6,0}
@@ -32,7 +33,7 @@
 
 
 \author{Zebedee Marsh}
-\title{Analysis - Simulating disease spread through Cellular Automata and the SIR model}
+\title{Analysis - Simulating disease spread through Cellular Automata and the SIR model DRAFT}
 
 \begin{document}
     
@@ -49,7 +50,20 @@ My project aims to provide a starting point for where a disease outbreak can be 
 
 Source: https://sundial.csun.edu/156361/news/a-timeline-of-outbreaks-from-2000-to-present/
 
+\section{Initial objectives}
+These objects represent my initial aims of what this project should be able to do. These may change later on throughout this project.
+\begin{itemize}
+    \item Simulate the spread of a disease using the SIR model
+    \item Simulate the spread of a disease using the Cellular Automata model
+    \item Input custom parameters or use default values (from a previous disease) including infection rate, incubation period and death rate for the SIR model
+    \item Input custom parameters or use default values (from a previous disease) relating to the number and infectivity of cells for the CA model
+    \item Set a quarantine period or introduce a vaccine (therefore limiting disease transmission)
+    \item Click on a graph and show statistics from that point in time
+    \item Export graphs produced as png
+    \item Upload past simulation results into the program to generate a graph from that previous simulation
+    \item Be able to compare graphs of two different diseases
 
+\end{itemize}
 
 \section{Potential user}
 Mr Bliss - Biology teacher at Abingdon School
@@ -67,10 +81,43 @@ To first understand how I could make this project, I had to research the two mai
     \item Learn how to use Tkinter to create a GUI interface and multiple pages
     \item Learn how to create, use and modify an SQL database using Sqlite3
 \end{itemize}
+\subsection{The SIR model}
+The SIR model is a simple disease spread model which uses differential equations to determine the number of people in three categories, the susceptible, the infected and the recovered. The susceptible population represent those who can become infected a disease, the infected population represent those currently infected with the disease who are able to spread it to other people and the recovered population represent those who are no longer infected. In some models, people in the recovered population can be infected again.
+\subsubsection{Equations for the SIR model}
+
+\textbf{People in each group}
+
+\(S = S(t) \) - number of susceptible individuals
+
+\(I = I(t) \) - number of infected individuals
+
+\(R = R(t) \) - number of recovered individuals
 
 
+\textbf{The Susceptible equation}
+\[ \frac{dS}{dt}=\frac{-\beta S(t)I(t)}{N} \]
+where \(\beta\) is the rate at which infections occur (a positive constant)
 
-\section{Research of existing solutions}
+
+\textbf{The Infected equation}
+\[ \frac{dI}{dt}=\frac{\beta S(t)I(t)}{N}-\gamma I(t) \]
+where \(\gamma\) is the rate at which people recover
+
+
+\textbf{The Recovered equation}
+\[ \frac{dR}{dt}=\gamma I(t) \]
+
+
+\textbf{Model without vital dynamics}
+\[ \frac{dS}{dt} + \frac{dI}{dt} + \frac{dR}{dt} = 0 \]
+As this model doesn't take into account vital dynamics ie. people aren't added through birth or removed through death, the sum of all the changes is constant and equal to 0
+
+
+\subsection{The CA model TBD}
+Dolore accusam dolores ipsum stet amet, sit at sea labore aliquyam accusam sit. Takimata elitr dolor ea sea no labore erat et at. Clita ipsum stet justo et, voluptua vero voluptua dolor sea dolore ipsum sit dolore, dolor sanctus magna lorem sed ut amet dolores dolore sadipscing. Sed elitr dolor et invidunt no sit magna et sit. Et labore sit amet sea gubergren, erat et sanctus nonumy dolor takimata rebum takimata no. Amet sit voluptua diam et sit, kasd et sea sed ut est est aliquyam diam, ipsum dolores magna clita vero aliquyam, duo amet sed no voluptua justo eirmod..
+
+\newpage
+\section{Research of existing solutions TDB}
 TBD
 
 
@@ -86,12 +133,15 @@ E1. I will try to implement a feature where the parameters of two diseases could
 
 
 \newpage
-\section{Prototyping of code}
+\section{Prototyping of code TDB}
 TBD
 
 
 \newpage
-\section{Documented design}
+\section{Documented design COMMENTED OUT}
+
+\begin{comment}
+
 \subsection{Main function}
 \includegraphics[width=\textwidth, angle=90]{s_main_function.png}
 \newpage
@@ -107,10 +157,15 @@ TBD
 \newpage
 \includegraphics[width=\textwidth, height=\textheight]{f_SIR.png}
 \newpage
-\newpage
-\section{The code}
 
-\subsection{Main Function}
+\end{comment}
+
+\newpage
+\section{The code COMMENTED OUT}
+
+\begin{comment}
+
+    \subsection{Main Function}
 \begin{lstlisting}
 # pylint: disable=unused-variable
 import tkinter as tk
@@ -1035,5 +1090,6 @@ class cellular_automata:
 
 \end{lstlisting}
 
+\end{comment}
 
 \end{document}

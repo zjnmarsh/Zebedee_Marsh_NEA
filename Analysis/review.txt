@@ -1,0 +1,19 @@
+Add prototyping of code
+Add research of existing solutions
+
+Add mathematical equations DONE
+
+Need to describe algorithms DONE
+
+Database stuff
+- sql commands
+- data flow diagrams
+
+Objectives
+
+GUI interface - Documented design
+
+Testing section
+
+Language and libraries we're using - analysis
+

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.9.13)  27 NOV 2020 14:52
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.9.13)  1 DEC 2020 19:15
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -199,6 +199,11 @@ Package caption Info: listings package is loaded.
 )
 \c@subfigure=\count283
 \c@subtable=\count284
+) (/usr/local/texlive/2020/texmf-dist/tex/latex/tools/verbatim.sty
+Package: verbatim 2019/11/10 v1.5r LaTeX2e package for verbatim enhancements
+\every@verbatim=\toks23
+\verbatim@line=\toks24
+\verbatim@in@stream=\read3
 ) (/usr/local/texlive/2020/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2020/03/24 1.8d listings language file
 ) (/usr/local/texlive/2020/texmf-dist/tex/latex/l3backend/l3backend-pdfmode.def
@@ -208,27 +213,27 @@ File: l3backend-pdfmode.def 2020-03-12 L3 backend support: PDF mode
 ) (/Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.aux)
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 37.
-LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 38.
+LaTeX Font Info:    ... okay on input line 38.
 
 No file pythontex-files-main/main.pytxmcr.
 Run PythonTeX to create it.
-Package newfloat Info: New float `listing' with options `fileext=lopytx' on input line 37.
+Package newfloat Info: New float `listing' with options `fileext=lopytx' on input line 38.
 \c@listing=\count286
 \newfloat@ftype=\count287
-Package newfloat Info: float type `listing'=8 on input line 37.
+Package newfloat Info: float type `listing'=8 on input line 38.
 \c@sublisting=\count288
 (/usr/local/texlive/2020/texmf-dist/tex/latex/base/textcomp.sty
 Package: textcomp 2020/02/02 v2.0n Standard LaTeX package
@@ -241,12 +246,12 @@ Package: textcomp 2020/02/02 v2.0n Standard LaTeX package
 \scratchbox=\box54
 \nofMPsegments=\count291
 \nofMParguments=\count292
-\everyMPshowfont=\toks23
+\everyMPshowfont=\toks25
 \MPscratchCnt=\count293
 \MPscratchDim=\dimen160
 \MPnumerator=\count294
 \makeMPintoPDFobject=\count295
-\everyMPtoPDFconversion=\toks24
+\everyMPtoPDFconversion=\toks26
 ) (/usr/local/texlive/2020/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
@@ -256,14 +261,14 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: End \AtBeginDocument code.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 39.
+(Font)              <12> on input line 40.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 39.
+(Font)              <8> on input line 40.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 39.
+(Font)              <6> on input line 40.
  (/Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.toc
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <10.95> on input line 8.
+(Font)              <10.95> on input line 5.
 )
 \tf@toc=\write5
 \openout5 = `main.toc'.
@@ -271,94 +276,24 @@ LaTeX Font Info:    External font `cmex10' loaded for size
  [1
 
 {/usr/local/texlive/2020/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-Overfull \hbox (24.3401pt too wide) in paragraph at lines 50--51
+Overfull \hbox (24.3401pt too wide) in paragraph at lines 51--52
 []\OT1/cmr/m/n/10.95 Source: https://sundial.csun.edu/156361/news/a-timeline-of-outbreaks-from-2000-to-present/ 
  []
 
-[2] [3]
-<images/s_main_function.png, id=18, 4495.79625pt x 1533.73pt>
-File: images/s_main_function.png Graphic file (type png)
-<use images/s_main_function.png>
-Package pdftex.def Info: images/s_main_function.png  used on input line 96.
-(pdftex.def)             Requested size: 452.9679pt x 154.52872pt.
- [4 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/s_main_function.png>]
-<images/f_main.png, id=24, 317.0244pt x 652.5981pt>
-File: images/f_main.png Graphic file (type png)
-<use images/f_main.png>
-Package pdftex.def Info: images/f_main.png  used on input line 98.
-(pdftex.def)             Requested size: 452.99799pt x 670.5405pt.
-
-Overfull \hbox (30.03009pt too wide) in paragraph at lines 98--99
-[][] 
- []
-
-[5 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/f_main.png>]
-<images/s_CA.png, id=28, 3226.0525pt x 1228.59pt>
-File: images/s_CA.png Graphic file (type png)
-<use images/s_CA.png>
-Package pdftex.def Info: images/s_CA.png  used on input line 101.
-(pdftex.def)             Requested size: 452.9679pt x 172.48885pt.
-
-Overfull \hbox (30.0pt too wide) in paragraph at lines 101--102
-[] 
- []
-
-[6 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/s_CA.png>]
-<images/f_CA.png, id=33, 415.0707pt x 613.8132pt>
-File: images/f_CA.png Graphic file (type png)
-<use images/f_CA.png>
-Package pdftex.def Info: images/f_CA.png  used on input line 103.
-(pdftex.def)             Requested size: 452.97542pt x 670.56978pt.
-
-Overfull \hbox (30.00752pt too wide) in paragraph at lines 103--104
-[][] 
- []
-
-[7 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/f_CA.png>]
-<images/s_SIR.png, id=38, 2090.81125pt x 828.09375pt>
-File: images/s_SIR.png Graphic file (type png)
-<use images/s_SIR.png>
-Package pdftex.def Info: images/s_SIR.png  used on input line 106.
-(pdftex.def)             Requested size: 452.9679pt x 179.40134pt.
-
-Overfull \hbox (30.0pt too wide) in paragraph at lines 106--107
-[] 
- []
-
-[8 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/s_SIR.png>]
-<images/f_SIR.png, id=43, 272.4579pt x 715.9548pt>
-File: images/f_SIR.png Graphic file (type png)
-<use images/f_SIR.png>
-Package pdftex.def Info: images/f_SIR.png  used on input line 108.
-(pdftex.def)             Requested size: 452.99919pt x 670.51775pt.
-
-Overfull \hbox (30.0313pt too wide) in paragraph at lines 108--109
-[][] 
- []
-
-[9 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/f_SIR.png>]
-LaTeX Font Info:    Trying to load font information for TS1+cmtt on input line 143.
- (/usr/local/texlive/2020/texmf-dist/tex/latex/base/ts1cmtt.fd
-File: ts1cmtt.fd 2019/12/16 v2.5j Standard LaTeX font definitions
-) [10] [11] [12] [13] [14] [15] [16] [17] [18] [19] [20] [21] [22] [23] [24] [25]
-Overfull \hbox (274.7254pt too wide) in paragraph at lines 1004--1006
-[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]  
- []
-
-[26] [27] (/Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.aux) ) 
+[2] [3] [4] [5] [6] [7] [8] (/Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.aux) ) 
 Here is how much of TeX's memory you used:
- 8168 strings out of 480608
- 140450 string characters out of 5903630
- 639204 words of memory out of 5000000
- 23958 multiletter control sequences out of 15000+600000
- 538315 words of font info for 44 fonts, out of 8000000 for 9000
+ 7419 strings out of 480608
+ 132356 string characters out of 5903630
+ 578794 words of memory out of 5000000
+ 23219 multiletter control sequences out of 15000+600000
+ 537850 words of font info for 42 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 51i,6n,50p,917b,1776s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2020/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}</usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/cm-super/sfrm1095.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/cm-super/sftt1000.pfb>
-Output written on "/Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.pdf" (27 pages, 431851 bytes).
+ 51i,6n,50p,917b,216s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/texlive/2020/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}</usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/cm-super/sfrm1095.pfb>
+Output written on "/Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.pdf" (8 pages, 112400 bytes).
 PDF statistics:
- 134 PDF objects out of 1000 (max. 8388607)
- 87 compressed objects within 1 object stream
+ 64 PDF objects out of 1000 (max. 8388607)
+ 45 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 31 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
