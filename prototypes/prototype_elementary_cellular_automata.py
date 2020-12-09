@@ -4,7 +4,6 @@
 
 import time
 
-
 class CA:
     def __init__(self, width, generations):
         self.ruleset = [0, 1, 1, 1, 1, 0, 1, 1]

@@ -4,9 +4,20 @@
 \contentsline {section}{\numberline {4}How the problem was researched}{3}%
 \contentsline {subsection}{\numberline {4.1}The SIR model}{3}%
 \contentsline {subsubsection}{\numberline {4.1.1}Equations for the SIR model}{3}%
-\contentsline {subsection}{\numberline {4.2}The CA model TBD}{4}%
-\contentsline {section}{\numberline {5}Research of existing solutions TDB}{5}%
-\contentsline {section}{\numberline {6}Interview with target user}{5}%
-\contentsline {section}{\numberline {7}Prototyping of code TDB}{6}%
-\contentsline {section}{\numberline {8}Documented design COMMENTED OUT}{7}%
-\contentsline {section}{\numberline {9}The code COMMENTED OUT}{8}%
+\contentsline {subsection}{\numberline {4.2}The Cellular Automata model}{4}%
+\contentsline {subsubsection}{\numberline {4.2.1}My implementation of CA}{4}%
+\contentsline {section}{\numberline {5}Prototyping of code}{5}%
+\contentsline {subsection}{\numberline {5.1}The scientific models}{5}%
+\contentsline {subsubsection}{\numberline {5.1.1}Elementary cellular automata}{5}%
+\contentsline {subsubsection}{\numberline {5.1.2}Basic SIR model}{6}%
+\contentsline {subsection}{\numberline {5.2}External library testing TBD}{6}%
+\contentsline {subsubsection}{\numberline {5.2.1}Tkinter}{6}%
+\contentsline {subsubsection}{\numberline {5.2.2}Matplotlib}{8}%
+\contentsline {subsubsection}{\numberline {5.2.3}FuncAnimation}{8}%
+\contentsline {subsubsection}{\numberline {5.2.4}Pandas}{9}%
+\contentsline {subsubsection}{\numberline {5.2.5}Pygame}{10}%
+\contentsline {subsection}{\numberline {5.3}SQL database TDB}{12}%
+\contentsline {section}{\numberline {6}Research of existing solutions TDB}{13}%
+\contentsline {section}{\numberline {7}Interview with target user}{14}%
+\contentsline {section}{\numberline {8}Documented design COMMENTED OUT}{15}%
+\contentsline {section}{\numberline {9}The code COMMENTED OUT}{16}%

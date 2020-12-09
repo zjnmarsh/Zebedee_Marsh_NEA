@@ -8,6 +8,11 @@
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage{verbatim}
+\usepackage{cite}
+\usepackage{caption}
+\usepackage{subcaption}
+
+
 \graphicspath{ {images/} }
 
 \definecolor{dkgreen}{rgb}{0,0.6,0}
@@ -42,7 +47,7 @@
 \newpage
 
 \section{Introduction}
-Since 1999, there have been 11 major disease outbreaks (Daily Sundial, 2020) across the globe, eight of which involved thousands of cases. To effectively control an outbreak and ultimately stop it in its tracks, it's current and past states must be analysed so it's spread can be predicted, which is essential in influencing how governments should deal with such a threat.
+Since 1999, there have been 11 major disease outbreaks ~\cite{moran-perez_2020} across the globe, eight of which involved thousands of cases. To effectively control an outbreak and ultimately stop it in its tracks, it's current and past states must be analysed so it's spread can be predicted, which is essential in influencing how governments should deal with such a threat.
 
 This is currently being seen in how the UK government is dealing with COVID-19, where a balance between a total lockdown and total freedom needs to be struck to control how the virus spreads. This balance is essential in allowing businesses to continue operating, keeping the economy afloat and allowing people their freedoms to do what they want.
 
@@ -113,28 +118,341 @@ where \(\gamma\) is the rate at which people recover
 As this model doesn't take into account vital dynamics ie. people aren't added through birth or removed through death, the sum of all the changes is constant and equal to 0
 
 
-\subsection{The CA model TBD}
-Dolore accusam dolores ipsum stet amet, sit at sea labore aliquyam accusam sit. Takimata elitr dolor ea sea no labore erat et at. Clita ipsum stet justo et, voluptua vero voluptua dolor sea dolore ipsum sit dolore, dolor sanctus magna lorem sed ut amet dolores dolore sadipscing. Sed elitr dolor et invidunt no sit magna et sit. Et labore sit amet sea gubergren, erat et sanctus nonumy dolor takimata rebum takimata no. Amet sit voluptua diam et sit, kasd et sea sed ut est est aliquyam diam, ipsum dolores magna clita vero aliquyam, duo amet sed no voluptua justo eirmod..
+\subsection{The Cellular Automata model}
+The basic idea of cellular automata that there there is a collection of cells with a finite set of states. Every new generation, the state of a cell can be changed depending on the state of it's neighbouring cells. 
+
+\subsubsection{My implementation of CA}
+\begin{itemize}
+    \item Cells move randomly within a grid. Most cells will be susceptible but some will be infected
+    \item If a susceptible cell comes in close range to an infected cell, there is a chance that that susceptible cell will be come infected
+    \item Infected cells are only infected for a certain period of time, so after a certain number of generations the cell will no longer be infected and will be in the recovered category
+\end{itemize}
+\newpage
+\section{Prototyping of code}
+
+\subsection{The scientific models}
+\subsubsection{Elementary cellular automata}
+My initial cellular automata model was very basic and only worked on a 1D line. The shape of each new line would be decided by looking at the previous line and applying a ruleset to it.
+\begin{lstlisting}
+class CA:
+    def __init__(self, width, generations):
+        self.ruleset = [0, 1, 1, 1, 1, 0, 1, 1]
+        self.width = width
+        self.cells = [0] * width
+        self.new_cells = [None] * width
+        self.cells[int((width / 2) - 1)] = 1
+        self.generations = generations
+        self.cell_timeline = []
+
+    def rules(self, a, b, c, i):
+        index = int((a + b + c), 2)
+        ruleset = [0, 1, 0, 1, 1, 0, 1, 0]
+        self.new_cells[i] = ruleset[index]
+
+    def draw(self):
+        output = ""
+        for cell_state in self.cell_timeline:
+            for element in cell_state:
+                if element == 0:
+                    output += " " + " "
+                else:
+                    output += "X" + " "
+            print(output)
+            time.sleep(0.1)
+            output = ""
+
+    def ca(self):
+        for gen in range(self.generations):
+            for i in range(self.width):
+                a = str(self.cells[((i - 1) % self.width)])
+                b = str(self.cells[i])
+                c = str(self.cells[((i + 1) % self.width)])
+                # print(a,b,c)
+                self.rules(a, b, c, i)
+            self.cells = self.new_cells
+            self.cell_timeline.append(self.cells)
+            self.new_cells = [None] * self.width
+        self.draw()
+
+ca = CA(100, 100)
+ca.ca()
+\end{lstlisting}
+\textbf{The result of elementary cellular automata}
+
+\includegraphics[width=\textwidth]{eca.png}
+
+\subsubsection{Basic SIR model}
+My starting block for the SIR model was a function which calculated the rate of change of the susceptible, infected and recovered population. 
+\begin{lstlisting}
+def eqns(y0, t, beta, gamma):
+S, I, R = y0
+dsdt = -(beta * S * I) / N  # rate of change of susceptible individuals
+didt = ((beta * S * I) / N) - gamma * I  # rate of change of infected individuals
+drdt = gamma * I  # rate of change of recovered individuals
+return dsdt, didt, drdt
+\end{lstlisting}
+
+\subsection{External library testing TBD}
+\subsubsection{Tkinter}
+My intial prototying for tkinter was done with the help of a YouTube video which focused on having multiple tkinter pages in a single file.
+Link: https://youtu.be/jBUpjijYtCk
+
+This prototype allowed there to be multiple Tkinter windows which could be switched between by a button click. The way this method worked was by removeing and adding widgets depending on which page should be shown. Although this method may have worked for me, in the final project I went with destroying a Tkinter window and starting a completely new one when a user wanted to switch, as the code for this was easier to understand and write. 
+
+\begin{lstlisting}
+import tkinter as tk
+
+
+class Gui(tk.Tk):
+
+    def __init__(self, *args,
+                    **kwargs):  # *args - pass through any number of variables; **kwargs - pass through dictionaries
+        tk.Tk.__init__(self, *args, **kwargs)  # initialising tkinter
+        container = tk.Frame(self)  # the frame of the window
+        container.pack(side="top", fill="both", expand=True)
+        container.grid_rowconfigure(0, weight=1)  # 0 sets minimum size, weight shows priority
+        container.grid_columnconfigure(0, weight=1)
+        self.frames = {}  # allows application to open different types of pages easily
+
+        for F in (StartPage, PageOne):  # all pages need to be listed here
+            frame = F(container, self)
+            self.frames[F] = frame  # saving classes to dictionary, "loading it in"
+            frame.grid(row=0, column=0, sticky="nsew")
+
+        self.show_frame(StartPage)  # start page is shown first
+
+    def show_frame(self, cont):
+        frame = self.frames[cont]  # looks for cont in dict
+        frame.tkraise()  # which is then raised
+
+
+class StartPage(tk.Frame):
+
+    def __init__(self, parent,
+                    controller):  # parent class is Gui, controller class is main class, allowing show_frame to be called
+        tk.Frame.__init__(self, parent)
+
+        label = tk.Label(self, text="Start Page")
+        label.pack(pady=10, padx=10)
+        button1 = tk.Button(self, text="Page 1", command=lambda: controller.show_frame(PageOne))
+        button1.pack()
+
+
+class PageOne(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+
+        label = tk.Label(self, text="This is page 1")
+        label.pack(pady=10, padx=10)
+        button2 = tk.Button(self, text="Start Page", command=lambda: controller.show_frame(StartPage))
+        button2.pack()
+
+
+app = Gui()
+app.mainloop()
+\end{lstlisting}
+\textbf{The result}
+
+\begin{figure}
+    \centering
+    \begin{minipage}{.5\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{p_tk_start.png}
+      \captionof{figure}{Start Tkinter window}
+      \label{fig:test1}
+    \end{minipage}%
+    \begin{minipage}{.5\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{p_tk_p1.png}
+      \captionof{figure}{Page 1 Tkinter window}
+      \label{fig:test2}
+    \end{minipage}
+\end{figure}
+
+
+\subsubsection{Matplotlib}
+\subsubsection{FuncAnimation}
+The initial way I tried to update a graph with new values was by deleting the graph and plotting a new one. Funcanimation provided an easier way to do this, with the option of saving the animation as a video which was one of the objectives for my project. This prototype shows how a line graph works with funcanimate.
+
+\begin{lstlisting}
+    import matplotlib.pyplot as plt
+    from matplotlib.animation import FuncAnimation
+    from itertools import count
+    import random
+    
+    x_full = [[229, 29, 52, 90, 78], [228, 29, 52, 90, 79], [229, 28, 53, 89, 79], [228, 27, 52, 90, 78], [227, 28, 51, 89, 79], [227, 27, 50, 88, 78], [226, 28, 51, 88, 79], [227, 29, 51, 89, 79], [227, 30, 51, 90, 79], [228, 30, 51, 90, 79], [229, 30, 50, 89, 78], [228, 30, 49, 90, 79], [228, 30, 50, 89, 78], [228, 31, 50, 88, 78], [229, 32, 49, 87, 78], [230, 33, 50, 87, 77], [230, 34, 50, 88, 76], [231, 35, 51, 87, 75], [232, 36, 50, 87, 74], [232, 37, 51, 86, 74]]
+    y_full = [[37, 23, 94, 195, 90], [37, 22, 93, 194, 89], [36, 22, 94, 195, 88], [36, 22, 95, 194, 88], [35, 22, 94, 195, 88], [36, 22, 95, 196, 89], [35, 21, 94, 197, 90], [34, 20, 94, 196, 91], [34, 20, 94, 197, 90], [35, 19, 94, 196, 90], [35, 18, 95, 197, 89], [35, 18, 94, 198, 88], [35, 19, 93, 197, 89], [35, 20, 94, 196, 90], [34, 20, 95, 196, 90], [33, 19, 95, 195, 90], [33, 19, 96, 196, 91], [33, 20, 95, 196, 90], [32, 20, 94, 195, 90], [31, 19, 93, 194, 91]]
+    
+    x_vals = []
+    y_vals = []
+    
+    index = count()
+    
+    def animate(i):
+        x_vals.append(next(index))
+        y_vals.append(random.randint(0,5))
+        plt.plot(x_vals, y_vals)
+    
+    ani = FuncAnimation(plt.gcf(), animate, interval=10)  # get current figure, function, interval
+    
+    plt.show()
+\end{lstlisting}
+\textbf{The result}
+
+\begin{figure}
+    \centering
+    \begin{minipage}{.5\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{p_fa_1.png}
+      \captionof{figure}{Graph 1}
+      \label{fig:test1}
+    \end{minipage}%
+    \begin{minipage}{.5\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{p_fa_2.png}
+      \captionof{figure}{Graph 2}
+      \label{fig:test2}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{minipage}{.5\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{p_fa_3.png}
+      \captionof{figure}{Graph 3}
+      \label{fig:test1}
+    \end{minipage}%
+    \begin{minipage}{.5\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{p_fa_4.png}
+      \captionof{figure}{Graph 4}
+      \label{fig:test2}
+    \end{minipage}
+\end{figure}
+
+\subsubsection{Pandas}
+I used Pandas to help export the data generated using the SIR model. This allowed me to generate an excel file with appropriate column names, which could possibly be used later for data analysis
+\begin{lstlisting}
+def export_to_excel():
+data = {'Time': timearray,
+        'S': solver_result[0],
+        'I': solver_result[1],
+        'R': solver_result[2]}
+
+df = pd.DataFrame(data, columns=['Time', 'S', 'I', 'R'])
+name = "output" + str(f) + ".xlsx"
+df.to_excel(name, sheet_name='output')
+\end{lstlisting}
+\begin{center}
+    \includegraphics[height=10cm, width=\linewidth, keepaspectratio]{p_pan.png}
+\end{center}
+
+\subsubsection{Pygame}
+One of the options I considered to simulate and show my Cellular Automata simulation was Pygame. With Pygame I would be able to easily create cells which could move randomly in a set space, and using Pygame's collision method I could detect if cells touched. In the end I decided against this method as although it may have been easier, using Matplotlib graphs would grant me extra flexibility, for example if I wanted to export position data of each cell I would already know how to do that with Matplotlib. The prototype I tested was made with the help of a YouTube video covering Pygame: https://youtu.be/NjvIooRpuH4
+\begin{lstlisting}
+import pygame
+import time
+
+pygame.init()
+
+black = (0,0,0)
+white = (255,255,255)
+red = (255,0,0)
+
+gameDisplay = pygame.display.set_mode((800,600))
+pygame.display.set_caption('Test')
+clock = pygame.time.Clock()
+
+carImg = pygame.image.load('unnamed.jpg')
+
+def text_objects(text, font):
+    textSurface = font.render(text, True, black)  # what to render, anti-aliasing, colour
+    return textSurface, textSurface
+
+def message_display(text):
+    largeText = pygame.font.Font('freesansbold.ttf', 115)
+    TextSurf, TextRect = text_objects(text, largeText)
+    TextRect.center = (800/2, 600/2)
+    gameDisplay.blit(TextSurf, TextRect)
+
+    time.sleep(2)
+
+    game_loop()
+
+def crash():
+    message_display('You crashed')
+
+def car(x,y):  # car object
+    gameDisplay.blit(carImg, (x,y)) # drawing carImg to x,y
+
+def game_loop():
+
+    x = (100)
+    y = (100)
+    x_change = 0
+
+    gameExit = False
+
+    while not gameExit:  # user controls
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                gameExit = True
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    x_change = -10
+                elif event.key == pygame.K_RIGHT:
+                    x_change = 10
+
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                    x_change = 0
+
+            print(event)
+
+        x += x_change
+
+        gameDisplay.fill(white)
+        car(x,y)
+
+        if x > 800 or x < 0:  # boundaries
+            crash()
+
+        pygame.display.update()
+        clock.tick(60)
+
+game_loop()
+pygame.quit()
+\end{lstlisting}
+
+
+\subsection{SQL database TDB}
 
 \newpage
 \section{Research of existing solutions TDB}
 TBD
-
+\newpage
 
 
 \section{Interview with target user}
-\textbf{Q1. How could such a tool like this be used in the classroom?}\\
-A1. As a comparator of diseases; To be able to decide the best method to restrict a disease; To possibly predict the start of a second spike\\
-E1. I will try to implement a feature where the parameters of two diseases could be entered, and a graph could be calculated and shown for both, which would allow a user to compare the spread of the two diseases. I will also add features that a government may try and implement to restrict a disease. This could include a lockdown feature or a vaccine introduction which would allow a user to see how the spread of a disease could change.
+\textbf{Q1. How could such a tool like this be used in the classroom?}
 
-\textbf{Q1. How could such a tool like this be used in the classroom?}\\
-A1. As a comparator of diseases; To be able to decide the best method to restrict a disease; To possibly predict the start of a second spike\\
+A1. As a comparator of diseases; To be able to decide the best method to restrict a disease; To possibly predict the start of a second spike
+
+E1. I will try to implement a feature where the parameters of two diseases could be entered, and a graph could be calculated and shown for both, which would allow a user to compare the spread of the two diseases.I will also add features that a government may try and implement to restrict a disease. This could include a lockdown feature or a vaccine introduction which would allow a user to see how the spread of a disease could change.
+\\
+
+\textbf{Q1. How could such a tool like this be used in the classroom?}
+
+A1. As a comparator of diseases; To be able to decide the best method to restrict a disease; To possibly predict the start of a second spike
+
 E1. I will try to implement a feature where the parameters of two diseases could be entered, and a graph could be calculated and shown for both, which would allow a user to compare the spread of the two diseases. I will also add features that a government may try and implement to restrict a disease. This could include a lockdown feature or a vaccine introduction which would allow a user to see how the spread of a disease could change.
 
 
 \newpage
-\section{Prototyping of code TDB}
-TBD
+
 
 
 \newpage
@@ -165,9 +483,9 @@ TBD
 
 \begin{comment}
 
-    \subsection{Main Function}
+\subsection{Main Function}
+
 \begin{lstlisting}
-# pylint: disable=unused-variable
 import tkinter as tk
 from tkinter import ttk
 from scipy.integrate import odeint
@@ -195,7 +513,6 @@ class gui_Main_Window:
         self.master = master
         self.frame = ttk.Frame(master, padding=5)
 
-        # self.lbl_name = ttk.Label(self.frame, text='This is the main page')
         self.e_user = ttk.Entry(self.frame)
         self.btn_login = ttk.Button(self.frame, text='Login', command=self.login)
         self.btn_SIR = ttk.Button(self.frame, text='SIR model', command=self.openSIR, state=tk.DISABLED)
@@ -203,7 +520,6 @@ class gui_Main_Window:
 
         self.frame.grid(row=0, column=0, sticky='nsew')
 
-        # self.lbl_name.grid(column=1, row=0, columnspan=3, sticky='n')
         self.e_user.grid(column=1, row=0, sticky='n')
         self.btn_login.grid(column=2, row=0, sticky='n')
         self.btn_SIR.grid(column=1, row=1, columnspan=2, sticky='s')
@@ -216,15 +532,12 @@ class gui_Main_Window:
         self.frame.rowconfigure(1, weight=1)
 
     def openSIR(self):
-        # self.master.destroy()
         root2 = tk.Tk()
         root2.title('SIR Model')
-        # root2.geometry('1400x900')
         new_window = gui_First_SIR_Window(root2)
         root2.mainloop()
 
     def openCA(self):
-        # self.master.destroy()
         root2 = tk.Tk()
         root2.title('CA Model')
         new_window = gui_First_CA_Window(root2)
@@ -268,7 +581,6 @@ class gui_First_SIR_Window:
 
         self.lbl_num_sim = ttk.Label(self.frame, text='Number of simulations')
         self.e_num_sim = ttk.Entry(self.frame)
-        # self.num_sim.insert(0, 1)
         self.btn_open_file = ttk.Button(self.frame, text='Load File', command=self.open_file)
         self.btn_input_param = ttk.Button(self.frame, text='Enter Parameters', command=self.input)
         self.btn_close = ttk.Button(self.frame, text='Close', command=self.close)
@@ -278,7 +590,6 @@ class gui_First_SIR_Window:
         self.lbl_name.grid(column=0, row=0, columnspan=2, sticky='n')
         self.lbl_num_sim.grid(column=0, row=1)
         self.e_num_sim.grid(column=1, row=1)
-        # self.num_sim.grid(column=0, row=1)
         self.btn_open_file.grid(column=0, row=2)
         self.btn_input_param.grid(column=1, row=2)
         self.btn_close.grid(column=0, row=3, sticky='s')
@@ -295,13 +606,11 @@ class gui_First_SIR_Window:
     def open_file(self):
         filename = filedialog.askopenfilename()
         df = pd.read_excel(filename)
-        # print(df)
 
     def input(self):
         self.number_of_simulations = int(self.e_num_sim.get())
         print(self.number_of_simulations)
 
-        # self.number_of_simulations = 1
         root3 = tk.Tk()
         root3.title('Input Parameters')
         input_window = gui_SIR_Param(root3, self.number_of_simulations)
@@ -385,7 +694,6 @@ class gui_SIR_Param:
             self.counter = 0
 
     def submit_param(self):
-        # print(self.param_list)
         self.master.destroy()
         queue = my_sir.QueueSimulation(self.number_of_simulations, self.param_list[0], self.param_list[1],
                                         self.param_list[2],
@@ -404,8 +712,6 @@ class gui_First_CA_Window:
         self.frame = ttk.Frame(master, padding=5)
 
         self.lbl_name = ttk.Label(self.frame, text='This is the Cellular Automata model')
-        # self.num_sim = ttk.Entry(self.frame)
-        # self.num_sim.insert(0, 1)
         self.btn_open_file = ttk.Button(self.frame, text='Load File', command=self.open_file)
         self.btn_input_param = ttk.Button(self.frame, text='Enter Parameters', command=self.input)
         self.btn_show_history = ttk.Button(self.frame, text='History', command=self.show_history)
@@ -414,7 +720,6 @@ class gui_First_CA_Window:
         self.frame.grid(row=0, column=0, sticky='nsew')
 
         self.lbl_name.grid(column=0, row=0, columnspan=2, sticky='n')
-        # self.num_sim.grid(column=0, row=1)
         self.btn_open_file.grid(column=0, row=1)
         self.btn_input_param.grid(column=1, row=1)
         self.btn_show_history.grid(column=0, row=2)
@@ -436,7 +741,6 @@ class gui_First_CA_Window:
         if lines[-1] == "":
             del lines[-1]
 
-        # result = [json.loads(item) for item in lines]
         self.master.destroy()
 
         ca = my_ca.cellular_automata(0, 0, 0, 0, 0, 0, False, 0, False, 0, True, lines)
@@ -554,18 +858,13 @@ class gui_CA_Param:
         days_imm = int(self.e_d_i.get())
 
         self.master.destroy()
-        # print(rec_inf)
-        # print(use_imm)
 
         arguments = [no_cells, generations, size_x, size_y, inf_rad, no_inf, rec_inf, days_rec, use_imm,
                         days_imm, False]
 
         my_sql.ca_enter_param(current_user, arguments)
 
-        # ca = my_ca.cellular_automata(no_cells, generations, size_x, size_y, inf_rad, no_inf, rec_inf, days_rec, use_imm,
-        #                              days_imm, False)
         ca = my_ca.cellular_automata(*arguments)  # arguments sent as separate parameters
-
         ca.new_generation()
 
 
@@ -576,9 +875,6 @@ class gui_CA_history:
         self.frame = ttk.Frame(master, padding=5)
         self.frame.grid(row=0, column=0, sticky='nsew')
         self.user_history = my_sql.ca_return_history(current_user) # user_history is a list of tuples
-        # print(self.user_history)
-        # print(self.user_history[0][1:])
-
 
         self.lb_history = tk.Listbox(self.frame, width=50)
         for i in range(len(self.user_history)):
@@ -714,8 +1010,6 @@ class SIR_model:
 
 \subsection{CA Function}
 \begin{lstlisting}
-# pylint: disable=unused-variable
-# pylint: enable=too-many-lines
 
 import matplotlib.pyplot as plt
 import random
@@ -736,13 +1030,11 @@ class cell:
         self.immune_count = d_i
         self.original_immune = d_i
         self.use_immunity = u_i
-        # self.infection_rate = i
 
     def cell_test_function(self):
         return self.x, self.y, self.infected
 
     def location(self):
-        # print(self.x, self.y)
         return self.x, self.y
 
     def recover_generation(self):
@@ -765,7 +1057,6 @@ class cell:
         def nothing():
             pass
 
-        # mvmt = 5
         mvmt = random.randint(0, 50)
 
         def north():
@@ -880,7 +1171,6 @@ class cellular_automata:
             del self.lines[-1]
 
         result = [json.loads(item) for item in self.lines]
-        # print(result)
         return result
 
     def update_position(self):
@@ -898,13 +1188,6 @@ class cellular_automata:
             infected.append(self.cell_object_dict[cell_obj_name].infected)
             recovered.append(self.cell_object_dict[cell_obj_name].recovered)
             immune.append(self.cell_object_dict[cell_obj_name].immune)
-
-        # print(infected)
-        # print(recovered)
-        # print(immune)
-        # print("------------")
-
-        # self.collect_data()  # this function could be moved into the new generation class function
 
         return loc_x, loc_y, infected, recovered, immune
 
@@ -927,11 +1210,7 @@ class cellular_automata:
             for infected_tuple in infected_locations:
                 if (sus_x - infected_tuple[0]) ** 2 + (
                         sus_y - infected_tuple[1]) <= self.infection_radius ** 2:  # equation of a circle
-                    # self.cell_object_dict[cell_name].infected = True  # need to chance for chance
-                    # PROBLEM
                     cell_obj.infected = True
-                    # print(f'{cell_obj} has been infected')
-                    # cell is infected, LISTS ARE NOT UPDATED
 
         if self.r_i:  # if recovered can be infected - doesn't change immunity status but is currently dependent on it - CHANGE
             for recovered in recovered_obj:
@@ -958,8 +1237,6 @@ class cellular_automata:
 
     def new_generation(self):
         """Main definition for running program. For the number of generations to simulate, call self.update_position() to get new coordinate lists"""
-
-        # coordinates = []
 
         sus_full = []
         inf_full = []
@@ -1030,11 +1307,6 @@ class cellular_automata:
                 lg_values[1].append(len(gen_inf))
                 lg_values[2].append((len(gen_rec) + len(gen_imm)))
 
-                # coordinates.append([x_list, y_list])
-
-                # print(sus_full)
-
-        # self.export_to_excel() # will soon be redundant
         if not self.user_file:
             self.export_data(sus_full, inf_full, rec_full, imm_full, lg_values, time_array)  # WORKING NOW
 
@@ -1053,10 +1325,8 @@ class cellular_automata:
         fig, axs = plt.subplots(2)
         fig.suptitle('Cellular Automata')
 
-        # animate_graph = Anim(self.generations, sus_full, inf_full, rec_full, imm_full, self.use_immunity, time_array, lg_values)
 
         def animate(i):  # need to adjust to work with two graphs
-            # https://stackoverflow.com/questions/42621036/how-to-use-funcanimation-to-update-and-animate-multiple-figures-with-matplotlib
 
             axs[0].cla()
 
@@ -1078,8 +1348,6 @@ class cellular_automata:
             axs[1].plot(time_array[0:i], lg_values[1][0:i], label="Infected", color="red")
             axs[1].plot(time_array[0:i], lg_values[2][0:i], label="recovered", color="purple")
 
-        # plt.xlim(0, self.size_x)
-        # plt.ylim(0, self.size_y)
 
         ani = FuncAnimation(plt.gcf(), animate, frames=self.generations, interval=100, repeat=False)
 
@@ -1091,5 +1359,8 @@ class cellular_automata:
 \end{lstlisting}
 
 \end{comment}
+\newpage
 
+\bibliography{references}{}
+\bibliographystyle{plain}
 \end{document}

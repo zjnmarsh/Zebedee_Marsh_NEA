@@ -9,7 +9,7 @@ Database stuff
 - sql commands
 - data flow diagrams
 
-Objectives
+Objectives DONE
 
 GUI interface - Documented design
 

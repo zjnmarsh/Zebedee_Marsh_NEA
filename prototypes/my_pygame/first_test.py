@@ -17,7 +17,7 @@ carImg = pygame.image.load('unnamed.jpg')
 
 def text_objects(text, font):
     textSurface = font.render(text, True, black)  # what to render, anti-aliasing, colour
-    return textSurface, textSurfa
+    return textSurface, textSurface
 
 def message_display(text):
     largeText = pygame.font.Font('freesansbold.ttf', 115)
@@ -28,8 +28,6 @@ def message_display(text):
     time.sleep(2)
 
     game_loop()
-
-
 
 def crash():
     message_display('You crashed')
@@ -60,8 +58,6 @@ def game_loop():
                 if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                     x_change = 0
 
-
-
             print(event)
 
         x += x_change
@@ -73,11 +69,7 @@ def game_loop():
             crash()
 
         pygame.display.update()
-
         clock.tick(60)
-
-
 
 game_loop()
 pygame.quit()
-

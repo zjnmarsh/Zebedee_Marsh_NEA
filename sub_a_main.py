@@ -1,3 +1,4 @@
+# pylint: disable=unused-variable
 import tkinter as tk
 from tkinter import ttk
 from scipy.integrate import odeint
@@ -20,6 +21,8 @@ current_user = "None"
 
 
 class gui_Main_Window:
+    """First window shown where user must login and can choose to simulate using either CA or openSIR
+    """
 
     def __init__(self, master):
         self.master = master
@@ -61,6 +64,8 @@ class gui_Main_Window:
         root2.mainloop()
 
     def login(self):
+        """Gets username from user that was entered into username box, calls enter_username sql function with ti and assigns it to the current user global variable
+        """
         username = str(self.e_user.get())
         my_sql.enter_username(username)
         global current_user
@@ -83,12 +88,13 @@ class gui_Main_Window:
         self.btn_login.grid(column=2, row=0, sticky='n')
         self.btn_SIR['state'] = tk.DISABLED
         self.btn_CA['state'] = tk.DISABLED
+        current_user = "None"
 
 
 # ---------------------------------------
 
 class gui_First_SIR_Window:
-    """Class asking user to enter how many graphs they want"""
+    """GUI where user can enter how many graphs they want to make, and whether they want to manually enter parameters, chose a file or use past parameters in history"""
 
     def __init__(self, master):
         self.master = master
@@ -137,6 +143,9 @@ class gui_First_SIR_Window:
         input_window = gui_SIR_Param(root3, self.number_of_simulations)
         root3.mainloop()
 
+    def show_history(self):
+        # Need to use sql
+        pass
 
 class gui_SIR_Param:
     """Class for entering SIR parameters"""
@@ -215,6 +224,8 @@ class gui_SIR_Param:
             self.counter = 0
 
     def submit_param(self):
+        """Creates queue object from my_sir function and calls the run simulation function
+        """
         # print(self.param_list)
         self.master.destroy()
         queue = my_sir.QueueSimulation(self.number_of_simulations, self.param_list[0], self.param_list[1],
@@ -228,6 +239,8 @@ class gui_SIR_Param:
 # ---------------------------------------
 
 class gui_First_CA_Window:
+    """GUI window where user can enter parameters manually, load file generated or show history of previously used parameters and choose one for the ceccular automata model
+    """
 
     def __init__(self, master):
         self.master = master
@@ -289,7 +302,7 @@ class gui_First_CA_Window:
 
 
 class gui_CA_Param:
-    """Class for entering CA parameters
+    """GUI interface for inputting cellular automata parameters manually
     Need to make some entry boxes dependent on checkboxes
     """
 
@@ -371,6 +384,8 @@ class gui_CA_Param:
         self.frame.rowconfigure(6, weight=1)
 
     def enter_param(self):
+        """Gets values that were input, creates a cellular automata object and calls the new_generation function to start the cellular automata function
+        """
         # should call CA function in this
         no_cells = int(self.e_no_cells.get())
         generations = int(self.e_gen.get())
