@@ -105,8 +105,9 @@ class gui_First_SIR_Window:
         self.lbl_num_sim = ttk.Label(self.frame, text='Number of simulations')
         self.e_num_sim = ttk.Entry(self.frame)
         # self.num_sim.insert(0, 1)
-        self.btn_open_file = ttk.Button(self.frame, text='Load File', command=self.open_file)
+        self.btn_open_file = ttk.Button(self.frame, text='Load File DUMMY', command=self.open_file)
         self.btn_input_param = ttk.Button(self.frame, text='Enter Parameters', command=self.input)
+        self.btn_history = ttk.Button(self.frame, text='Show History', command=self.show_history)
         self.btn_close = ttk.Button(self.frame, text='Close', command=self.close)
 
         self.frame.grid(row=0, column=0, sticky='nsew')
@@ -117,7 +118,8 @@ class gui_First_SIR_Window:
         # self.num_sim.grid(column=0, row=1)
         self.btn_open_file.grid(column=0, row=2)
         self.btn_input_param.grid(column=1, row=2)
-        self.btn_close.grid(column=0, row=3, sticky='s')
+        self.btn_history.grid(column=0, row=3)
+        self.btn_close.grid(column=1, row=3, sticky='s')
 
         self.master.columnconfigure(0, weight=1)
         self.master.rowconfigure(0, weight=1)
@@ -144,8 +146,9 @@ class gui_First_SIR_Window:
         root3.mainloop()
 
     def show_history(self):
-        # Need to use sql
-        pass
+        root3 = tk.Tk()
+        root3.title('History')
+        history_window = gui_SIR_history(root3)
 
 class gui_SIR_Param:
     """Class for entering SIR parameters"""
@@ -228,6 +231,9 @@ class gui_SIR_Param:
         """
         # print(self.param_list)
         self.master.destroy()
+
+        
+
         queue = my_sir.QueueSimulation(self.number_of_simulations, self.param_list[0], self.param_list[1],
                                        self.param_list[2],
                                        self.param_list[3], self.param_list[4],
@@ -235,6 +241,47 @@ class gui_SIR_Param:
 
         queue.run_simulation()
 
+
+class gui_SIR_history:
+
+    def __init__(self, master):
+        self.master = master
+        self.frame = ttk.Frame(master, padding=5)
+        self.frame.grid(row=0, column=0, sticky='nsew')
+        self.user_history = my_sql.sir_return_history(current_user) # user_history is a list of tuples
+        print(self.user_history)
+        # print(self.user_history[0][1:])
+
+
+        self.lb_history = tk.Listbox(self.frame, width=50)
+        for i in range(len(self.user_history)):
+            to_insert = str(i) + "  " + str(self.user_history[i][1:])
+            self.lb_history.insert(i, to_insert)
+
+        self.lbl_title = ttk.Label(self.frame, text=f"History of {current_user}")
+        self.btn_exit = ttk.Button(self.frame, text="Exit", command=self.exit)
+        self.lbl_text = ttk.Label(self.frame, text="Enter number to simulate with same parameters")
+        self.e_sim_num = ttk.Entry(self.frame)
+        self.btn_use = ttk.Button(self.frame, text="Use values", command=self.use)
+
+        self.lbl_title.grid(column=1, row=1, columnspan=3)
+        self.lbl_text.grid(column=1, row=2, columnspan=3)
+        self.lb_history.grid(column=1, row=3)
+        self.e_sim_num.grid(column=2, row=3)
+        self.btn_use.grid(column=3, row=3)
+        self.btn_exit.grid(column=2, row=4, columnspan=2)
+
+    def exit(self):
+        self.master.destroy()
+
+    def use(self):
+        """User enter number and set of parameters are retrieved from the database"""
+        sim_number = int(self.e_sim_num.get())
+        sim_param = list(self.user_history[sim_number][1:])
+        print(sim_param)
+        # sim_param.append(False)
+        # ca = my_ca.cellular_automata(*sim_param)
+        # ca.new_generation()
 
 # ---------------------------------------
 
@@ -421,7 +468,7 @@ class gui_CA_history:
         self.frame = ttk.Frame(master, padding=5)
         self.frame.grid(row=0, column=0, sticky='nsew')
         self.user_history = my_sql.ca_return_history(current_user) # user_history is a list of tuples
-        # print(self.user_history)
+        print(self.user_history)
         # print(self.user_history[0][1:])
 
 
@@ -462,6 +509,7 @@ class gui_CA_history:
 
 root = tk.Tk()
 root.title('Main Window')
+root.geometry("300x100")
 
 window = gui_Main_Window(root)
 

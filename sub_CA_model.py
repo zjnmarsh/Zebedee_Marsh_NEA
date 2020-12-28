@@ -148,7 +148,7 @@ class cellular_automata:
     def export_data(self, sus_full, inf_full, rec_full, imm_full, lg_values, time_array):
         """Should export data in a format that it can be analysed and reused
         gen_imm empty when not using immunity, but shouldn't be a problem"""
-
+    
         filename = "ca_output.txt"
         with open(filename, 'w') as file:
             file.write(str(sus_full) + "\n")

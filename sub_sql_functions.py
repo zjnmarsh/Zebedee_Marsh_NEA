@@ -86,6 +86,11 @@ def sir_enter_param(in_user, up):
     conn.commit()
     conn.close()
 
+def sir_return_history(in_user):
+    conn = sqlite3.connect('my_database.db')
+    c = conn.cursor()
+    c.execute("SELECT * FROM sir_param WHERE user=:curr_user", {'curr_user':in_user})
+    return c.fetchall()
 
 # initial_setup()
 
