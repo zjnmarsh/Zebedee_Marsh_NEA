@@ -48,8 +48,22 @@ class gui_Main_Window:
         self.frame.columnconfigure(1, weight=1)
         self.frame.rowconfigure(1, weight=1)
 
+        if current_user != "None":
+            self.pers_login()
+
+    def pers_login(self):
+        self.btn_SIR['state'] = tk.NORMAL
+        self.btn_CA['state'] = tk.NORMAL
+        self.e_user.destroy()
+        self.btn_login.destroy()
+        self.lbl_name = ttk.Label(self.frame, text=f'Hello {current_user}')
+        self.lbl_name.grid(column=1, row=0)
+        self.btn_logout = ttk.Button(self.frame, text='logout', command=self.logout)
+        self.btn_logout.grid(column=2, row=0)
+
+
     def openSIR(self):
-        # self.master.destroy()
+        self.master.destroy()
         root2 = tk.Tk()
         root2.title('SIR Model')
         # root2.geometry('1400x900')
@@ -57,7 +71,7 @@ class gui_Main_Window:
         root2.mainloop()
 
     def openCA(self):
-        # self.master.destroy()
+        self.master.destroy()
         root2 = tk.Tk()
         root2.title('CA Model')
         new_window = gui_First_CA_Window(root2)
@@ -129,6 +143,10 @@ class gui_First_SIR_Window:
 
     def close(self):
         self.master.destroy()
+        main_win = tk.Tk()
+        main_win.title('Main Window')
+        new_window = gui_Main_Window(main_win)
+        main_win.mainloop()
 
     def open_file(self):
         filename = filedialog.askopenfilename()
@@ -140,12 +158,14 @@ class gui_First_SIR_Window:
         print(self.number_of_simulations)
 
         # self.number_of_simulations = 1
+        self.master.destroy()
         root3 = tk.Tk()
         root3.title('Input Parameters')
         input_window = gui_SIR_Param(root3, self.number_of_simulations)
         root3.mainloop()
 
     def show_history(self):
+        self.master.destroy()
         root3 = tk.Tk()
         root3.title('History')
         history_window = gui_SIR_history(root3)
@@ -170,6 +190,7 @@ class gui_SIR_Param:
         self.tr_name = ttk.Label(self.frame, text='Transmission rate')
         self.re_name = ttk.Label(self.frame, text='Recovery rate')
         self.btn_enter = ttk.Button(self.frame, text='Enter', command=self.enter_param)
+        self.btn_close = ttk.Button(self.frame, text='Close', command=self.exit)
 
         # button variables
         self.e_s = ttk.Entry(self.frame)
@@ -192,7 +213,8 @@ class gui_SIR_Param:
         self.e_tr.grid(column=1, row=4, sticky='w')
         self.e_re.grid(column=1, row=5, sticky='w')
 
-        self.btn_enter.grid(column=0, row=6, columnspan=2, sticky='s')
+        self.btn_enter.grid(column=1, row=6, columnspan=1)
+        self.btn_close.grid(column=0, row=6, columnspan=1)
 
         self.master.columnconfigure(0, weight=1)
         self.master.rowconfigure(0, weight=1)
@@ -240,6 +262,11 @@ class gui_SIR_Param:
 
         queue.run_simulation()
 
+    def exit(self):
+        self.master.destroy()
+        sir_win = tk.Tk()
+        sir_win.title('SIR')
+        sir_main = gui_First_SIR_Window(sir_win)
 
 class gui_SIR_history:
 
@@ -272,6 +299,9 @@ class gui_SIR_history:
 
     def exit(self):
         self.master.destroy()
+        sir_win = tk.Tk()
+        sir_win.title('SIR')
+        sir_main = gui_First_SIR_Window(sir_win)
 
     def use(self):
         """User enter number and set of parameters are retrieved from the database"""
@@ -337,17 +367,23 @@ class gui_First_CA_Window:
 
     def input(self):
         # manual user input
+        self.master.destroy()
         root3 = tk.Tk()
         root3.title('Input Parameters')
         input_window = gui_CA_Param(root3)
 
     def show_history(self):
+        self.master.destroy()
         root3 = tk.Tk()
         root3.title('History')
         history_window = gui_CA_history(root3)
 
     def close(self):
         self.master.destroy()
+        main_win = tk.Tk()
+        main_win.title('Main Window')
+        new_window = gui_Main_Window(main_win)
+        main_win.mainloop()
 
 
 class gui_CA_Param:
@@ -390,6 +426,7 @@ class gui_CA_Param:
         self.e_d_i = ttk.Entry(self.frame)
 
         self.btn_enter = ttk.Button(self.frame, text='Enter', command=self.enter_param)
+        self.btn_close = ttk.Button(self.frame, text='Close', command=self.close)
 
         # grid label variables
         self.l_lbl_name.grid(column=0, row=0, columnspan=2, sticky='n')
@@ -416,7 +453,8 @@ class gui_CA_Param:
         self.cb_use_imm.grid(column=1, row=8, sticky='w')
         self.e_d_i.grid(column=3, row=8, sticky='w')
 
-        self.btn_enter.grid(column=0, row=9, columnspan=4, sticky='s')
+        self.btn_enter.grid(column=0, row=9, columnspan=2, sticky='s')
+        self.btn_close.grid(column=2, row=9, columnspan=2, sticky='s')
 
         # grid main column and tow
         self.master.columnconfigure(0, weight=1)
@@ -462,6 +500,12 @@ class gui_CA_Param:
 
         ca.new_generation()
 
+    def close(self):
+        self.master.destroy()
+        main_ca = tk.Tk()
+        main_ca.title('CA')
+        new_window = gui_First_CA_Window(main_ca)
+        main_ca.mainloop()
 
 class gui_CA_history:
 
@@ -494,6 +538,10 @@ class gui_CA_history:
 
     def exit(self):
         self.master.destroy()
+        main_ca = tk.Tk()
+        main_ca.title('CA')
+        new_window = gui_First_CA_Window(main_ca)
+        main_ca.mainloop()
 
     def use(self):
         """User enter number and set of parameters are retrieved from the database"""
@@ -513,6 +561,8 @@ root = tk.Tk()
 root.title('Main Window')
 root.geometry("300x100")
 
-window = gui_Main_Window(root)
+# window = gui_Main_Window(root)
+window = gui_First_CA_Window(root)
+current_user = "zebedee"
 
 root.mainloop()
