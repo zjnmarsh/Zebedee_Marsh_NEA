@@ -232,7 +232,6 @@ class gui_SIR_Param:
         # print(self.param_list)
         self.master.destroy()
 
-        
 
         queue = my_sir.QueueSimulation(self.number_of_simulations, self.param_list[0], self.param_list[1],
                                        self.param_list[2],
@@ -279,9 +278,12 @@ class gui_SIR_history:
         sim_number = int(self.e_sim_num.get())
         sim_param = list(self.user_history[sim_number][1:])
         print(sim_param)
-        # sim_param.append(False)
-        # ca = my_ca.cellular_automata(*sim_param)
-        # ca.new_generation()
+
+        queue = my_sir.QueueSimulation(1, [sim_param[0]], [sim_param[1]], [sim_param[2]], [sim_param[3]], [sim_param[4]], sim_param[5], current_user)
+
+        queue.run_simulation()
+
+
 
 # ---------------------------------------
 
