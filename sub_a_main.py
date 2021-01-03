@@ -119,7 +119,7 @@ class gui_First_SIR_Window:
         self.lbl_num_sim = ttk.Label(self.frame, text='Number of simulations')
         self.e_num_sim = ttk.Entry(self.frame)
         # self.num_sim.insert(0, 1)
-        self.btn_open_file = ttk.Button(self.frame, text='Load File DUMMY', command=self.open_file)
+        self.btn_open_file = ttk.Button(self.frame, text='Load File', command=self.open_file)
         self.btn_input_param = ttk.Button(self.frame, text='Enter Parameters', command=self.input)
         self.btn_history = ttk.Button(self.frame, text='Show History', command=self.show_history)
         self.btn_close = ttk.Button(self.frame, text='Close', command=self.close)
@@ -149,9 +149,24 @@ class gui_First_SIR_Window:
         main_win.mainloop()
 
     def open_file(self):
+        print("file dialoge")
         filename = filedialog.askopenfilename()
+        print(filename)
         df = pd.read_excel(filename)
-        # print(df)
+        timearray = df['Time'].values.tolist()
+        susceptible = df['S'].values.tolist()
+        infected = df['I'].values.tolist()
+        recovered = df['R'].values.tolist()
+
+        self.master.destroy()
+
+        plot = my_sir.plot_graph(timearray, susceptible, infected, recovered)
+        plot.plot()
+
+
+
+
+
 
     def input(self):
         self.number_of_simulations = int(self.e_num_sim.get())

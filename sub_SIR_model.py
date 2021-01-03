@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import sub_sql_functions as my_sql
 
+
 class QueueSimulation:
 
     def __init__(self, n, s_list, i_list, r_list, b_list, g_list, t, current_user):
@@ -72,7 +73,7 @@ class SIR_model:
                     'R': solver_result[2]}
 
             df = pd.DataFrame(data, columns=['Time', 'S', 'I', 'R'])
-            name = "output" + str(f) + ".xlsx"
+            name = "output" + str(f) + ".xls"
             df.to_excel(name, sheet_name='output')
 
         export_to_excel()
@@ -80,3 +81,18 @@ class SIR_model:
         plt.plot(timearray, solver_result[1], label="I(t)")
         plt.plot(timearray, solver_result[2], label="R(t)")
 
+
+class plot_graph:
+
+    def __init__(self, ta, s, i, r):
+        # deconstruct file here
+        self.timearray = ta
+        self.sus = s
+        self.inf = i
+        self.rec = r
+
+    def plot(self):
+        plt.plot(self.timearray, self.sus, label="S(t)")
+        plt.plot(self.timearray, self.inf, label="I(t)")
+        plt.plot(self.timearray, self.rec, label="R(t)")
+        plt.show()
