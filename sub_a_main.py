@@ -12,6 +12,7 @@ import matplotlib
 import csv
 import json
 from tkinter import filedialog
+from tkinter import messagebox
 
 import sub_SIR_model as my_sir
 import sub_CA_model as my_ca
@@ -61,7 +62,6 @@ class gui_Main_Window:
         self.btn_logout = ttk.Button(self.frame, text='logout', command=self.logout)
         self.btn_logout.grid(column=2, row=0)
 
-
     def openSIR(self):
         self.master.destroy()
         root2 = tk.Tk()
@@ -103,6 +103,14 @@ class gui_Main_Window:
         self.btn_SIR['state'] = tk.DISABLED
         self.btn_CA['state'] = tk.DISABLED
         current_user = "None"
+
+
+class error:
+
+    def __init__(self, err_type, message):
+        tk.Tk().withdraw()
+        title = err_type + " error"
+        messagebox.showerror(title, message)
 
 
 # ---------------------------------------
@@ -149,7 +157,8 @@ class gui_First_SIR_Window:
         main_win.mainloop()
 
     def open_file(self):
-        print("file dialoge")
+
+        print("file dialog")
         filename = filedialog.askopenfilename()
         print(filename)
         df = pd.read_excel(filename)
@@ -163,27 +172,33 @@ class gui_First_SIR_Window:
         plot = my_sir.plot_graph(timearray, susceptible, infected, recovered)
         plot.plot()
 
-
-
-
-
-
     def input(self):
-        self.number_of_simulations = int(self.e_num_sim.get())
-        print(self.number_of_simulations)
+        # print(type(self.e_num_sim.get()))
+        try:
+            int(self.e_num_sim.get())
+            if 1 <= int(self.e_num_sim.get()) <= 10:
+                self.number_of_simulations = int(self.e_num_sim.get())
+                print(self.number_of_simulations)
 
-        # self.number_of_simulations = 1
-        self.master.destroy()
-        root3 = tk.Tk()
-        root3.title('Input Parameters')
-        input_window = gui_SIR_Param(root3, self.number_of_simulations)
-        root3.mainloop()
+                # self.number_of_simulations = 1
+                self.master.destroy()
+                root3 = tk.Tk()
+                root3.title('Input Parameters')
+                input_window = gui_SIR_Param(root3, self.number_of_simulations)
+                root3.mainloop()
+            else:
+                err = error("Entry", "Please enter an integer between 1 and 10")
+        except ValueError:
+            err = error("Entry", "Please enter an integer between 1 and 10")
+
+
 
     def show_history(self):
         self.master.destroy()
         root3 = tk.Tk()
         root3.title('History')
         history_window = gui_SIR_history(root3)
+
 
 class gui_SIR_Param:
     """Class for entering SIR parameters"""
@@ -269,13 +284,25 @@ class gui_SIR_Param:
         # print(self.param_list)
         self.master.destroy()
 
+        pass1 = True
+        for sub_list in self.param_list:
+            for value in sub_list:
+                if value < 0:
+                    pass1 = False
+                    err = error("Value", "Negative numbers cannot be used for any of these inputs")
 
-        queue = my_sir.QueueSimulation(self.number_of_simulations, self.param_list[0], self.param_list[1],
-                                       self.param_list[2],
-                                       self.param_list[3], self.param_list[4],
-                                       100, current_user)
+        if not pass1:
+            root3 = tk.Tk()
+            root3.title('Input Parameters')
+            input_window = gui_SIR_Param(root3, self.number_of_simulations)
+            root3.mainloop()
+        else:
+            queue = my_sir.QueueSimulation(self.number_of_simulations, self.param_list[0], self.param_list[1],
+                                           self.param_list[2],
+                                           self.param_list[3], self.param_list[4],
+                                           100, current_user)
 
-        queue.run_simulation()
+            queue.run_simulation()
 
     def exit(self):
         self.master.destroy()
@@ -283,16 +310,16 @@ class gui_SIR_Param:
         sir_win.title('SIR')
         sir_main = gui_First_SIR_Window(sir_win)
 
+
 class gui_SIR_history:
 
     def __init__(self, master):
         self.master = master
         self.frame = ttk.Frame(master, padding=5)
         self.frame.grid(row=0, column=0, sticky='nsew')
-        self.user_history = my_sql.sir_return_history(current_user) # user_history is a list of tuples
+        self.user_history = my_sql.sir_return_history(current_user)  # user_history is a list of tuples
         print(self.user_history)
         # print(self.user_history[0][1:])
-
 
         self.lb_history = tk.Listbox(self.frame, width=50)
         for i in range(len(self.user_history)):
@@ -324,10 +351,10 @@ class gui_SIR_history:
         sim_param = list(self.user_history[sim_number][1:])
         print(sim_param)
 
-        queue = my_sir.QueueSimulation(1, [sim_param[0]], [sim_param[1]], [sim_param[2]], [sim_param[3]], [sim_param[4]], sim_param[5], current_user)
+        queue = my_sir.QueueSimulation(1, [sim_param[0]], [sim_param[1]], [sim_param[2]], [sim_param[3]],
+                                       [sim_param[4]], sim_param[5], current_user)
 
         queue.run_simulation()
-
 
 
 # ---------------------------------------
@@ -522,16 +549,16 @@ class gui_CA_Param:
         new_window = gui_First_CA_Window(main_ca)
         main_ca.mainloop()
 
+
 class gui_CA_history:
 
     def __init__(self, master):
         self.master = master
         self.frame = ttk.Frame(master, padding=5)
         self.frame.grid(row=0, column=0, sticky='nsew')
-        self.user_history = my_sql.ca_return_history(current_user) # user_history is a list of tuples
+        self.user_history = my_sql.ca_return_history(current_user)  # user_history is a list of tuples
         print(self.user_history)
         # print(self.user_history[0][1:])
-
 
         self.lb_history = tk.Listbox(self.frame, width=50)
         for i in range(len(self.user_history)):
@@ -568,7 +595,6 @@ class gui_CA_history:
         ca.new_generation()
 
 
-
 # ---------------------------------------
 
 
@@ -576,8 +602,8 @@ root = tk.Tk()
 root.title('Main Window')
 root.geometry("300x100")
 
-# window = gui_Main_Window(root)
-window = gui_First_CA_Window(root)
+window = gui_Main_Window(root)
+# window = gui_First_CA_Window(root)
 current_user = "zebedee"
 
 root.mainloop()

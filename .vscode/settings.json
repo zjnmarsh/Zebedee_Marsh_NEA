@@ -1,4 +1,4 @@
 {
-    "python.pythonPath": "Interpreter2/bin/python",
-    "latex-workshop.latex.autoBuild.run": "never"
+    "latex-workshop.latex.autoBuild.run": "never",
+    "python.pythonPath": "venv/bin/python"
 }

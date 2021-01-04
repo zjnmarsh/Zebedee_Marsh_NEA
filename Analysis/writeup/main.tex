@@ -271,10 +271,10 @@ app.mainloop()
 \end{figure}
 
 
-\subsubsection{Matplotlib}
-\subsubsection{FuncAnimation}
+\subsubsection{Matplotlib - FuncAnimation}
 The initial way I tried to update a graph with new values was by deleting the graph and plotting a new one. Funcanimation provided an easier way to do this, with the option of saving the animation as a video which was one of the objectives for my project. This prototype shows how a line graph works with funcanimate.
 
+It works for both line graphs and scatter graphs
 \begin{lstlisting}
     import matplotlib.pyplot as plt
     from matplotlib.animation import FuncAnimation
@@ -295,9 +295,9 @@ The initial way I tried to update a graph with new values was by deleting the gr
         plt.plot(x_vals, y_vals)
     
     ani = FuncAnimation(plt.gcf(), animate, interval=10)  # get current figure, function, interval
-    
     plt.show()
 \end{lstlisting}
+
 \textbf{The result}
 
 \begin{figure}
@@ -458,25 +458,25 @@ E1. I will try to implement a feature where the parameters of two diseases could
 \newpage
 \section{Documented design COMMENTED OUT}
 
-\begin{comment}
+% \begin{comment}
 
-\subsection{Main function}
-\includegraphics[width=\textwidth, angle=90]{s_main_function.png}
+\subsection{Main function structure diagram}
+\includegraphics[height=5.43cm, width=\textwidth]{s_main_function.png}
+\subsection{Main function flowchart}
+\includegraphics[height=15cm]{f_main.png}
 \newpage
-\includegraphics[width=\textwidth, height=\textheight]{f_main.png}
+\subsection{Cellular automata structure diagram}
+\includegraphics[height=5cm]{s_CA.png}
+\subsection{Cellular automata flowchart}
+\includegraphics[height=15cm]{f_CA.png}
 \newpage
-\subsection{Cellular automata}
-\includegraphics[width=\textwidth]{s_CA.png}
-\newpage
-\includegraphics[width=\textwidth, height=\textheight]{f_CA.png}
-\newpage
-\subsection{SIR Model}
-\includegraphics[width=\textwidth]{s_SIR.png}
-\newpage
-\includegraphics[width=\textwidth, height=\textheight]{f_SIR.png}
+\subsection{SIR Model structure diagram}
+\includegraphics[height=3.6cm]{s_SIR.png}
+\subsection{SIR model flowchart}
+\includegraphics[height=17.3cm]{f_SIR.png}
 \newpage
 
-\end{comment}
+% \end{comment}
 
 \newpage
 \section{The code COMMENTED OUT}

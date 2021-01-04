@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.9.13)  4 DEC 2020 11:02
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.9.13)  4 JAN 2021 18:40
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**"/Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.tex"
-(/Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.tex
+**"/Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/main.tex"
+(/Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/main.tex
 LaTeX2e <2020-02-02> patch level 5
 L3 programming layer <2020-03-06> (/usr/local/texlive/2020/texmf-dist/tex/latex/base/article.cls
 Document Class: article 2019/12/20 v1.4l Standard LaTeX document class
@@ -214,7 +214,7 @@ File: lstlang1.sty 2020/03/24 1.8d listings language file
 File: l3backend-pdfmode.def 2020-03-12 L3 backend support: PDF mode
 \l__kernel_color_stack_int=\count285
 \l__pdf_internal_box=\box53
-) (/Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.aux
+) (/Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/main.aux
 
 LaTeX Warning: Label `fig:test1' multiply defined.
 
@@ -283,7 +283,7 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <8> on input line 45.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 45.
- (/Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.toc
+ (/Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/main.toc
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <10.95> on input line 5.
 )
@@ -308,7 +308,7 @@ Overfull \hbox (30.0pt too wide) in paragraph at lines 182--183
 [][] 
  []
 
-[5] [6 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/eca.png>]
+[5] [6 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/eca.png>]
 <images/p_tk_start.png, id=33, 391.4625pt x 301.125pt>
 File: images/p_tk_start.png Graphic file (type png)
 <use images/p_tk_start.png>
@@ -319,7 +319,7 @@ File: images/p_tk_p1.png Graphic file (type png)
 <use images/p_tk_p1.png>
 Package pdftex.def Info: images/p_tk_p1.png  used on input line 267.
 (pdftex.def)             Requested size: 226.48395pt x 174.2207pt.
- [7] [8 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_tk_start.png> </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_tk_p1.png>]
+ [7] [8 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_tk_start.png> </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_tk_p1.png>]
 <images/p_fa_1.png, id=44, 754.82pt x 658.46pt>
 File: images/p_fa_1.png Graphic file (type png)
 <use images/p_fa_1.png>
@@ -343,40 +343,78 @@ Package pdftex.def Info: images/p_fa_4.png  used on input line 329.
 LaTeX Font Info:    Trying to load font information for TS1+cmtt on input line 339.
  (/usr/local/texlive/2020/texmf-dist/tex/latex/base/ts1cmtt.fd
 File: ts1cmtt.fd 2019/12/16 v2.5j Standard LaTeX font definitions
-) [9 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_fa_1.png> </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_fa_2.png> </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_fa_3.png> </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_fa_4.png>]
-<images/p_pan.png, id=55, 669.50125pt x 854.19125pt>
+) [9 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_fa_1.png> </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_fa_2.png> </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_fa_3.png> </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_fa_4.png>]
+<images/p_pan.png, id=56, 669.50125pt x 854.19125pt>
 File: images/p_pan.png Graphic file (type png)
 <use images/p_pan.png>
 Package pdftex.def Info: images/p_pan.png  used on input line 349.
 (pdftex.def)             Requested size: 222.99968pt x 284.51683pt.
- [10 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_pan.png>] [11] [12] [13]
+ [10 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_pan.png>] [11] [12] [13]
 Underfull \hbox (badness 10000) in paragraph at lines 444--446
 
  []
 
-[14] [15] [16] (/Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.bbl)
+[14]
+<images/s_main_function.png, id=74, 4495.79625pt x 1533.73pt>
+File: images/s_main_function.png Graphic file (type png)
+<use images/s_main_function.png>
+Package pdftex.def Info: images/s_main_function.png  used on input line 464.
+(pdftex.def)             Requested size: 452.96738pt x 154.48192pt.
+
+Overfull \hbox (29.99948pt too wide) in paragraph at lines 464--465
+[] 
+ []
+
+<images/f_main.png, id=75, 317.0244pt x 652.5981pt>
+File: images/f_main.png Graphic file (type png)
+<use images/f_main.png>
+Package pdftex.def Info: images/f_main.png  used on input line 466.
+(pdftex.def)             Requested size: 207.33081pt x 426.79134pt.
+[15 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/s_main_function.png> </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/f_main.png>]
+<images/s_CA.png, id=80, 3226.0525pt x 1228.59pt>
+File: images/s_CA.png Graphic file (type png)
+<use images/s_CA.png>
+Package pdftex.def Info: images/s_CA.png  used on input line 469.
+(pdftex.def)             Requested size: 373.52336pt x 142.26378pt.
+<images/f_CA.png, id=81, 415.0707pt x 613.8132pt>
+File: images/f_CA.png Graphic file (type png)
+<use images/f_CA.png>
+Package pdftex.def Info: images/f_CA.png  used on input line 471.
+(pdftex.def)             Requested size: 288.61578pt x 426.79134pt.
+ [16 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/s_CA.png> </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/f_CA.png>]
+<images/s_SIR.png, id=86, 453.3738pt x 113.223pt>
+File: images/s_SIR.png Graphic file (type png)
+<use images/s_SIR.png>
+Package pdftex.def Info: images/s_SIR.png  used on input line 474.
+(pdftex.def)             Requested size: 410.17027pt x 102.43008pt.
+<images/f_SIR.png, id=87, 272.4579pt x 715.9548pt>
+File: images/f_SIR.png Graphic file (type png)
+<use images/f_SIR.png>
+Package pdftex.def Info: images/f_SIR.png  used on input line 476.
+(pdftex.def)             Requested size: 187.32265pt x 492.23276pt.
+ [17 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/s_SIR.png> </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/f_SIR.png>] [18] (/Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/main.bbl)
 
 Package caption Warning: Unused \captionsetup[sub] on input line 14.
 See the caption package documentation for explanation.
 
-[17] (/Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.aux)
+[19] (/Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/main.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 8135 strings out of 480608
- 140145 string characters out of 5903630
+ 8171 strings out of 480608
+ 140909 string characters out of 5903630
  636624 words of memory out of 5000000
- 23914 multiletter control sequences out of 15000+600000
+ 23944 multiletter control sequences out of 15000+600000
  538315 words of font info for 44 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 51i,8n,50p,917b,1667s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 51i,8n,50p,925b,1667s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2020/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}</usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/cm-super/sfrm1095.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/cm-super/sftt1000.pfb>
-Output written on "/Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.pdf" (17 pages, 2026659 bytes).
+Output written on "/Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/main.pdf" (19 pages, 2300344 bytes).
 PDF statistics:
- 117 PDF objects out of 1000 (max. 8388607)
- 71 compressed objects within 1 object stream
+ 133 PDF objects out of 1000 (max. 8388607)
+ 76 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 41 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 71 words of extra memory for PDF output out of 10000 (max. 10000000)
 

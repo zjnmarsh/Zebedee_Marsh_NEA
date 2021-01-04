@@ -1,9 +1,9 @@
-PWD /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis
+PWD /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup
 INPUT /usr/local/texlive/2020/texmf.cnf
 INPUT /usr/local/texlive/2020/texmf-dist/web2c/texmf.cnf
 INPUT /usr/local/texlive/2020/texmf-var/web2c/pdftex/pdflatex.fmt
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.tex
-OUTPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.log
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/main.tex
+OUTPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/main.log
 INPUT /usr/local/texlive/2020/texmf-dist/tex/latex/base/article.cls
 INPUT /usr/local/texlive/2020/texmf-dist/tex/latex/base/article.cls
 INPUT /usr/local/texlive/2020/texmf-dist/tex/latex/base/size11.clo
@@ -50,7 +50,7 @@ INPUT /usr/local/texlive/2020/texmf-dist/tex/generic/kvsetkeys/kvsetkeys.sty
 INPUT /usr/local/texlive/2020/texmf-dist/tex/generic/kvsetkeys/kvsetkeys.sty
 INPUT /usr/local/texlive/2020/texmf-dist/tex/latex/filehook/filehook.sty
 INPUT /usr/local/texlive/2020/texmf-dist/tex/latex/filehook/filehook.sty
-OUTPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.pytxcode
+OUTPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/main.pytxcode
 INPUT /usr/local/texlive/2020/texmf-dist/tex/latex/subfiles/subfiles.sty
 INPUT /usr/local/texlive/2020/texmf-dist/tex/latex/subfiles/subfiles.sty
 INPUT /usr/local/texlive/2020/texmf-dist/tex/latex/import/import.sty
@@ -91,9 +91,9 @@ INPUT /usr/local/texlive/2020/texmf-dist/tex/latex/listings/lstlang1.sty
 INPUT /usr/local/texlive/2020/texmf-dist/tex/latex/listings/lstlang1.sty
 INPUT /usr/local/texlive/2020/texmf-dist/tex/latex/l3backend/l3backend-pdfmode.def
 INPUT /usr/local/texlive/2020/texmf-dist/tex/latex/l3backend/l3backend-pdfmode.def
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.aux
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.aux
-OUTPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.aux
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/main.aux
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/main.aux
+OUTPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/main.aux
 INPUT /usr/local/texlive/2020/texmf-dist/tex/latex/base/textcomp.sty
 INPUT /usr/local/texlive/2020/texmf-dist/tex/latex/base/textcomp.sty
 INPUT /usr/local/texlive/2020/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
@@ -114,47 +114,65 @@ INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/public/cm/cmsy8.tfm
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/public/cm/cmsy6.tfm
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/public/cm/cmr12.tfm
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.toc
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.toc
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/main.toc
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/main.toc
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/public/cm/cmbx10.tfm
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/public/cm/cmmi10.tfm
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/public/cm/cmsy10.tfm
-OUTPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.toc
-OUTPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.pdf
+OUTPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/main.toc
+OUTPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/main.pdf
 INPUT /usr/local/texlive/2020/texmf-var/fonts/map/pdftex/updmap/pdftex.map
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/jknappen/ec/tcrm1095.tfm
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/public/cm/cmtt10.tfm
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/eca.png
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/eca.png
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/eca.png
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_tk_start.png
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_tk_start.png
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_tk_start.png
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_tk_p1.png
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_tk_p1.png
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_tk_p1.png
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_fa_1.png
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_fa_1.png
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_fa_1.png
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_fa_2.png
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_fa_2.png
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_fa_2.png
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_fa_3.png
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_fa_3.png
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_fa_3.png
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_fa_4.png
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_fa_4.png
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_fa_4.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/eca.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/eca.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/eca.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_tk_start.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_tk_start.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_tk_start.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_tk_p1.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_tk_p1.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_tk_p1.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_fa_1.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_fa_1.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_fa_1.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_fa_2.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_fa_2.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_fa_2.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_fa_3.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_fa_3.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_fa_3.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_fa_4.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_fa_4.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_fa_4.png
 INPUT /usr/local/texlive/2020/texmf-dist/tex/latex/base/ts1cmtt.fd
 INPUT /usr/local/texlive/2020/texmf-dist/tex/latex/base/ts1cmtt.fd
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/jknappen/ec/tctt1000.tfm
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_pan.png
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_pan.png
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/images/p_pan.png
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.bbl
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.bbl
-INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/main.aux
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_pan.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_pan.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/p_pan.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/s_main_function.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/s_main_function.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/s_main_function.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/f_main.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/f_main.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/f_main.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/s_CA.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/s_CA.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/s_CA.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/f_CA.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/f_CA.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/f_CA.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/s_SIR.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/s_SIR.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/s_SIR.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/f_SIR.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/f_SIR.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/f_SIR.png
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/main.bbl
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/main.bbl
+INPUT /Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/main.aux
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb

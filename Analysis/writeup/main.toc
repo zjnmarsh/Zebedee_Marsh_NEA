@@ -12,12 +12,17 @@
 \contentsline {subsubsection}{\numberline {5.1.2}Basic SIR model}{6}%
 \contentsline {subsection}{\numberline {5.2}External library testing TBD}{6}%
 \contentsline {subsubsection}{\numberline {5.2.1}Tkinter}{6}%
-\contentsline {subsubsection}{\numberline {5.2.2}Matplotlib}{8}%
-\contentsline {subsubsection}{\numberline {5.2.3}FuncAnimation}{8}%
-\contentsline {subsubsection}{\numberline {5.2.4}Pandas}{9}%
-\contentsline {subsubsection}{\numberline {5.2.5}Pygame}{10}%
+\contentsline {subsubsection}{\numberline {5.2.2}Matplotlib - FuncAnimation}{8}%
+\contentsline {subsubsection}{\numberline {5.2.3}Pandas}{9}%
+\contentsline {subsubsection}{\numberline {5.2.4}Pygame}{10}%
 \contentsline {subsection}{\numberline {5.3}SQL database TDB}{12}%
 \contentsline {section}{\numberline {6}Research of existing solutions TDB}{13}%
 \contentsline {section}{\numberline {7}Interview with target user}{14}%
 \contentsline {section}{\numberline {8}Documented design COMMENTED OUT}{15}%
-\contentsline {section}{\numberline {9}The code COMMENTED OUT}{16}%
+\contentsline {subsection}{\numberline {8.1}Main function structure diagram}{15}%
+\contentsline {subsection}{\numberline {8.2}Main function flowchart}{15}%
+\contentsline {subsection}{\numberline {8.3}Cellular automata structure diagram}{16}%
+\contentsline {subsection}{\numberline {8.4}Cellular automata flowchart}{16}%
+\contentsline {subsection}{\numberline {8.5}SIR Model structure diagram}{17}%
+\contentsline {subsection}{\numberline {8.6}SIR model flowchart}{17}%
+\contentsline {section}{\numberline {9}The code COMMENTED OUT}{18}%
