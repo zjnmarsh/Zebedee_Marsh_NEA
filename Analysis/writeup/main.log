@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.9.13)  5 JAN 2021 21:51
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.9.13)  5 JAN 2021 22:44
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -532,26 +532,89 @@ Overfull \hbox (30.0pt too wide) in paragraph at lines 489--490
 [] 
  []
 
-[18 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/uml_ca_sir.png> </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/re_sql.png>] [19] [20] [21] [22] [23] [24] [25] [26] [27] [28] [29] [30] [31] [32] [33] [34] [35] [36] [37]
-Overfull \hbox (9.02719pt too wide) in paragraph at lines 1488--1489
+[18 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/uml_ca_sir.png> </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/re_sql.png>] [19]
+<images/a_main_window.png, id=552, 557.08125pt x 475.7775pt>
+File: images/a_main_window.png Graphic file (type png)
+<use images/a_main_window.png>
+Package pdftex.def Info: images/a_main_window.png  used on input line 560.
+(pdftex.def)             Requested size: 452.9679pt x 386.8659pt.
+<images/a_sir_main.png, id=553, 563.10374pt x 550.055pt>
+File: images/a_sir_main.png Graphic file (type png)
+<use images/a_sir_main.png>
+Package pdftex.def Info: images/a_sir_main.png  used on input line 561.
+(pdftex.def)             Requested size: 452.9679pt x 442.47021pt.
+<images/a_sir_input.png, id=554, 452.69125pt x 427.5975pt>
+File: images/a_sir_input.png Graphic file (type png)
+<use images/a_sir_input.png>
+Package pdftex.def Info: images/a_sir_input.png  used on input line 562.
+(pdftex.def)             Requested size: 452.9679pt x 427.85742pt.
+<images/a_sir_history.png, id=555, 809.0225pt x 426.59375pt>
+File: images/a_sir_history.png Graphic file (type png)
+<use images/a_sir_history.png>
+Package pdftex.def Info: images/a_sir_history.png  used on input line 563.
+(pdftex.def)             Requested size: 452.9679pt x 238.8518pt.
+<images/a_sir_output.png, id=556, 593.21625pt x 543.02875pt>
+File: images/a_sir_output.png Graphic file (type png)
+<use images/a_sir_output.png>
+Package pdftex.def Info: images/a_sir_output.png  used on input line 564.
+(pdftex.def)             Requested size: 452.9679pt x 414.6616pt.
+File: images/a_main_window.png Graphic file (type png)
+<use images/a_main_window.png>
+Package pdftex.def Info: images/a_main_window.png  used on input line 565.
+(pdftex.def)             Requested size: 452.9679pt x 386.8659pt.
+<images/a_ca_main.png, id=557, 383.4325pt x 277.035pt>
+File: images/a_ca_main.png Graphic file (type png)
+<use images/a_ca_main.png>
+Package pdftex.def Info: images/a_ca_main.png  used on input line 566.
+(pdftex.def)             Requested size: 452.9679pt x 327.29582pt.
+<images/a_ca_input.png, id=558, 555.07375pt x 361.35pt>
+File: images/a_ca_input.png Graphic file (type png)
+<use images/a_ca_input.png>
+Package pdftex.def Info: images/a_ca_input.png  used on input line 567.
+(pdftex.def)             Requested size: 452.9679pt x 294.88086pt.
+<images/a_ca_history.png, id=559, 539.01375pt x 318.18875pt>
+File: images/a_ca_history.png Graphic file (type png)
+<use images/a_ca_history.png>
+Package pdftex.def Info: images/a_ca_history.png  used on input line 568.
+(pdftex.def)             Requested size: 452.9679pt x 267.39809pt.
+<images/a_ca_output.png, id=560, 513.92pt x 483.8075pt>
+File: images/a_ca_output.png Graphic file (type png)
+<use images/a_ca_output.png>
+Package pdftex.def Info: images/a_ca_output.png  used on input line 569.
+(pdftex.def)             Requested size: 452.9679pt x 426.43109pt.
+<images/a_open_file.png, id=561, 662.475pt x 378.41376pt>
+File: images/a_open_file.png Graphic file (type png)
+<use images/a_open_file.png>
+Package pdftex.def Info: images/a_open_file.png  used on input line 570.
+(pdftex.def)             Requested size: 452.9679pt x 258.73837pt.
+
+Overfull \hbox (30.0pt too wide) in paragraph at lines 560--571
+[] 
+ []
+
+[20] [21]
+Overfull \vbox (181.23442pt too high) has occurred while \output is active []
+
+ [22 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/a_main_window.png> </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/a_sir_main.png>] [23 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/a_sir_input.png> </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/a_sir_history.png>] [24 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/a_sir_output.png>] [25] [26 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/a_ca_main.png> </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/a_ca_input.png>] [27 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/a_ca_history.png>] [28 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/a_ca_output.png>] [29 </Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/images/a_open_file.png>] [30] [31] [32] [33] [34] [35] [36] [37] [38] [39] [40] [41] [42] [43] [44] [45] [46]
+Overfull \hbox (9.02719pt too wide) in paragraph at lines 1503--1504
 [][][][][][][][][][][][][][][][][]  
  []
 
-[38] [39] [40]
-Overfull \hbox (293.62506pt too wide) in paragraph at lines 1628--1630
+[47] [48] [49]
+Overfull \hbox (293.62506pt too wide) in paragraph at lines 1643--1645
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]  
  []
 
-[41] [42] [43] [44]
+[50] [51] [52] [53]
 
 Package caption Warning: Unused \captionsetup[sub] on input line 14.
 See the caption package documentation for explanation.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1782.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1782.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1797.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1797.
 (/Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/main.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1782.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1782.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1797.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1797.
 Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: 44D1E32D119B17EDA12EB0A7B9F8FE09;2576.
 
@@ -560,18 +623,18 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 13683 strings out of 480608
- 227725 string characters out of 5903630
+ 13752 strings out of 480608
+ 229170 string characters out of 5903630
  719166 words of memory out of 5000000
- 27836 multiletter control sequences out of 15000+600000
+ 27886 multiletter control sequences out of 15000+600000
  538315 words of font info for 44 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  51i,8n,50p,925b,1886s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2020/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}</usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/cm-super/sfrm1095.pfb></usr/local/texlive/2020/texmf-dist/fonts/type1/public/cm-super/sftt1000.pfb>
-Output written on "/Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/main.pdf" (44 pages, 2422576 bytes).
+Output written on "/Users/zebedeemarsh/Documents/Coding/CS Project main/CS-Project/Analysis/writeup/main.pdf" (53 pages, 3067704 bytes).
 PDF statistics:
- 2220 PDF objects out of 2487 (max. 8388607)
- 2113 compressed objects within 22 object streams
- 1529 named destinations out of 1728 (max. 500000)
- 361 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 2279 PDF objects out of 2487 (max. 8388607)
+ 2143 compressed objects within 22 object streams
+ 1538 named destinations out of 1728 (max. 500000)
+ 411 words of extra memory for PDF output out of 10000 (max. 10000000)
 
