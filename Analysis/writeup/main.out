@@ -1,0 +1,35 @@
+\BOOKMARK [1][-]{section.1}{1 Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{2 Initial objectives}{}% 2
+\BOOKMARK [1][-]{section.3}{3 Potential user}{}% 3
+\BOOKMARK [1][-]{section.4}{4 How the problem was researched}{}% 4
+\BOOKMARK [2][-]{subsection.4.1}{4.1 The SIR model}{section.4}% 5
+\BOOKMARK [3][-]{subsubsection.4.1.1}{4.1.1 Equations for the SIR model}{subsection.4.1}% 6
+\BOOKMARK [2][-]{subsection.4.2}{4.2 The Cellular Automata model}{section.4}% 7
+\BOOKMARK [3][-]{subsubsection.4.2.1}{4.2.1 My implementation of CA}{subsection.4.2}% 8
+\BOOKMARK [1][-]{section.5}{5 Prototyping of code}{}% 9
+\BOOKMARK [2][-]{subsection.5.1}{5.1 The scientific models}{section.5}% 10
+\BOOKMARK [3][-]{subsubsection.5.1.1}{5.1.1 Elementary cellular automata}{subsection.5.1}% 11
+\BOOKMARK [3][-]{subsubsection.5.1.2}{5.1.2 Basic SIR model}{subsection.5.1}% 12
+\BOOKMARK [2][-]{subsection.5.2}{5.2 External library testing TBD}{section.5}% 13
+\BOOKMARK [3][-]{subsubsection.5.2.1}{5.2.1 Tkinter}{subsection.5.2}% 14
+\BOOKMARK [3][-]{subsubsection.5.2.2}{5.2.2 Matplotlib - FuncAnimation}{subsection.5.2}% 15
+\BOOKMARK [3][-]{subsubsection.5.2.3}{5.2.3 Pandas}{subsection.5.2}% 16
+\BOOKMARK [3][-]{subsubsection.5.2.4}{5.2.4 Pygame}{subsection.5.2}% 17
+\BOOKMARK [2][-]{subsection.5.3}{5.3 SQL database TDB}{section.5}% 18
+\BOOKMARK [1][-]{section.6}{6 Interview with target user}{}% 19
+\BOOKMARK [1][-]{section.7}{7 Documented design NEEDS SQL AND UI DESIGN}{}% 20
+\BOOKMARK [2][-]{subsection.7.1}{7.1 Main function structure diagram}{section.7}% 21
+\BOOKMARK [2][-]{subsection.7.2}{7.2 Main function flowchart}{section.7}% 22
+\BOOKMARK [2][-]{subsection.7.3}{7.3 Cellular automata structure diagram}{section.7}% 23
+\BOOKMARK [2][-]{subsection.7.4}{7.4 Cellular automata flowchart}{section.7}% 24
+\BOOKMARK [2][-]{subsection.7.5}{7.5 SIR Model structure diagram}{section.7}% 25
+\BOOKMARK [2][-]{subsection.7.6}{7.6 SIR model flowchart}{section.7}% 26
+\BOOKMARK [2][-]{subsection.7.7}{7.7 Cellular automata and SIR model UML charts}{section.7}% 27
+\BOOKMARK [2][-]{subsection.7.8}{7.8 SQL Entity relationship diagram}{section.7}% 28
+\BOOKMARK [2][-]{subsection.7.9}{7.9 SQL queries used}{section.7}% 29
+\BOOKMARK [2][-]{subsection.7.10}{7.10 UI design}{section.7}% 30
+\BOOKMARK [1][-]{section.8}{8 The code}{}% 31
+\BOOKMARK [2][-]{subsection.8.1}{8.1 Main Function}{section.8}% 32
+\BOOKMARK [2][-]{subsection.8.2}{8.2 SIR Model Function}{section.8}% 33
+\BOOKMARK [2][-]{subsection.8.3}{8.3 CA Function}{section.8}% 34
+\BOOKMARK [2][-]{subsection.8.4}{8.4 SQL Function}{section.8}% 35

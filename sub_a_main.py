@@ -300,7 +300,7 @@ class gui_SIR_Param:
             queue = my_sir.QueueSimulation(self.number_of_simulations, self.param_list[0], self.param_list[1],
                                            self.param_list[2],
                                            self.param_list[3], self.param_list[4],
-                                           100, current_user)
+                                           1000, current_user)
 
             queue.run_simulation()
 

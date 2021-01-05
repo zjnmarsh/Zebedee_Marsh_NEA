@@ -1,0 +1,48 @@
+\subsection{SQL queries used}
+\textbf{Creating a new table}
+\begin{lstlisting}
+CREATE TABLE users (username text PRIMARY KEY, see_all integer)
+
+CREATE TABLE ca_param (
+    user string,
+    no_cells integer,
+    generations integer,
+    size_x integer,
+    size_y integer,
+    infection_radius integer,
+    no_infected integer,
+    recovered_can_be_infected integer,
+    days_until_recovered integer,
+    use_immunity integer,
+    days_of_immunity integer    
+    )
+
+CREATE TABLE sir_param (
+    user string,
+    sus0 integer,
+    inf0 integer,
+    rec0 integer,
+    beta integer,
+    gamma integer,
+    time integer
+    )
+
+INSERT INTO users VALUES (:username, :see_all), {'username': 'admin', 'see_all': 1}
+\end{lstlisting}
+This code sets up a clean database containing 3 tables, users, ca_param and sir_param. In the users table there are two columns, one containing the username and another containing a value to decide whether that user can see the history of all calculations performed and not just the calculations performed by that user. THIS WILL BE UPDATED. The ca_param and sir_param table contain columns to record the user doing the calculation and the parameters the user entered.
+
+\textbf{Inserting a new user into the user table}
+\begin{lstlisting}
+INSERT OR IGNORE INTO users VALUES (:username, :see_all),{'username': in_user, 'see_all': 0}
+\end{lstlisting}
+
+\textbf{Entering parameters from the Cellular Automata model}
+\begin{lstlisting}
+INSERT INTO ca_param VALUES (:user, :no_cells, :generations, :size_x, :size_y,
+                                            :infection_radius, :no_infected, :recovered_can_be_infected,
+                                            :days_until_recovered, :use_immunity, :days_of_immunity),
+              {'user': in_user, 'no_cells': up[0], 'generations': up[1], 'size_x': up[2], 'size_y': up[3],
+               'infection_radius': up[4], 'no_infected': up[5], 'recovered_can_be_infected': up[6],
+               'days_until_recovered': up[7], 'use_immunity': up[8], 'days_of_immunity': up[9]}
+\end{lstlisting}
+This function will be passed the user, in_user, and a list of the parameters entered, up. This will be added into the ca_param table.
