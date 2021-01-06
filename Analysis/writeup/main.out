@@ -17,7 +17,7 @@
 \BOOKMARK [3][-]{subsubsection.5.2.4}{5.2.4 Pygame}{subsection.5.2}% 17
 \BOOKMARK [2][-]{subsection.5.3}{5.3 SQL database TDB}{section.5}% 18
 \BOOKMARK [1][-]{section.6}{6 Interview with target user}{}% 19
-\BOOKMARK [1][-]{section.7}{7 Documented design NEEDS SQL AND UI DESIGN}{}% 20
+\BOOKMARK [1][-]{section.7}{7 Documented design}{}% 20
 \BOOKMARK [2][-]{subsection.7.1}{7.1 Main function structure diagram}{section.7}% 21
 \BOOKMARK [2][-]{subsection.7.2}{7.2 Main function flowchart}{section.7}% 22
 \BOOKMARK [2][-]{subsection.7.3}{7.3 Cellular automata structure diagram}{section.7}% 23
@@ -30,6 +30,6 @@
 \BOOKMARK [2][-]{subsection.7.10}{7.10 UI design}{section.7}% 30
 \BOOKMARK [1][-]{section.8}{8 The code}{}% 31
 \BOOKMARK [2][-]{subsection.8.1}{8.1 Main Function}{section.8}% 32
-\BOOKMARK [2][-]{subsection.8.2}{8.2 SIR Model Function}{section.8}% 33
-\BOOKMARK [2][-]{subsection.8.3}{8.3 CA Function}{section.8}% 34
-\BOOKMARK [2][-]{subsection.8.4}{8.4 SQL Function}{section.8}% 35
+\BOOKMARK [2][-]{subsection.8.2}{8.2 CA Model}{section.8}% 33
+\BOOKMARK [2][-]{subsection.8.3}{8.3 SIR Model}{section.8}% 34
+\BOOKMARK [2][-]{subsection.8.4}{8.4 SQL Functions}{section.8}% 35

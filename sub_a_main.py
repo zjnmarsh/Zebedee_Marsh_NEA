@@ -22,7 +22,7 @@ current_user = "None"
 
 
 class gui_Main_Window:
-    """First window shown where user must login and can choose to simulate using either CA or openSIR
+    """GUI of main window where user must login before they can choose SIR or CA model
     """
 
     def __init__(self, master):
@@ -53,6 +53,7 @@ class gui_Main_Window:
             self.pers_login()
 
     def pers_login(self):
+        """If a user closes an SIR or CA window, this function ensures that they stay logged in"""
         self.btn_SIR['state'] = tk.NORMAL
         self.btn_CA['state'] = tk.NORMAL
         self.e_user.destroy()
@@ -78,7 +79,7 @@ class gui_Main_Window:
         root2.mainloop()
 
     def login(self):
-        """Gets username from user that was entered into username box, calls enter_username sql function with ti and assigns it to the current user global variable
+        """Gets username from user that was entered into username box, calls enter_username sql function with it and assigns it to the current user global variable
         """
         username = str(self.e_user.get())
         my_sql.enter_username(username)
@@ -95,6 +96,7 @@ class gui_Main_Window:
         self.btn_logout.grid(column=2, row=0)
 
     def logout(self):
+        """Logs out user, setting global current_user to none and disabling SIR and CA button until they log in again"""
         print('logout')
         self.e_user = ttk.Entry(self.frame)
         self.btn_login = ttk.Button(self.frame, text='Login', command=self.login)
@@ -106,7 +108,7 @@ class gui_Main_Window:
 
 
 class error:
-
+    """Class for producing error box"""
     def __init__(self, err_type, message):
         tk.Tk().withdraw()
         title = err_type + " error"
@@ -157,7 +159,7 @@ class gui_First_SIR_Window:
         main_win.mainloop()
 
     def open_file(self):
-
+        """Allows user to open file containing results from previous simulation and converts the values into python lists so they can be used by the my_sir.plot_graph function"""
         print("file dialog")
         filename = filedialog.askopenfilename()
         print(filename)
@@ -173,7 +175,7 @@ class gui_First_SIR_Window:
         plot.plot()
 
     def input(self):
-        # print(type(self.e_num_sim.get()))
+        """Checks that user as entered a value between 1-10 for the number of simulations. IF the user has not, it will produce an error and ask user to enter a value between 1 and 10."""
         try:
             int(self.e_num_sim.get())
             if 1 <= int(self.e_num_sim.get()) <= 10:
@@ -191,8 +193,6 @@ class gui_First_SIR_Window:
         except ValueError:
             err = error("Entry", "Please enter an integer between 1 and 10")
 
-
-
     def show_history(self):
         self.master.destroy()
         root3 = tk.Tk()
@@ -201,7 +201,7 @@ class gui_First_SIR_Window:
 
 
 class gui_SIR_Param:
-    """Class for entering SIR parameters"""
+    """GUI for entering parameters for the SIR model"""
 
     def __init__(self, master, num_sim):
         self.param_list = [[], [], [], [], []]
@@ -260,6 +260,7 @@ class gui_SIR_Param:
         self.frame.rowconfigure(6, weight=1)
 
     def enter_param(self):
+        """Appends values user has entered to the main parameter list. If the number of simulations is more than 1, it will remove values in the input boxes so user can enter parameters for next simulaion."""
         self.counter += 1
 
         self.param_list[0].append(float(self.e_s.get()))
@@ -312,6 +313,8 @@ class gui_SIR_Param:
 
 
 class gui_SIR_history:
+    """GUI history window which shows history of values entered for the user currently logged in
+    """
 
     def __init__(self, master):
         self.master = master
@@ -319,7 +322,6 @@ class gui_SIR_history:
         self.frame.grid(row=0, column=0, sticky='nsew')
         self.user_history = my_sql.sir_return_history(current_user)  # user_history is a list of tuples
         print(self.user_history)
-        # print(self.user_history[0][1:])
 
         self.lb_history = tk.Listbox(self.frame, width=50)
         for i in range(len(self.user_history)):
@@ -368,8 +370,6 @@ class gui_First_CA_Window:
         self.frame = ttk.Frame(master, padding=5)
 
         self.lbl_name = ttk.Label(self.frame, text='This is the Cellular Automata model')
-        # self.num_sim = ttk.Entry(self.frame)
-        # self.num_sim.insert(0, 1)
         self.btn_open_file = ttk.Button(self.frame, text='Load File', command=self.open_file)
         self.btn_input_param = ttk.Button(self.frame, text='Enter Parameters', command=self.input)
         self.btn_show_history = ttk.Button(self.frame, text='History', command=self.show_history)
@@ -378,7 +378,6 @@ class gui_First_CA_Window:
         self.frame.grid(row=0, column=0, sticky='nsew')
 
         self.lbl_name.grid(column=0, row=0, columnspan=2, sticky='n')
-        # self.num_sim.grid(column=0, row=1)
         self.btn_open_file.grid(column=0, row=1)
         self.btn_input_param.grid(column=1, row=1)
         self.btn_show_history.grid(column=0, row=2)
@@ -400,7 +399,6 @@ class gui_First_CA_Window:
         if lines[-1] == "":
             del lines[-1]
 
-        # result = [json.loads(item) for item in lines]
         self.master.destroy()
 
         ca = my_ca.cellular_automata(0, 0, 0, 0, 0, 0, False, 0, False, 0, True, lines)
@@ -408,7 +406,6 @@ class gui_First_CA_Window:
         self.master.destroy()
 
     def input(self):
-        # manual user input
         self.master.destroy()
         root3 = tk.Tk()
         root3.title('Input Parameters')
@@ -528,16 +525,13 @@ class gui_CA_Param:
         days_imm = int(self.e_d_i.get())
 
         self.master.destroy()
-        # print(rec_inf)
-        # print(use_imm)
 
         arguments = [no_cells, generations, size_x, size_y, inf_rad, no_inf, rec_inf, days_rec, use_imm,
                      days_imm, False]
 
         my_sql.ca_enter_param(current_user, arguments)
 
-        # ca = my_ca.cellular_automata(no_cells, generations, size_x, size_y, inf_rad, no_inf, rec_inf, days_rec, use_imm,
-        #                              days_imm, False)
+
         ca = my_ca.cellular_automata(*arguments)  # arguments sent as separate parameters
 
         ca.new_generation()
@@ -551,6 +545,8 @@ class gui_CA_Param:
 
 
 class gui_CA_history:
+    """GUI history window which shows history of values entered for the user currently logged in
+    """
 
     def __init__(self, master):
         self.master = master
@@ -558,7 +554,6 @@ class gui_CA_history:
         self.frame.grid(row=0, column=0, sticky='nsew')
         self.user_history = my_sql.ca_return_history(current_user)  # user_history is a list of tuples
         print(self.user_history)
-        # print(self.user_history[0][1:])
 
         self.lb_history = tk.Listbox(self.frame, width=50)
         for i in range(len(self.user_history)):

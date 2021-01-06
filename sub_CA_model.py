@@ -8,7 +8,7 @@ import json
 
 
 class cell:
-    """Each cell will be a class instance of this class"""
+    """Each cell will be a class instance of this class. Gives each cell its own attributes"""
 
     def __init__(self, x, y, infected, d_r, d_i, u_i):
         self.x = x
@@ -298,11 +298,7 @@ class cellular_automata:
                             gen_rec.append([x_list[inf], y_list[inf]])
                         else:
                             gen_sus.append([x_list[inf], y_list[inf]])
-
-                # print(gen_inf)
-                # print(gen_rec)
-                # print(gen_sus)
-                # print("--------------")
+                            
 
                 sus_full.append(gen_sus)
                 inf_full.append(gen_inf)
@@ -314,9 +310,6 @@ class cellular_automata:
                 lg_values[1].append(len(gen_inf))
                 lg_values[2].append((len(gen_rec) + len(gen_imm)))
 
-                # coordinates.append([x_list, y_list])
-
-                # print(sus_full)
 
         # self.export_to_excel() # will soon be redundant
         if not self.user_file:
@@ -327,12 +320,6 @@ class cellular_automata:
             sus_full, inf_full, rec_full, imm_full, lg_values, time_array = self.import_data()
             self.generations = len(time_array)
             print("Imported data!")
-            # print(sus_full)
-            # print(inf_full)
-            # print(rec_full)
-            # print(imm_full)
-            # print(lg_values)
-            # print(time_array)
 
         fig, axs = plt.subplots(2)
         fig.suptitle('Cellular Automata')
@@ -362,8 +349,6 @@ class cellular_automata:
             axs[1].plot(time_array[0:i], lg_values[1][0:i], label="Infected", color="red")
             axs[1].plot(time_array[0:i], lg_values[2][0:i], label="recovered", color="purple")
 
-        # plt.xlim(0, self.size_x)
-        # plt.ylim(0, self.size_y)
 
         ani = FuncAnimation(plt.gcf(), animate, frames=self.generations, interval=100, repeat=False)
 

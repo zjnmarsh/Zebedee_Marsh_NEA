@@ -603,7 +603,7 @@ current_user = "None"
 
 
 class gui_Main_Window:
-    """First window shown where user must login and can choose to simulate using either CA or openSIR
+    """GUI of main window where user must login before they can choose SIR or CA model
     """
 
     def __init__(self, master):
@@ -634,6 +634,7 @@ class gui_Main_Window:
             self.pers_login()
 
     def pers_login(self):
+        """If a user closes an SIR or CA window, this function ensures that they stay logged in"""
         self.btn_SIR['state'] = tk.NORMAL
         self.btn_CA['state'] = tk.NORMAL
         self.e_user.destroy()
@@ -659,7 +660,7 @@ class gui_Main_Window:
         root2.mainloop()
 
     def login(self):
-        """Gets username from user that was entered into username box, calls enter_username sql function with ti and assigns it to the current user global variable
+        """Gets username from user that was entered into username box, calls enter_username sql function with it and assigns it to the current user global variable
         """
         username = str(self.e_user.get())
         my_sql.enter_username(username)
@@ -676,6 +677,7 @@ class gui_Main_Window:
         self.btn_logout.grid(column=2, row=0)
 
     def logout(self):
+        """Logs out user, setting global current_user to none and disabling SIR and CA button until they log in again"""
         print('logout')
         self.e_user = ttk.Entry(self.frame)
         self.btn_login = ttk.Button(self.frame, text='Login', command=self.login)
@@ -687,7 +689,7 @@ class gui_Main_Window:
 
 
 class error:
-
+    """Class for producing error box"""
     def __init__(self, err_type, message):
         tk.Tk().withdraw()
         title = err_type + " error"
@@ -738,7 +740,7 @@ class gui_First_SIR_Window:
         main_win.mainloop()
 
     def open_file(self):
-
+        """Allows user to open file containing results from previous simulation and converts the values into python lists so they can be used by the my_sir.plot_graph function"""
         print("file dialog")
         filename = filedialog.askopenfilename()
         print(filename)
@@ -754,7 +756,7 @@ class gui_First_SIR_Window:
         plot.plot()
 
     def input(self):
-        # print(type(self.e_num_sim.get()))
+        """Checks that user as entered a value between 1-10 for the number of simulations. IF the user has not, it will produce an error and ask user to enter a value between 1 and 10."""
         try:
             int(self.e_num_sim.get())
             if 1 <= int(self.e_num_sim.get()) <= 10:
@@ -772,8 +774,6 @@ class gui_First_SIR_Window:
         except ValueError:
             err = error("Entry", "Please enter an integer between 1 and 10")
 
-
-
     def show_history(self):
         self.master.destroy()
         root3 = tk.Tk()
@@ -782,7 +782,7 @@ class gui_First_SIR_Window:
 
 
 class gui_SIR_Param:
-    """Class for entering SIR parameters"""
+    """GUI for entering parameters for the SIR model"""
 
     def __init__(self, master, num_sim):
         self.param_list = [[], [], [], [], []]
@@ -841,6 +841,7 @@ class gui_SIR_Param:
         self.frame.rowconfigure(6, weight=1)
 
     def enter_param(self):
+        """Appends values user has entered to the main parameter list. If the number of simulations is more than 1, it will remove values in the input boxes so user can enter parameters for next simulaion."""
         self.counter += 1
 
         self.param_list[0].append(float(self.e_s.get()))
@@ -879,9 +880,9 @@ class gui_SIR_Param:
             root3.mainloop()
         else:
             queue = my_sir.QueueSimulation(self.number_of_simulations, self.param_list[0], self.param_list[1],
-                                           self.param_list[2],
-                                           self.param_list[3], self.param_list[4],
-                                           1000, current_user)
+                                            self.param_list[2],
+                                            self.param_list[3], self.param_list[4],
+                                            1000, current_user)
 
             queue.run_simulation()
 
@@ -893,6 +894,8 @@ class gui_SIR_Param:
 
 
 class gui_SIR_history:
+    """GUI history window which shows history of values entered for the user currently logged in
+    """
 
     def __init__(self, master):
         self.master = master
@@ -900,7 +903,6 @@ class gui_SIR_history:
         self.frame.grid(row=0, column=0, sticky='nsew')
         self.user_history = my_sql.sir_return_history(current_user)  # user_history is a list of tuples
         print(self.user_history)
-        # print(self.user_history[0][1:])
 
         self.lb_history = tk.Listbox(self.frame, width=50)
         for i in range(len(self.user_history)):
@@ -933,7 +935,7 @@ class gui_SIR_history:
         print(sim_param)
 
         queue = my_sir.QueueSimulation(1, [sim_param[0]], [sim_param[1]], [sim_param[2]], [sim_param[3]],
-                                       [sim_param[4]], sim_param[5], current_user)
+                                        [sim_param[4]], sim_param[5], current_user)
 
         queue.run_simulation()
 
@@ -949,8 +951,6 @@ class gui_First_CA_Window:
         self.frame = ttk.Frame(master, padding=5)
 
         self.lbl_name = ttk.Label(self.frame, text='This is the Cellular Automata model')
-        # self.num_sim = ttk.Entry(self.frame)
-        # self.num_sim.insert(0, 1)
         self.btn_open_file = ttk.Button(self.frame, text='Load File', command=self.open_file)
         self.btn_input_param = ttk.Button(self.frame, text='Enter Parameters', command=self.input)
         self.btn_show_history = ttk.Button(self.frame, text='History', command=self.show_history)
@@ -959,7 +959,6 @@ class gui_First_CA_Window:
         self.frame.grid(row=0, column=0, sticky='nsew')
 
         self.lbl_name.grid(column=0, row=0, columnspan=2, sticky='n')
-        # self.num_sim.grid(column=0, row=1)
         self.btn_open_file.grid(column=0, row=1)
         self.btn_input_param.grid(column=1, row=1)
         self.btn_show_history.grid(column=0, row=2)
@@ -981,7 +980,6 @@ class gui_First_CA_Window:
         if lines[-1] == "":
             del lines[-1]
 
-        # result = [json.loads(item) for item in lines]
         self.master.destroy()
 
         ca = my_ca.cellular_automata(0, 0, 0, 0, 0, 0, False, 0, False, 0, True, lines)
@@ -989,7 +987,6 @@ class gui_First_CA_Window:
         self.master.destroy()
 
     def input(self):
-        # manual user input
         self.master.destroy()
         root3 = tk.Tk()
         root3.title('Input Parameters')
@@ -1109,16 +1106,13 @@ class gui_CA_Param:
         days_imm = int(self.e_d_i.get())
 
         self.master.destroy()
-        # print(rec_inf)
-        # print(use_imm)
 
         arguments = [no_cells, generations, size_x, size_y, inf_rad, no_inf, rec_inf, days_rec, use_imm,
-                     days_imm, False]
+                        days_imm, False]
 
         my_sql.ca_enter_param(current_user, arguments)
 
-        # ca = my_ca.cellular_automata(no_cells, generations, size_x, size_y, inf_rad, no_inf, rec_inf, days_rec, use_imm,
-        #                              days_imm, False)
+
         ca = my_ca.cellular_automata(*arguments)  # arguments sent as separate parameters
 
         ca.new_generation()
@@ -1132,6 +1126,8 @@ class gui_CA_Param:
 
 
 class gui_CA_history:
+    """GUI history window which shows history of values entered for the user currently logged in
+    """
 
     def __init__(self, master):
         self.master = master
@@ -1139,7 +1135,6 @@ class gui_CA_history:
         self.frame.grid(row=0, column=0, sticky='nsew')
         self.user_history = my_sql.ca_return_history(current_user)  # user_history is a list of tuples
         print(self.user_history)
-        # print(self.user_history[0][1:])
 
         self.lb_history = tk.Listbox(self.frame, width=50)
         for i in range(len(self.user_history)):
@@ -1188,491 +1183,476 @@ window = gui_Main_Window(root)
 current_user = "zebedee"
 
 root.mainloop()
-
+    
 \end{lstlisting}
 
-\subsection{SIR Model Function}
+\subsection{CA Model}
 \begin{lstlisting}
-    import matplotlib.pyplot as plt
-    import pandas as pd
-    import sub_sql_functions as my_sql
-    
-    
-    class QueueSimulation:
-    
-        def __init__(self, n, s_list, i_list, r_list, b_list, g_list, t, current_user):
-            self.n = n  # number of simulations to be run
-            self.parameters = []
-            for i in range(n):
-                self.parameters.append([s_list[i], i_list[i], r_list[i], b_list[i], g_list[i], t, i + 1])
-                my_sql.sir_enter_param(current_user, [s_list[i], i_list[i], r_list[i], b_list[i], g_list[i], t])
-            print(self.parameters)
-    
-        def run_simulation(self):
-            sir_model = SIR_model()
-            for i in range(self.n):
-                sir_model.SIR_model(*self.parameters[i])
-            plt.show()
-    
-    
-    class SIR_model:
-    
-        def __init__(self):
+# pylint: disable=unused-variable
+# pylint: enable=too-many-lines
+
+import matplotlib.pyplot as plt
+import random
+from matplotlib.animation import FuncAnimation
+import json
+
+
+class cell:
+    """Each cell will be a class instance of this class. Gives each cell its own attributes"""
+
+    def __init__(self, x, y, infected, d_r, d_i, u_i):
+        self.x = x
+        self.y = y
+        self.infected = infected
+        self.recovered = False
+        self.recover_count = d_r  # default - can be changed - time until infected cell recovers
+        self.immune = False
+        self.immune_count = d_i
+        self.original_immune = d_i
+        self.use_immunity = u_i
+        # self.infection_rate = i
+
+    def cell_test_function(self):
+        return self.x, self.y, self.infected
+
+    def location(self):
+        # print(self.x, self.y)
+        return self.x, self.y
+
+    def recover_generation(self):
+        self.recover_count -= 1
+        if self.recover_count <= 0:
+            self.recovered = True
+            self.infected = False
+            self.recover_count = 10
+            if self.use_immunity:
+                self.immune = True
+
+    def immunity_generation(self):
+        if self.immune:
+            self.immune_count -= 1
+            if self.immune_count <= 0:
+                self.immune = False
+                self.immune_count = self.original_immune
+
+    def movement(self):
+        def nothing():
             pass
-    
-        def SIR_model(self, s0, i0, r0, beta, gamma, t, f, *args, **kwargs):
-            """
-            :param s0: number of susceptible people
-            :param i0: number of infected people
-            :param r0: number of recovered people
-            :param beta: transmission rate of an individual
-            :param gamma: recovery rate of an individual
-            :param t: how long the simulation should run for
-            :param f: how many graphs should be calculated simultaneously
-            """
-    
-            plt.figure(f)  # names the graph
-            N = s0 + i0 + r0  # total population
-    
-            timearray = list(range(1, int(t)))  # creates time array
-    
-            def eqns(param):
-                # e = random.uniform(0, 1)
-                e = 0
-                S, I, R = param
-                dsdt = (-(beta * S * I) / N) + (e * R)  # rate of change of susceptible individuals
-                didt = ((beta * S * I) / N) - gamma * I  # rate of change of infected individuals
-                drdt = (gamma * I) - (e * R)  # rate of change of recovered individuals
-                return dsdt, didt, drdt
-    
-            def solver():  # solves differential equations in eqns
-                param = (s0, i0, r0)
-                solver_result = [[], [], []]
-                for time in timearray:
-                    eqns_results = eqns(param)
-                    x, y, z = (param[0] + eqns_results[0]), (param[1] + eqns_results[1]), (param[2] + eqns_results[2])
-                    solver_result[0].append(x)
-                    solver_result[1].append(y)
-                    solver_result[2].append(z)
-                    param = (x, y, z)
-                return solver_result
-    
-            solver_result = solver()
-    
-            # print(solver_result)
-    
-            def export_to_excel():  # exports calculated results to excel
-                data = {'Time': timearray,
-                        'S': solver_result[0],
-                        'I': solver_result[1],
-                        'R': solver_result[2]}
-    
-                df = pd.DataFrame(data, columns=['Time', 'S', 'I', 'R'])
-                name = "output" + str(f) + ".xls"
-                df.to_excel(name, sheet_name='output')
-    
-            export_to_excel()
-            plt.plot(timearray, solver_result[0], label="S(t)")
-            plt.plot(timearray, solver_result[1], label="I(t)")
-            plt.plot(timearray, solver_result[2], label="R(t)")
-    
-    
-    class plot_graph:
-    
-        def __init__(self, ta, s, i, r):
-            # deconstruct file here
-            self.timearray = ta
-            self.sus = s
-            self.inf = i
-            self.rec = r
-    
-        def plot(self):
-            plt.plot(self.timearray, self.sus, label="S(t)")
-            plt.plot(self.timearray, self.inf, label="I(t)")
-            plt.plot(self.timearray, self.rec, label="R(t)")
-            plt.show()
-    
-\end{lstlisting}
 
-\subsection{CA Function}
-\begin{lstlisting}
-    # pylint: disable=unused-variable
-    # pylint: enable=too-many-lines
+        # mvmt = 5
+        mvmt = random.randint(0, 50)
+
+        def north():
+            self.y -= mvmt
+
+        def northeast():
+            self.x += mvmt
+            self.y -= mvmt
+
+        def east():
+            self.x += mvmt
+
+        def southeast():
+            self.x += mvmt
+            self.y += mvmt
+
+        def south():
+            self.y += mvmt
+
+        def southwest():
+            self.x -= mvmt
+            self.y += mvmt
+
+        def west():
+            self.x -= mvmt
+
+        def northwest():
+            self.x -= mvmt
+            self.y -= mvmt
+
+        instructions = {
+            0: nothing,
+            1: north,
+            2: northeast,
+            3: east,
+            4: southeast,
+            5: south,
+            6: southwest,
+            7: west,
+            8: northwest
+        }
+
+        rand = random.randint(0, 8)
+        instructions[rand]()  # like a switch case condition - for constant time complexity
+        # print(self.x, self.y)
+
+
+class cellular_automata:
+    """Main class to run function"""
+
+    def __init__(self, no_cells, generations, size_x, size_y, infection_radius, infected, r_i, d_r, immunity, d_i,
+                    user_file, *uf_param):
+        """Creates list of how every many cells the user inputs so a list will look like ['cell1','cell2','cell3'...]. Each
+        element in that list will then be used as a dictionary key where the definition will be a class instance of cell. Each
+        class instance will be created with a random x and y coordinate, and an infected status.
+        r_i : recovered can be infected
+        d_r : days until recovery
+        """
+        self.user_file = user_file
+        self.use_immunity = immunity
+        self.number_of_cells = no_cells
+        self.number_of_infected = infected
+        self.infection_radius = infection_radius
+        self.generations = generations
+        self.cell_list = []
+        self.cell_object_dict = {}
+        self.size_x = size_x
+        self.size_y = size_y
+        self.full_list = []
+        self.r_i = r_i  # recovered can be infected
+
+        if len(uf_param) != 0:
+            self.uf_param = uf_param
+            self.lines = list(uf_param)[0]
+
+        for i in range(no_cells):
+            self.cell_list.append(("cell" + str(i)))
+
+        infected_counter = 0
+        for element in self.cell_list:  # creates user inputted number of infected cells first, then creates normal cells
+            infected_counter += 1
+            infected_status = False
+            if infected_counter < self.number_of_infected:
+                infected_status = True
+            rand_x, rand_y = self.rand_coordinate_generator()
+            self.cell_object_dict[element] = cell(rand_x, rand_y,
+                                                    infected_status, d_r, d_i,
+                                                    self.use_immunity)  # creates a dictionary of cell objects
+
+    def rand_coordinate_generator(self):
+        """Generates random coordinates for cells being generated"""
+        rand_x = random.randint(0, self.size_x)
+        rand_y = random.randint(0, self.size_y)
+        return rand_x, rand_y
+
+    def export_data(self, sus_full, inf_full, rec_full, imm_full, lg_values, time_array):
+        """Should export data in a format that it can be analysed and reused
+        gen_imm empty when not using immunity, but shouldn't be a problem"""
     
-    import matplotlib.pyplot as plt
-    import random
-    from matplotlib.animation import FuncAnimation
-    import json
-    
-    
-    class cell:
-        """Each cell will be a class instance of this class"""
-    
-        def __init__(self, x, y, infected, d_r, d_i, u_i):
-            self.x = x
-            self.y = y
-            self.infected = infected
-            self.recovered = False
-            self.recover_count = d_r  # default - can be changed - time until infected cell recovers
-            self.immune = False
-            self.immune_count = d_i
-            self.original_immune = d_i
-            self.use_immunity = u_i
-            # self.infection_rate = i
-    
-        def cell_test_function(self):
-            return self.x, self.y, self.infected
-    
-        def location(self):
-            # print(self.x, self.y)
-            return self.x, self.y
-    
-        def recover_generation(self):
-            self.recover_count -= 1
-            if self.recover_count <= 0:
-                self.recovered = True
-                self.infected = False
-                self.recover_count = 10
+        filename = "ca_output.txt"
+        with open(filename, 'w') as file:
+            file.write(str(sus_full) + "\n")
+            file.write(str(inf_full) + "\n")
+            file.write(str(rec_full) + "\n")
+            file.write(str(imm_full) + "\n")
+            file.write(str(lg_values) + "\n")
+            file.write(str(time_array) + "\n")
+
+    def import_data(self):
+
+        if self.lines[-1] == "":
+            del self.lines[-1]
+
+        result = [json.loads(item) for item in self.lines]
+        # print(result)
+        return result
+
+    def update_position(self):
+        """For each cell object, movement function will be called to see where the cell will move, and the x coordinate list and y coordinate list will be returned of the new generation"""
+        loc_x = []
+        loc_y = []
+        infected = []
+        recovered = []
+        immune = []
+
+        for cell_obj_name in self.cell_list:  # for each cell object name ie. 'cell1', 'cell2' etc, use the name as a dictionary key and run movement function and get location
+            self.cell_object_dict[cell_obj_name].movement()
+            loc_x.append(self.cell_object_dict[cell_obj_name].location()[0])
+            loc_y.append(self.cell_object_dict[cell_obj_name].location()[1])
+            infected.append(self.cell_object_dict[cell_obj_name].infected)
+            recovered.append(self.cell_object_dict[cell_obj_name].recovered)
+            immune.append(self.cell_object_dict[cell_obj_name].immune)
+
+        # print(infected)
+        # print(recovered)
+        # print(immune)
+        # print("------------")
+
+        # self.collect_data()  # this function could be moved into the new generation class function
+
+        return loc_x, loc_y, infected, recovered, immune
+
+    def cells_touch(
+            self):  # need to change to put all infected in a list, THEN compare susceptible otherwise not proper
+        """If another cell in in a certain radius of an infected cell, it will become infected. To be changed"""
+        infected_locations = []  # list of tuples of infected cells
+        recovered_obj = []
+        susceptible_obj = []
+        for cell_name in self.cell_list:
+            if self.cell_object_dict[cell_name].infected:
+                infected_locations.append(self.cell_object_dict[cell_name].location())
+            elif self.cell_object_dict[cell_name].recovered:
+                recovered_obj.append(self.cell_object_dict[cell_name])  # holds recovered both with and without immunity
+            else:
+                susceptible_obj.append(self.cell_object_dict[cell_name])
+
+        def touch(cell_obj):
+            sus_x, sus_y = cell_obj.location()
+            for infected_tuple in infected_locations:
+                if (sus_x - infected_tuple[0]) ** 2 + (
+                        sus_y - infected_tuple[1]) <= self.infection_radius ** 2:  # equation of a circle
+                    # self.cell_object_dict[cell_name].infected = True  # need to chance for chance
+                    # PROBLEM
+                    cell_obj.infected = True
+                    # print(f'{cell_obj} has been infected')
+                    # cell is infected, LISTS ARE NOT UPDATED
+
+        if self.r_i:  # if recovered can be infected - doesn't change immunity status but is currently dependent on it - CHANGE
+            for recovered in recovered_obj:
+                if not recovered.immune:
+                    touch(recovered)
+        for susceptible in susceptible_obj:
+            if not susceptible.immune:
+                touch(susceptible)
+
+    def cell_recovery(self):
+        """Cells automatically recover after a certain period of time"""
+        for cell_name in self.cell_list:
+            cell_obj = self.cell_object_dict[cell_name]
+            if cell_obj.recovered == False and cell_obj.infected == True:
+                cell_obj.recover_generation()
+            elif cell_obj.recovered == True and cell_obj.infected:
+                cell_obj.recover_generation()
+
+    def cell_immunity(self):
+        for cell_name in self.cell_list:
+            cell_obj = self.cell_object_dict[cell_name]
+            if cell_obj.recovered == True and cell_obj.immune == True:
+                cell_obj.immunity_generation()
+
+    def new_generation(self):
+        """Main definition for running program. For the number of generations to simulate, call self.update_position() to get new coordinate lists"""
+
+        # coordinates = []
+
+        sus_full = []
+        inf_full = []
+        rec_full = []
+        imm_full = []
+
+        lg_values = [[], [], []]
+
+        time_array = list(range(0, self.generations))
+
+        if not self.user_file:
+            # if user chosing own file will not need - put in function later
+            for i in range(
+                    self.generations):
+
+                if i % 50 == 0:
+                    print("Generating generation " + str(i))
+
+                x_list, y_list, infected, recovered, immune = self.update_position()
+
+                # check if cells touch here, then can adjust objects if need
+                self.cells_touch()  # adjusts the objects, not any list
+
+                # recovery function
+                self.cell_recovery()
+
+                # immunity function
                 if self.use_immunity:
-                    self.immune = True
-    
-        def immunity_generation(self):
-            if self.immune:
-                self.immune_count -= 1
-                if self.immune_count <= 0:
-                    self.immune = False
-                    self.immune_count = self.original_immune
-    
-        def movement(self):
-            def nothing():
-                pass
-    
-            # mvmt = 5
-            mvmt = random.randint(0, 50)
-    
-            def north():
-                self.y -= mvmt
-    
-            def northeast():
-                self.x += mvmt
-                self.y -= mvmt
-    
-            def east():
-                self.x += mvmt
-    
-            def southeast():
-                self.x += mvmt
-                self.y += mvmt
-    
-            def south():
-                self.y += mvmt
-    
-            def southwest():
-                self.x -= mvmt
-                self.y += mvmt
-    
-            def west():
-                self.x -= mvmt
-    
-            def northwest():
-                self.x -= mvmt
-                self.y -= mvmt
-    
-            instructions = {
-                0: nothing,
-                1: north,
-                2: northeast,
-                3: east,
-                4: southeast,
-                5: south,
-                6: southwest,
-                7: west,
-                8: northwest
-            }
-    
-            rand = random.randint(0, 8)
-            instructions[rand]()  # like a switch case condition - for constant time complexity
-            # print(self.x, self.y)
-    
-    
-    class cellular_automata:
-        """Main class to run function"""
-    
-        def __init__(self, no_cells, generations, size_x, size_y, infection_radius, infected, r_i, d_r, immunity, d_i,
-                     user_file, *uf_param):
-            """Creates list of how every many cells the user inputs so a list will look like ['cell1','cell2','cell3'...]. Each
-            element in that list will then be used as a dictionary key where the definition will be a class instance of cell. Each
-            class instance will be created with a random x and y coordinate, and an infected status.
-            r_i : recovered can be infected
-            d_r : days until recovery
-            """
-            self.user_file = user_file
-            self.use_immunity = immunity
-            self.number_of_cells = no_cells
-            self.number_of_infected = infected
-            self.infection_radius = infection_radius
-            self.generations = generations
-            self.cell_list = []
-            self.cell_object_dict = {}
-            self.size_x = size_x
-            self.size_y = size_y
-            self.full_list = []
-            self.r_i = r_i  # recovered can be infected
-    
-            if len(uf_param) != 0:
-                self.uf_param = uf_param
-                self.lines = list(uf_param)[0]
-    
-            for i in range(no_cells):
-                self.cell_list.append(("cell" + str(i)))
-    
-            infected_counter = 0
-            for element in self.cell_list:  # creates user inputted number of infected cells first, then creates normal cells
-                infected_counter += 1
-                infected_status = False
-                if infected_counter < self.number_of_infected:
-                    infected_status = True
-                rand_x, rand_y = self.rand_coordinate_generator()
-                self.cell_object_dict[element] = cell(rand_x, rand_y,
-                                                      infected_status, d_r, d_i,
-                                                      self.use_immunity)  # creates a dictionary of cell objects
-    
-        def rand_coordinate_generator(self):
-            """Generates random coordinates for cells being generated"""
-            rand_x = random.randint(0, self.size_x)
-            rand_y = random.randint(0, self.size_y)
-            return rand_x, rand_y
-    
-        def export_data(self, sus_full, inf_full, rec_full, imm_full, lg_values, time_array):
-            """Should export data in a format that it can be analysed and reused
-            gen_imm empty when not using immunity, but shouldn't be a problem"""
-        
-            filename = "ca_output.txt"
-            with open(filename, 'w') as file:
-                file.write(str(sus_full) + "\n")
-                file.write(str(inf_full) + "\n")
-                file.write(str(rec_full) + "\n")
-                file.write(str(imm_full) + "\n")
-                file.write(str(lg_values) + "\n")
-                file.write(str(time_array) + "\n")
-    
-        def import_data(self):
-    
-            if self.lines[-1] == "":
-                del self.lines[-1]
-    
-            result = [json.loads(item) for item in self.lines]
-            # print(result)
-            return result
-    
-        def update_position(self):
-            """For each cell object, movement function will be called to see where the cell will move, and the x coordinate list and y coordinate list will be returned of the new generation"""
-            loc_x = []
-            loc_y = []
-            infected = []
-            recovered = []
-            immune = []
-    
-            for cell_obj_name in self.cell_list:  # for each cell object name ie. 'cell1', 'cell2' etc, use the name as a dictionary key and run movement function and get location
-                self.cell_object_dict[cell_obj_name].movement()
-                loc_x.append(self.cell_object_dict[cell_obj_name].location()[0])
-                loc_y.append(self.cell_object_dict[cell_obj_name].location()[1])
-                infected.append(self.cell_object_dict[cell_obj_name].infected)
-                recovered.append(self.cell_object_dict[cell_obj_name].recovered)
-                immune.append(self.cell_object_dict[cell_obj_name].immune)
-    
-            # print(infected)
-            # print(recovered)
-            # print(immune)
-            # print("------------")
-    
-            # self.collect_data()  # this function could be moved into the new generation class function
-    
-            return loc_x, loc_y, infected, recovered, immune
-    
-        def cells_touch(
-                self):  # need to change to put all infected in a list, THEN compare susceptible otherwise not proper
-            """If another cell in in a certain radius of an infected cell, it will become infected. To be changed"""
-            infected_locations = []  # list of tuples of infected cells
-            recovered_obj = []
-            susceptible_obj = []
-            for cell_name in self.cell_list:
-                if self.cell_object_dict[cell_name].infected:
-                    infected_locations.append(self.cell_object_dict[cell_name].location())
-                elif self.cell_object_dict[cell_name].recovered:
-                    recovered_obj.append(self.cell_object_dict[cell_name])  # holds recovered both with and without immunity
+                    self.cell_immunity()
+
+                gen_sus = []
+                gen_inf = []
+                gen_rec = []
+                gen_imm = []
+
+                # puts cells in list depending on their status and whether immunity is used
+                if self.use_immunity:
+                    for inf in range(len(self.cell_list)):
+                        if infected[inf]:  # if True
+                            gen_inf.append([x_list[inf], y_list[inf]])
+                        elif immune[inf]:
+                            gen_imm.append([x_list[inf], y_list[inf]])
+                        elif recovered[inf]:
+                            gen_rec.append([x_list[inf], y_list[inf]])
+                        else:
+                            gen_sus.append([x_list[inf], y_list[inf]])
                 else:
-                    susceptible_obj.append(self.cell_object_dict[cell_name])
-    
-            def touch(cell_obj):
-                sus_x, sus_y = cell_obj.location()
-                for infected_tuple in infected_locations:
-                    if (sus_x - infected_tuple[0]) ** 2 + (
-                            sus_y - infected_tuple[1]) <= self.infection_radius ** 2:  # equation of a circle
-                        # self.cell_object_dict[cell_name].infected = True  # need to chance for chance
-                        # PROBLEM
-                        cell_obj.infected = True
-                        # print(f'{cell_obj} has been infected')
-                        # cell is infected, LISTS ARE NOT UPDATED
-    
-            if self.r_i:  # if recovered can be infected - doesn't change immunity status but is currently dependent on it - CHANGE
-                for recovered in recovered_obj:
-                    if not recovered.immune:
-                        touch(recovered)
-            for susceptible in susceptible_obj:
-                if not susceptible.immune:
-                    touch(susceptible)
-    
-        def cell_recovery(self):
-            """Cells automatically recover after a certain period of time"""
-            for cell_name in self.cell_list:
-                cell_obj = self.cell_object_dict[cell_name]
-                if cell_obj.recovered == False and cell_obj.infected == True:
-                    cell_obj.recover_generation()
-                elif cell_obj.recovered == True and cell_obj.infected:
-                    cell_obj.recover_generation()
-    
-        def cell_immunity(self):
-            for cell_name in self.cell_list:
-                cell_obj = self.cell_object_dict[cell_name]
-                if cell_obj.recovered == True and cell_obj.immune == True:
-                    cell_obj.immunity_generation()
-    
-        def new_generation(self):
-            """Main definition for running program. For the number of generations to simulate, call self.update_position() to get new coordinate lists"""
-    
-            # coordinates = []
-    
-            sus_full = []
-            inf_full = []
-            rec_full = []
-            imm_full = []
-    
-            lg_values = [[], [], []]
-    
-            time_array = list(range(0, self.generations))
-    
-            if not self.user_file:
-                # if user chosing own file will not need - put in function later
-                for i in range(
-                        self.generations):
-    
-                    if i % 50 == 0:
-                        print("Generating generation " + str(i))
-    
-                    x_list, y_list, infected, recovered, immune = self.update_position()
-    
-                    # check if cells touch here, then can adjust objects if need
-                    self.cells_touch()  # adjusts the objects, not any list
-    
-                    # recovery function
-                    self.cell_recovery()
-    
-                    # immunity function
-                    if self.use_immunity:
-                        self.cell_immunity()
-    
-                    gen_sus = []
-                    gen_inf = []
-                    gen_rec = []
-                    gen_imm = []
-    
-                    # puts cells in list depending on their status and whether immunity is used
-                    if self.use_immunity:
-                        for inf in range(len(self.cell_list)):
-                            if infected[inf]:  # if True
-                                gen_inf.append([x_list[inf], y_list[inf]])
-                            elif immune[inf]:
-                                gen_imm.append([x_list[inf], y_list[inf]])
-                            elif recovered[inf]:
-                                gen_rec.append([x_list[inf], y_list[inf]])
-                            else:
-                                gen_sus.append([x_list[inf], y_list[inf]])
-                    else:
-                        for inf in range(len(self.cell_list)):
-                            if infected[inf]:  # if True
-                                gen_inf.append([x_list[inf], y_list[inf]])
-                            elif recovered[inf]:
-                                gen_rec.append([x_list[inf], y_list[inf]])
-                            else:
-                                gen_sus.append([x_list[inf], y_list[inf]])
-    
-                    # print(gen_inf)
-                    # print(gen_rec)
-                    # print(gen_sus)
-                    # print("--------------")
-    
-                    sus_full.append(gen_sus)
-                    inf_full.append(gen_inf)
-                    rec_full.append(gen_rec)
-                    if self.use_immunity:
-                        imm_full.append(gen_imm)
-    
-                    lg_values[0].append(len(gen_sus))
-                    lg_values[1].append(len(gen_inf))
-                    lg_values[2].append((len(gen_rec) + len(gen_imm)))
-    
-                    # coordinates.append([x_list, y_list])
-    
-                    # print(sus_full)
-    
-            # self.export_to_excel() # will soon be redundant
-            if not self.user_file:
-                self.export_data(sus_full, inf_full, rec_full, imm_full, lg_values, time_array)  # WORKING NOW
-    
-            # if using own values, assign them here
-            if self.user_file:
-                sus_full, inf_full, rec_full, imm_full, lg_values, time_array = self.import_data()
-                self.generations = len(time_array)
-                print("Imported data!")
-                # print(sus_full)
-                # print(inf_full)
-                # print(rec_full)
-                # print(imm_full)
-                # print(lg_values)
-                # print(time_array)
-    
-            fig, axs = plt.subplots(2)
-            fig.suptitle('Cellular Automata')
-    
-            # animate_graph = Anim(self.generations, sus_full, inf_full, rec_full, imm_full, self.use_immunity, time_array, lg_values)
-    
-            def animate(i):  # need to adjust to work with two graphs
-                # https://stackoverflow.com/questions/42621036/how-to-use-funcanimation-to-update-and-animate-multiple-figures-with-matplotlib
-    
-                axs[0].cla()
-    
-                x_sus_full = [cell[0] for cell in sus_full[i]]
-                y_sus_full = [cell[1] for cell in sus_full[i]]
-                x_inf_full = [cell[0] for cell in inf_full[i]]
-                y_inf_full = [cell[1] for cell in inf_full[i]]
-                x_rec_full = [cell[0] for cell in rec_full[i]]
-                y_rec_full = [cell[1] for cell in rec_full[i]]
-    
-                axs[0].scatter(x_sus_full, y_sus_full, color='blue')
-                axs[0].scatter(x_inf_full, y_inf_full, color='red')
-                axs[0].scatter(x_rec_full, y_rec_full, color='purple')
+                    for inf in range(len(self.cell_list)):
+                        if infected[inf]:  # if True
+                            gen_inf.append([x_list[inf], y_list[inf]])
+                        elif recovered[inf]:
+                            gen_rec.append([x_list[inf], y_list[inf]])
+                        else:
+                            gen_sus.append([x_list[inf], y_list[inf]])
+                            
+
+                sus_full.append(gen_sus)
+                inf_full.append(gen_inf)
+                rec_full.append(gen_rec)
                 if self.use_immunity:
-                    axs[0].scatter([cell[0] for cell in imm_full[i]], [cell[1] for cell in imm_full[i]], color='gray')
-    
-                # plots line graph
-                axs[1].plot(time_array[0:i], lg_values[0][0:i], label="Susceptible", color="blue")
-                axs[1].plot(time_array[0:i], lg_values[1][0:i], label="Infected", color="red")
-                axs[1].plot(time_array[0:i], lg_values[2][0:i], label="recovered", color="purple")
-    
-            # plt.xlim(0, self.size_x)
-            # plt.ylim(0, self.size_y)
-    
-            ani = FuncAnimation(plt.gcf(), animate, frames=self.generations, interval=100, repeat=False)
-    
-            # ani.save('video.mp4', writer='ffmpeg', fps=30, dpi=250)
-    
-            plt.tight_layout()
-            plt.show()
+                    imm_full.append(gen_imm)
+
+                lg_values[0].append(len(gen_sus))
+                lg_values[1].append(len(gen_inf))
+                lg_values[2].append((len(gen_rec) + len(gen_imm)))
+
+
+        # self.export_to_excel() # will soon be redundant
+        if not self.user_file:
+            self.export_data(sus_full, inf_full, rec_full, imm_full, lg_values, time_array)  # WORKING NOW
+
+        # if using own values, assign them here
+        if self.user_file:
+            sus_full, inf_full, rec_full, imm_full, lg_values, time_array = self.import_data()
+            self.generations = len(time_array)
+            print("Imported data!")
+
+        fig, axs = plt.subplots(2)
+        fig.suptitle('Cellular Automata')
+
+        # animate_graph = Anim(self.generations, sus_full, inf_full, rec_full, imm_full, self.use_immunity, time_array, lg_values)
+
+        def animate(i):  # need to adjust to work with two graphs
+            # https://stackoverflow.com/questions/42621036/how-to-use-funcanimation-to-update-and-animate-multiple-figures-with-matplotlib
+
+            axs[0].cla()
+
+            x_sus_full = [cell[0] for cell in sus_full[i]]
+            y_sus_full = [cell[1] for cell in sus_full[i]]
+            x_inf_full = [cell[0] for cell in inf_full[i]]
+            y_inf_full = [cell[1] for cell in inf_full[i]]
+            x_rec_full = [cell[0] for cell in rec_full[i]]
+            y_rec_full = [cell[1] for cell in rec_full[i]]
+
+            axs[0].scatter(x_sus_full, y_sus_full, color='blue')
+            axs[0].scatter(x_inf_full, y_inf_full, color='red')
+            axs[0].scatter(x_rec_full, y_rec_full, color='purple')
+            if self.use_immunity:
+                axs[0].scatter([cell[0] for cell in imm_full[i]], [cell[1] for cell in imm_full[i]], color='gray')
+
+            # plots line graph
+            axs[1].plot(time_array[0:i], lg_values[0][0:i], label="Susceptible", color="blue")
+            axs[1].plot(time_array[0:i], lg_values[1][0:i], label="Infected", color="red")
+            axs[1].plot(time_array[0:i], lg_values[2][0:i], label="recovered", color="purple")
+
+
+        ani = FuncAnimation(plt.gcf(), animate, frames=self.generations, interval=100, repeat=False)
+
+        # ani.save('video.mp4', writer='ffmpeg', fps=30, dpi=250)
+
+        plt.tight_layout()
+        plt.show()
+
+\end{lstlisting}
+
+\subsection{SIR Model}
+\begin{lstlisting}
+import matplotlib.pyplot as plt
+import pandas as pd
+import sub_sql_functions as my_sql
+
+
+class QueueSimulation:
+
+    def __init__(self, n, s_list, i_list, r_list, b_list, g_list, t, current_user):
+        self.n = n  # number of simulations to be run
+        self.parameters = []
+        for i in range(n):
+            self.parameters.append([s_list[i], i_list[i], r_list[i], b_list[i], g_list[i], t, i + 1])
+            my_sql.sir_enter_param(current_user, [s_list[i], i_list[i], r_list[i], b_list[i], g_list[i], t])
+        print(self.parameters)
+
+    def run_simulation(self):
+        sir_model = SIR_model()
+        for i in range(self.n):
+            sir_model.SIR_model(*self.parameters[i])
+        plt.show()
+
+
+class SIR_model:
+
+    def __init__(self):
+        pass
+
+    def SIR_model(self, s0, i0, r0, beta, gamma, t, f, *args, **kwargs):
+        """
+        :param s0: number of susceptible people
+        :param i0: number of infected people
+        :param r0: number of recovered people
+        :param beta: transmission rate of an individual
+        :param gamma: recovery rate of an individual
+        :param t: how long the simulation should run for
+        :param f: how many graphs should be calculated simultaneously
+        """
+
+        plt.figure(f)  # names the graph
+        N = s0 + i0 + r0  # total population
+
+        timearray = list(range(1, int(t)))  # creates time array
+
+        def eqns(param):
+            # e = random.uniform(0, 1)
+            e = 0
+            S, I, R = param
+            dsdt = (-(beta * S * I) / N) + (e * R)  # rate of change of susceptible individuals
+            didt = ((beta * S * I) / N) - gamma * I  # rate of change of infected individuals
+            drdt = (gamma * I) - (e * R)  # rate of change of recovered individuals
+            return dsdt, didt, drdt
+
+        def solver():  # solves differential equations in eqns
+            param = (s0, i0, r0)
+            solver_result = [[], [], []]
+            for time in timearray:
+                eqns_results = eqns(param)
+                x, y, z = (param[0] + eqns_results[0]), (param[1] + eqns_results[1]), (param[2] + eqns_results[2])
+                solver_result[0].append(x)
+                solver_result[1].append(y)
+                solver_result[2].append(z)
+                param = (x, y, z)
+            return solver_result
+
+        solver_result = solver()
+
+        # print(solver_result)
+
+        def export_to_excel():  # exports calculated results to excel
+            data = {'Time': timearray,
+                    'S': solver_result[0],
+                    'I': solver_result[1],
+                    'R': solver_result[2]}
+
+            df = pd.DataFrame(data, columns=['Time', 'S', 'I', 'R'])
+            name = "output" + str(f) + ".xls"
+            df.to_excel(name, sheet_name='output')
+
+        export_to_excel()
+        plt.plot(timearray, solver_result[0], label="S(t)")
+        plt.plot(timearray, solver_result[1], label="I(t)")
+        plt.plot(timearray, solver_result[2], label="R(t)")
+
+
+class plot_graph:
+
+    def __init__(self, ta, s, i, r):
+        # deconstruct file here
+        self.timearray = ta
+        self.sus = s
+        self.inf = i
+        self.rec = r
+
+    def plot(self):
+        plt.plot(self.timearray, self.sus, label="S(t)")
+        plt.plot(self.timearray, self.inf, label="I(t)")
+        plt.plot(self.timearray, self.rec, label="R(t)")
+        plt.show()
     
 \end{lstlisting}
 
-\subsection{SQL Function}
+\subsection{SQL Functions}
 \begin{lstlisting}
     import sqlite3
     import os.path
@@ -1767,25 +1747,8 @@ root.mainloop()
         c = conn.cursor()
         c.execute("SELECT * FROM sir_param WHERE user=:curr_user", {'curr_user':in_user})
         return c.fetchall()
-    
-    # initial_setup()
-    
-    # enter_username("Alice")
-    
-    # conn = sqlite3.connect('my_database.db')
-    # c = conn.cursor()
-    #
-    # c.execute("SELECT * FROM users")
-    # print(c.fetchall())
-    
-    # ca_enter_param('chase', [10, 25, 50, 50, 3, 3, True, 5, True, 5])
-    # ca_enter_param('chase', [1, 2, 5, 5, 1, 3, True, 5, True, 5])
-    # ca_enter_param('Alice', [33, 5, 80, 30, 3, 3, True, 5, True, 5])
-    # c.execute("SELECT * FROM ca_param")
-    # print(c.fetchall())
-    
-    
 \end{lstlisting}
+
 
 \newpage
 
