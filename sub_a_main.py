@@ -20,7 +20,6 @@ import sub_sql_functions as my_sql
 
 current_user = "None"
 
-
 class gui_Main_Window:
     """GUI of main window where user must login before they can choose SIR or CA model
     """
@@ -82,7 +81,10 @@ class gui_Main_Window:
         """Gets username from user that was entered into username box, calls enter_username sql function with it and assigns it to the current user global variable
         """
         username = str(self.e_user.get())
-        my_sql.enter_username(username)
+        exists = my_sql.username_exists(username)
+        if not exists:
+            self.enter_email(username)
+
         global current_user
         current_user = username
 
@@ -95,6 +97,13 @@ class gui_Main_Window:
         self.btn_logout = ttk.Button(self.frame, text='logout', command=self.logout)
         self.btn_logout.grid(column=2, row=0)
 
+    def enter_email(self, username):
+        print('enter_email')
+        root5 = tk.Tk()
+        root5.title('Enter email')
+        email_window = gui_Enter_Email(root5, username)
+        return
+
     def logout(self):
         """Logs out user, setting global current_user to none and disabling SIR and CA button until they log in again"""
         print('logout')
@@ -106,6 +115,35 @@ class gui_Main_Window:
         self.btn_CA['state'] = tk.DISABLED
         current_user = "None"
 
+
+class gui_Enter_Email:
+    def __init__(self, master, username):
+        self.username = username
+        self.email = ""
+
+        self.master = master
+        self.frame = ttk.Frame(master, padding=5)
+
+        self.lbl_email = ttk.Label(self.frame, text='Please enter your email address')
+        self.e_email = ttk.Entry(self.frame)
+        self.btn_enter = ttk.Button(self.frame, text="Submit", command=self.submit)
+
+        self.frame.grid(row=0, column=0, sticky='nswe')
+
+        self.lbl_email.grid(column=0, row=0)
+        self.e_email.grid(column=0, row=1)
+        self.btn_enter.grid(column=0, row=2)
+
+        self.master.columnconfigure(0, weight=1)
+        self.master.rowconfigure(0, weight=1)
+
+        self.frame.columnconfigure(1, weight=1)
+        self.frame.rowconfigure(1, weight=1)
+
+    def submit(self):
+        self.email = str(self.e_email.get())
+        my_sql.enter_username(self.username, self.email)
+        self.master.destroy()
 
 class error:
     """Class for producing error box"""

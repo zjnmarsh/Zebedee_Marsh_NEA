@@ -10,7 +10,7 @@ def initial_setup():
     c = conn.cursor()
     # c.execute("DROP TABLE users")
     # c.execute("DROP TABLE ca_param")
-    c.execute("CREATE TABLE users (username text PRIMARY KEY, see_all integer)")
+    c.execute("CREATE TABLE users (username text PRIMARY KEY, see_all integer, email string)")
 
     c.execute("""CREATE TABLE ca_param (
                 user string,
@@ -25,7 +25,7 @@ def initial_setup():
                 use_immunity integer,
                 days_of_immunity integer    
                 )""")
-    c.execute("INSERT INTO users VALUES (:username, :see_all)", {'username': 'admin', 'see_all': 1})
+    c.execute("INSERT INTO users VALUES (:username, :see_all, :email)", {'username': 'admin', 'see_all': 1, 'email': "None"})
 
     c.execute("""CREATE TABLE sir_param (
                 user string,
@@ -41,13 +41,25 @@ def initial_setup():
     conn.close()
 
 
-def enter_username(in_user):
+def username_exists(in_user):
+    conn = sqlite3.connect('my_database.db')
+    c = conn.cursor()
+
+    # check if username already in table
+    c.execute("SELECT EXISTS(SELECT * from users WHERE username=:input_user)", {'input_user': in_user})
+    exists = c.fetchone()[0]
+    return exists
+
+
+def enter_username(in_user, email):
     """If new username entered, it will create a record in the users table for that user, if username
     entered already exists nothing happens. Username is returned"""
     conn = sqlite3.connect('my_database.db')
     c = conn.cursor()
-    c.execute("INSERT OR IGNORE INTO users VALUES (:username, :see_all)",
-              {'username': in_user, 'see_all': 0})  # don't add if duplicate username
+    # c.execute("INSERT OR IGNORE INTO users VALUES (:username, :see_all)",
+    #           {'username': in_user, 'see_all': 0})  # don't add if duplicate username
+    c.execute("INSERT INTO users VALUES (:username, :see_all, :email)",
+              {'username': in_user, 'see_all': 0, 'email': email})  # don't add if duplicate username
     conn.commit()
     conn.close()
     return in_user
@@ -81,16 +93,19 @@ def sir_enter_param(in_user, up):
     conn = sqlite3.connect('my_database.db')
     c = conn.cursor()
     c.execute("""INSERT INTO sir_param VALUES (:user, :sus0, :inf0, :rec0, :beta, :gamma, :time)""",
-              {'user': in_user, 'sus0': up[0], 'inf0': up[1], 'rec0': up[2], 'beta': up[3], 'gamma': up[4], 'time': up[5]
+              {'user': in_user, 'sus0': up[0], 'inf0': up[1], 'rec0': up[2], 'beta': up[3], 'gamma': up[4],
+               'time': up[5]
                })
     conn.commit()
     conn.close()
 
+
 def sir_return_history(in_user):
     conn = sqlite3.connect('my_database.db')
     c = conn.cursor()
-    c.execute("SELECT * FROM sir_param WHERE user=:curr_user", {'curr_user':in_user})
+    c.execute("SELECT * FROM sir_param WHERE user=:curr_user", {'curr_user': in_user})
     return c.fetchall()
+
 
 # initial_setup()
 
@@ -107,4 +122,5 @@ def sir_return_history(in_user):
 # ca_enter_param('Alice', [33, 5, 80, 30, 3, 3, True, 5, True, 5])
 # c.execute("SELECT * FROM ca_param")
 # print(c.fetchall())
-
+# initial_setup()
+# username_exists("admin")
