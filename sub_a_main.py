@@ -1,16 +1,7 @@
 # pylint: disable=unused-variable
 import tkinter as tk
 from tkinter import ttk
-from scipy.integrate import odeint
-import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
-import random
-import time
-from matplotlib.animation import FuncAnimation
-import matplotlib
-import csv
-import json
 from tkinter import filedialog
 from tkinter import messagebox
 
@@ -120,19 +111,32 @@ class gui_Enter_Email:
     def __init__(self, master, username):
         self.username = username
         self.email = ""
+        self.fn = ""
+        self.ln = ""
 
         self.master = master
         self.frame = ttk.Frame(master, padding=5)
 
-        self.lbl_email = ttk.Label(self.frame, text='Please enter your email address')
-        self.e_email = ttk.Entry(self.frame)
+        self.lbl_email = ttk.Label(self.frame, text='Email')
+        self.lbl_fn = ttk.Label(self.frame, text='First Name')
+        self.lbl_ln = ttk.Label(self.frame, text='Last Name')
+
+        self.e_email = ttk.Entry(self.frame, text="Email")
+        self.e_fn = ttk.Entry(self.frame, text="First Name")
+        self.e_ln = ttk.Entry(self.frame, text="Last Name")
+
         self.btn_enter = ttk.Button(self.frame, text="Submit", command=self.submit)
 
         self.frame.grid(row=0, column=0, sticky='nswe')
 
         self.lbl_email.grid(column=0, row=0)
-        self.e_email.grid(column=0, row=1)
-        self.btn_enter.grid(column=0, row=2)
+        self.lbl_fn.grid(column=0, row=1)
+        self.lbl_ln.grid(column=0, row=2)
+        self.e_email.grid(column=1, row=0)
+        self.e_fn.grid(column=1, row=1)
+        self.e_ln.grid(column=1, row=2)
+
+        self.btn_enter.grid(column=0, row=3, columnspan=2)
 
         self.master.columnconfigure(0, weight=1)
         self.master.rowconfigure(0, weight=1)
@@ -142,7 +146,9 @@ class gui_Enter_Email:
 
     def submit(self):
         self.email = str(self.e_email.get())
-        my_sql.enter_username(self.username, self.email)
+        self.fn = str(self.e_fn.get())
+        self.ln = str(self.e_ln.get())
+        my_sql.enter_username(self.username, self.email, self.fn, self.ln)
         self.master.destroy()
 
 class error:
