@@ -76,13 +76,15 @@ class gui_Main_Window:
         exists = my_sql.username_exists(username)
         if not exists:
             self.enter_email(username)
+        else:
+            user_id = my_sql.get_id(username)
+            global current_id
+            current_id = user_id
 
         global current_user
         current_user = username
 
-        user_id = my_sql.get_id(username)
-        global current_id
-        current_id = user_id
+
 
 
         self.btn_SIR['state'] = tk.NORMAL
@@ -156,6 +158,8 @@ class gui_Enter_Email:
         self.ln = str(self.e_ln.get())
         self.id = self.generate_id()
         my_sql.enter_username(self.username, self.id, self.email, self.fn, self.ln)
+        global current_id
+        current_id = self.id
         self.master.destroy()
 
     def generate_id(self):
