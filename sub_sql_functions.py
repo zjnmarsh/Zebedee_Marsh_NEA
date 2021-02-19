@@ -48,10 +48,10 @@ def initial_setup2():
     c = conn.cursor()
     # c.execute("DROP TABLE users")
     # c.execute("DROP TABLE ca_param")
-    c.execute("CREATE TABLE users (username text PRIMARY KEY, see_all integer, email string, first_name string, last_name string)")
+    c.execute("CREATE TABLE users (username text PRIMARY KEY, user_id integer, see_all integer,  email string, first_name string, last_name string)")
 
     c.execute("""CREATE TABLE ca_param (
-                user string,
+                user_id integer,
                 no_cells integer,
                 generations integer,
                 size_x integer,
@@ -63,10 +63,10 @@ def initial_setup2():
                 use_immunity integer,
                 days_of_immunity integer    
                 )""")
-    c.execute("INSERT INTO users VALUES (:username, :see_all, :email, :first_name, :last_name)", {'username': 'admin', 'see_all': 1, 'email': "None", 'first_name': "None", 'last_name': "None"})
+    c.execute("INSERT INTO users VALUES (:username, :user_id, :see_all, :email, :first_name, :last_name)", {'username': 'admin', 'user_id': 1, 'see_all': 1, 'email': "None", 'first_name': "None", 'last_name': "None"})
 
     c.execute("""CREATE TABLE sir_param (
-                user string,
+                user integer,
                 sus0 integer,
                 inf0 integer,
                 rec0 integer,
@@ -88,19 +88,25 @@ def username_exists(in_user):
     return exists
 
 
-def enter_username(in_user, email, fn, ln):
+def enter_username(in_user, id, email, fn, ln):
     """If new username entered, it will create a record in the users table for that user, if username
     entered already exists nothing happens. Username is returned"""
     conn = sqlite3.connect('my_database.db')
     c = conn.cursor()
     # c.execute("INSERT OR IGNORE INTO users VALUES (:username, :see_all)",
     #           {'username': in_user, 'see_all': 0})  # don't add if duplicate username
-    c.execute("INSERT INTO users VALUES (:username, :see_all, :email, :first_name, :last_name)",
-              {'username': in_user, 'see_all': 0, 'email': email, 'first_name': fn, 'last_name': ln})  # don't add if duplicate username
+    c.execute("INSERT INTO users VALUES (:username, :user_id, :see_all, :email, :first_name, :last_name)",
+              {'username': in_user, 'user_id' : id, 'see_all': 0, 'email': email, 'first_name': fn, 'last_name': ln})  # don't add if duplicate username
     conn.commit()
     conn.close()
     return in_user
 
+
+def get_id(in_user):
+    conn = sqlite3.connect('my_database.db')
+    c = conn.cursor()
+    c.execute("SELECT user_id from users WHERE username=:curr_user", {'curr_user': in_user})
+    return c.fetchone()[0]
 
 def ca_enter_param(in_user, up):
     """Inserts new parameters entered by the user into the CA parameter database"""
@@ -162,3 +168,4 @@ def sir_return_history(in_user):
 # initial_setup()
 # username_exists("admin")
 # initial_setup2()
+# print(get_id("zebedee"))

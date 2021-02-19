@@ -10,6 +10,7 @@ import sub_CA_model as my_ca
 import sub_sql_functions as my_sql
 
 current_user = "None"
+current_id = "1"
 
 class gui_Main_Window:
     """GUI of main window where user must login before they can choose SIR or CA model
@@ -78,6 +79,11 @@ class gui_Main_Window:
 
         global current_user
         current_user = username
+
+        user_id = my_sql.get_id(username)
+        global current_id
+        current_id = user_id
+
 
         self.btn_SIR['state'] = tk.NORMAL
         self.btn_CA['state'] = tk.NORMAL
@@ -148,8 +154,19 @@ class gui_Enter_Email:
         self.email = str(self.e_email.get())
         self.fn = str(self.e_fn.get())
         self.ln = str(self.e_ln.get())
-        my_sql.enter_username(self.username, self.email, self.fn, self.ln)
+        self.id = self.generate_id()
+        my_sql.enter_username(self.username, self.id, self.email, self.fn, self.ln)
         self.master.destroy()
+
+    def generate_id(self):
+        alphabet = list('abcdefghijklmnopqrstuvwxyz')
+        usr_list = [x for x in self.username]
+        id = []
+        for letter in usr_list:
+            id.append(str(alphabet.index(letter)))
+        user_id = "".join(id)
+        # print(user_id)
+        return user_id
 
 class error:
     """Class for producing error box"""
