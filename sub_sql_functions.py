@@ -66,7 +66,7 @@ def initial_setup2():
     c.execute("INSERT INTO users VALUES (:username, :user_id, :see_all, :email, :first_name, :last_name)", {'username': 'admin', 'user_id': 1, 'see_all': 1, 'email': "None", 'first_name': "None", 'last_name': "None"})
 
     c.execute("""CREATE TABLE sir_param (
-                user integer,
+                user_id integer,
                 sus0 integer,
                 inf0 integer,
                 rec0 integer,
@@ -108,25 +108,25 @@ def get_id(in_user):
     c.execute("SELECT user_id from users WHERE username=:curr_user", {'curr_user': in_user})
     return c.fetchone()[0]
 
-def ca_enter_param(in_user, up):
+def ca_enter_param(in_id, up):
     """Inserts new parameters entered by the user into the CA parameter database"""
     conn = sqlite3.connect('my_database.db')
     c = conn.cursor()
-    c.execute("""INSERT INTO ca_param VALUES (:user, :no_cells, :generations, :size_x, :size_y,
+    c.execute("""INSERT INTO ca_param VALUES (:user_id, :no_cells, :generations, :size_x, :size_y,
                                             :infection_radius, :no_infected, :recovered_can_be_infected,
                                             :days_until_recovered, :use_immunity, :days_of_immunity)""",
-              {'user': in_user, 'no_cells': up[0], 'generations': up[1], 'size_x': up[2], 'size_y': up[3],
+              {'user_id': in_id, 'no_cells': up[0], 'generations': up[1], 'size_x': up[2], 'size_y': up[3],
                'infection_radius': up[4], 'no_infected': up[5], 'recovered_can_be_infected': up[6],
                'days_until_recovered': up[7], 'use_immunity': up[8], 'days_of_immunity': up[9]})
     conn.commit()
     conn.close()
 
 
-def ca_return_history(in_user):
+def ca_return_history(in_id):
     """Returns entered parameter history depending on current user"""
     conn = sqlite3.connect('my_database.db')
     c = conn.cursor()
-    c.execute("SELECT * FROM ca_param WHERE user=:curr_user", {'curr_user': in_user})
+    c.execute("SELECT * FROM ca_param WHERE user_id=:curr_id", {'curr_id': in_id})
     # conn.close()
     return c.fetchall()
 
@@ -135,18 +135,18 @@ def sir_enter_param(in_user, up):
     """Inters new parameters entered by the user into the SIR parameter database"""
     conn = sqlite3.connect('my_database.db')
     c = conn.cursor()
-    c.execute("""INSERT INTO sir_param VALUES (:user, :sus0, :inf0, :rec0, :beta, :gamma, :time)""",
-              {'user': in_user, 'sus0': up[0], 'inf0': up[1], 'rec0': up[2], 'beta': up[3], 'gamma': up[4],
+    c.execute("""INSERT INTO sir_param VALUES (:user_id, :sus0, :inf0, :rec0, :beta, :gamma, :time)""",
+              {'user_id': in_user, 'sus0': up[0], 'inf0': up[1], 'rec0': up[2], 'beta': up[3], 'gamma': up[4],
                'time': up[5]
                })
     conn.commit()
     conn.close()
 
 
-def sir_return_history(in_user):
+def sir_return_history(in_id):
     conn = sqlite3.connect('my_database.db')
     c = conn.cursor()
-    c.execute("SELECT * FROM sir_param WHERE user=:curr_user", {'curr_user': in_user})
+    c.execute("SELECT * FROM sir_param WHERE user_id=:curr_id", {'curr_id': in_id})
     return c.fetchall()
 
 

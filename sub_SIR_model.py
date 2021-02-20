@@ -5,12 +5,12 @@ import sub_sql_functions as my_sql
 
 class QueueSimulation:
 
-    def __init__(self, n, s_list, i_list, r_list, b_list, g_list, t, current_user):
+    def __init__(self, n, s_list, i_list, r_list, b_list, g_list, t, current_id):
         self.n = n  # number of simulations to be run
         self.parameters = []
         for i in range(n):
             self.parameters.append([s_list[i], i_list[i], r_list[i], b_list[i], g_list[i], t, i + 1])
-            my_sql.sir_enter_param(current_user, [s_list[i], i_list[i], r_list[i], b_list[i], g_list[i], t])
+            my_sql.sir_enter_param(current_id, [s_list[i], i_list[i], r_list[i], b_list[i], g_list[i], t])
         print(self.parameters)
 
     def run_simulation(self):

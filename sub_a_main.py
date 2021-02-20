@@ -73,6 +73,7 @@ class gui_Main_Window:
         """Gets username from user that was entered into username box, calls enter_username sql function with it and assigns it to the current user global variable
         """
         username = str(self.e_user.get())
+        username = username.lower()
         exists = my_sql.username_exists(username)
         if not exists:
             self.enter_email(username)
@@ -83,8 +84,6 @@ class gui_Main_Window:
 
         global current_user
         current_user = username
-
-
 
 
         self.btn_SIR['state'] = tk.NORMAL
@@ -163,7 +162,7 @@ class gui_Enter_Email:
         self.master.destroy()
 
     def generate_id(self):
-        alphabet = list('abcdefghijklmnopqrstuvwxyz')
+        alphabet = list('abcdefghijklmnopqrstuvwxyz0123456789')
         usr_list = [x for x in self.username]
         id = []
         for letter in usr_list:
@@ -171,6 +170,7 @@ class gui_Enter_Email:
         user_id = "".join(id)
         # print(user_id)
         return user_id
+
 
 class error:
     """Class for producing error box"""
@@ -234,7 +234,7 @@ class gui_First_SIR_Window:
         infected = df['I'].values.tolist()
         recovered = df['R'].values.tolist()
 
-        self.master.destroy()
+        # self.master.destroy()
 
         plot = my_sir.plot_graph(timearray, susceptible, infected, recovered)
         plot.plot()
@@ -366,7 +366,7 @@ class gui_SIR_Param:
             queue = my_sir.QueueSimulation(self.number_of_simulations, self.param_list[0], self.param_list[1],
                                            self.param_list[2],
                                            self.param_list[3], self.param_list[4],
-                                           1000, current_user)
+                                           1000, current_id)
 
             queue.run_simulation()
 
@@ -385,7 +385,7 @@ class gui_SIR_history:
         self.master = master
         self.frame = ttk.Frame(master, padding=5)
         self.frame.grid(row=0, column=0, sticky='nsew')
-        self.user_history = my_sql.sir_return_history(current_user)  # user_history is a list of tuples
+        self.user_history = my_sql.sir_return_history(current_id)  # user_history is a list of tuples
         print(self.user_history)
 
         self.lb_history = tk.Listbox(self.frame, width=50)
@@ -393,7 +393,7 @@ class gui_SIR_history:
             to_insert = str(i) + "  " + str(self.user_history[i][1:])
             self.lb_history.insert(i, to_insert)
 
-        self.lbl_title = ttk.Label(self.frame, text=f"History of {current_user}")
+        self.lbl_title = ttk.Label(self.frame, text=f"History of {current_user} user id {current_id}")
         self.btn_exit = ttk.Button(self.frame, text="Exit", command=self.exit)
         self.lbl_text = ttk.Label(self.frame, text="Enter number to simulate with same parameters")
         self.e_sim_num = ttk.Entry(self.frame)
@@ -464,11 +464,11 @@ class gui_First_CA_Window:
         if lines[-1] == "":
             del lines[-1]
 
-        self.master.destroy()
+        # self.master.destroy()
 
         ca = my_ca.cellular_automata(0, 0, 0, 0, 0, 0, False, 0, False, 0, True, lines)
         ca.new_generation()
-        self.master.destroy()
+        # self.master.destroy()
 
     def input(self):
         self.master.destroy()
@@ -589,12 +589,12 @@ class gui_CA_Param:
         use_imm = self.b_u_i.get()
         days_imm = int(self.e_d_i.get())
 
-        self.master.destroy()
+        # self.master.destroy()
 
         arguments = [no_cells, generations, size_x, size_y, inf_rad, no_inf, rec_inf, days_rec, use_imm,
                      days_imm, False]
 
-        my_sql.ca_enter_param(current_user, arguments)
+        my_sql.ca_enter_param(current_id, arguments)
 
 
         ca = my_ca.cellular_automata(*arguments)  # arguments sent as separate parameters
@@ -617,7 +617,7 @@ class gui_CA_history:
         self.master = master
         self.frame = ttk.Frame(master, padding=5)
         self.frame.grid(row=0, column=0, sticky='nsew')
-        self.user_history = my_sql.ca_return_history(current_user)  # user_history is a list of tuples
+        self.user_history = my_sql.ca_return_history(current_id)  # user_history is a list of tuples
         print(self.user_history)
 
         self.lb_history = tk.Listbox(self.frame, width=50)
