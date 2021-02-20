@@ -126,7 +126,7 @@ def ca_return_history(in_id):
     """Returns entered parameter history depending on current user"""
     conn = sqlite3.connect('my_database.db')
     c = conn.cursor()
-    c.execute("SELECT * FROM ca_param WHERE user_id=:curr_id", {'curr_id': in_id})
+    c.execute("SELECT no_cells, generations, size_x, size_y, infection_radius, no_infected, recovered_can_be_infected, days_until_recovered, use_immunity, days_of_immunity FROM ca_param WHERE user_id=:curr_id", {'curr_id': in_id})
     # conn.close()
     return c.fetchall()
 
@@ -146,8 +146,44 @@ def sir_enter_param(in_user, up):
 def sir_return_history(in_id):
     conn = sqlite3.connect('my_database.db')
     c = conn.cursor()
-    c.execute("SELECT * FROM sir_param WHERE user_id=:curr_id", {'curr_id': in_id})
+    c.execute("SELECT sus0, inf0, rec0, beta, gamma, time FROM sir_param WHERE user_id=:curr_id", {'curr_id': in_id})
     return c.fetchall()
+
+
+# def user_statistics(user):
+#     conn = sqlite3.connect('my_database.db')
+#     c = conn.cursor()
+#     c.execute("""
+#                     SELECT users.username, ca_param.no_cells, ca_param.generations
+#                     FROM ca_param
+#                     JOIN users ON ca_param.user_id = users.user_id
+#                     WHERE username=:current_user""", {'current_user': user})
+
+#     rows = c.fetchall()
+#     for row in rows:
+#         print(row)
+#     return
+
+def full_statistics():
+    conn = sqlite3.connect('my_database.db')
+    c = conn.cursor()
+    c.execute("""
+                    SELECT users.username, no_cells, generations, size_x, size_y, infection_radius, no_infected, recovered_can_be_infected, days_until_recovered, use_immunity, days_of_immunity
+                    FROM ca_param
+                    JOIN users ON ca_param.user_id = users.user_id""")
+    ca_rows = c.fetchall()
+
+    c.execute("""
+                    SELECT users.username, sus0, inf0, rec0, beta, gamma
+                    FROM sir_param
+                    JOIN users ON sir_param.user_id = users.user_id""")
+    sir_rows = c.fetchall()
+
+    return sir_rows, ca_rows
+
+sir, ca = full_statistics()
+print(type(sir))
+print(sir)
 
 
 # initial_setup()

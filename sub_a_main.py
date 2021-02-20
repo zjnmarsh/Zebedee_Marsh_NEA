@@ -5,6 +5,9 @@ import pandas as pd
 from tkinter import filedialog
 from tkinter import messagebox
 
+import sqlite3
+
+
 import sub_SIR_model as my_sir
 import sub_CA_model as my_ca
 import sub_sql_functions as my_sql
@@ -179,7 +182,60 @@ class error:
         title = err_type + " error"
         messagebox.showerror(title, message)
 
+# ---------------------------------------
 
+class gui_Statistics:
+
+    def __init__(self, master):
+        self.master = master
+        self.frame = ttk.Frame(master, padding=5)
+
+        self.tree = ttk.Treeview(self.frame, column=("c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9", "c10", "c11", "c12"), show='headings')
+
+        self.tree.heading("#1", text="username")
+        self.tree.heading("#2", text="no_cells")
+        self.tree.heading("#3", text="generations")
+        self.tree.heading("#4", text="size x")
+        self.tree.heading("#5", text="size y")
+        self.tree.heading("#6", text="inf radius")
+        self.tree.heading("#7", text="number inf")
+        self.tree.heading("#8", text="rec inf true")
+        self.tree.heading("#9", text="days inf")
+        self.tree.heading("#10", text="use immunity")
+        self.tree.heading("#11", text="days immune")
+
+        self.tree.column('#1', width=100)
+        self.tree.column('#2', width=100)
+        self.tree.column('#3', width=100)
+        self.tree.column('#4', width=100)
+        self.tree.column('#5', width=100)
+        self.tree.column('#6', width=75)
+        self.tree.column('#7', width=75)
+        self.tree.column('#8', width=75)
+        self.tree.column('#9', width=75)
+        self.tree.column('#10', width=75)
+        self.tree.column('#11', width=75)
+
+        self.btn_ca = ttk.Button(self.frame, text="CA", command="self.show_ca")
+
+        self.frame.grid(column=0, row=0, sticky='nsew')
+
+        self.tree.grid(row=0, sticky='nsew')
+        self.treeview = self.tree
+        self.sir, self.ca = my_sql.full_statistics()
+        for row in self.ca:
+            self.tree.insert("", tk.END, values=row)
+
+        self.btn_ca.grid(column=1, row=0)
+
+        self.master.columnconfigure(0, weight=1)
+        self.master.rowconfigure(0, weight=1)
+
+        self.frame.columnconfigure(1, weight=1)
+        self.frame.rowconfigure(1, weight=1)
+
+    def show_ca(self):
+        pass
 # ---------------------------------------
 
 class gui_First_SIR_Window:
@@ -390,21 +446,23 @@ class gui_SIR_history:
 
         self.lb_history = tk.Listbox(self.frame, width=50)
         for i in range(len(self.user_history)):
-            to_insert = str(i) + "  " + str(self.user_history[i][1:])
+            to_insert = str(i) + "  " + str(self.user_history[i])
             self.lb_history.insert(i, to_insert)
 
         self.lbl_title = ttk.Label(self.frame, text=f"History of {current_user} user id {current_id}")
         self.btn_exit = ttk.Button(self.frame, text="Exit", command=self.exit)
         self.lbl_text = ttk.Label(self.frame, text="Enter number to simulate with same parameters")
+        self.lbl_key = ttk.Label(self.frame, text="Sim Number (Sus, Inf, Rec, Beta, Gamma, Time")
         self.e_sim_num = ttk.Entry(self.frame)
         self.btn_use = ttk.Button(self.frame, text="Use values", command=self.use)
 
         self.lbl_title.grid(column=1, row=1, columnspan=3)
         self.lbl_text.grid(column=1, row=2, columnspan=3)
-        self.lb_history.grid(column=1, row=3)
-        self.e_sim_num.grid(column=2, row=3)
-        self.btn_use.grid(column=3, row=3)
-        self.btn_exit.grid(column=2, row=4, columnspan=2)
+        self.lbl_key.grid(column=1, row=3)
+        self.lb_history.grid(column=1, row=4)
+        self.e_sim_num.grid(column=2, row=4)
+        self.btn_use.grid(column=3, row=4)
+        self.btn_exit.grid(column=2, row=5, columnspan=2)
 
     def exit(self):
         self.master.destroy()
@@ -415,11 +473,11 @@ class gui_SIR_history:
     def use(self):
         """User enter number and set of parameters are retrieved from the database"""
         sim_number = int(self.e_sim_num.get())
-        sim_param = list(self.user_history[sim_number][1:])
+        sim_param = list(self.user_history[sim_number])
         print(sim_param)
 
         queue = my_sir.QueueSimulation(1, [sim_param[0]], [sim_param[1]], [sim_param[2]], [sim_param[3]],
-                                       [sim_param[4]], sim_param[5], current_user)
+                                       [sim_param[4]], sim_param[5], current_id)
 
         queue.run_simulation()
 
@@ -622,21 +680,23 @@ class gui_CA_history:
 
         self.lb_history = tk.Listbox(self.frame, width=50)
         for i in range(len(self.user_history)):
-            to_insert = str(i) + "  " + str(self.user_history[i][1:])
+            to_insert = str(i) + "  " + str(self.user_history[i])
             self.lb_history.insert(i, to_insert)
 
         self.lbl_title = ttk.Label(self.frame, text=f"History of {current_user}")
         self.btn_exit = ttk.Button(self.frame, text="Exit", command=self.exit)
         self.lbl_text = ttk.Label(self.frame, text="Enter number to simulate with same parameters")
+        self.lbl_key = ttk.Label(self.frame, text="Sim Number (cells, generations, x, y, infection radius, number infected, recovered can be infected, days until recovered, use immunity, days of immunity)")
         self.e_sim_num = ttk.Entry(self.frame)
         self.btn_use = ttk.Button(self.frame, text="Use values", command=self.use)
 
         self.lbl_title.grid(column=1, row=1, columnspan=3)
         self.lbl_text.grid(column=1, row=2, columnspan=3)
-        self.lb_history.grid(column=1, row=3)
-        self.e_sim_num.grid(column=2, row=3)
-        self.btn_use.grid(column=3, row=3)
-        self.btn_exit.grid(column=2, row=4, columnspan=2)
+        self.lbl_key.grid(column=1, row=3)
+        self.lb_history.grid(column=1, row=4)
+        self.e_sim_num.grid(column=2, row=4)
+        self.btn_use.grid(column=3, row=4)
+        self.btn_exit.grid(column=2, row=5, columnspan=2)
 
     def exit(self):
         self.master.destroy()
@@ -648,7 +708,7 @@ class gui_CA_history:
     def use(self):
         """User enter number and set of parameters are retrieved from the database"""
         sim_number = int(self.e_sim_num.get())
-        sim_param = list(self.user_history[sim_number][1:])
+        sim_param = list(self.user_history[sim_number])
         print(sim_param)
         sim_param.append(False)
         ca = my_ca.cellular_automata(*sim_param)
@@ -660,10 +720,12 @@ class gui_CA_history:
 
 root = tk.Tk()
 root.title('Main Window')
-root.geometry("300x100")
+# root.geometry("300x100")
 
-window = gui_Main_Window(root)
+# window = gui_Main_Window(root)
 # window = gui_First_CA_Window(root)
+# root.geometry("700x400")
+window = gui_Statistics(root)
 current_user = "zebedee"
 
 root.mainloop()
