@@ -184,7 +184,7 @@ class error:
 
 # ---------------------------------------
 
-class gui_Statistics:
+class gui_ca_statistics:
 
     def __init__(self, master):
         self.master = master
@@ -216,7 +216,10 @@ class gui_Statistics:
         self.tree.column('#10', width=75)
         self.tree.column('#11', width=75)
 
-        self.btn_ca = ttk.Button(self.frame, text="CA", command="self.show_ca")
+        self.btn_filter = ttk.Button(self.frame, text="Filter", command="")
+        self.btn_export = ttk.Button(self.frame, text="Export", command="")
+        self.btn_exit = ttk.Button(self.frame, text="Exit", command="")
+
 
         self.frame.grid(column=0, row=0, sticky='nsew')
 
@@ -226,7 +229,9 @@ class gui_Statistics:
         for row in self.ca:
             self.tree.insert("", tk.END, values=row)
 
-        self.btn_ca.grid(column=1, row=0)
+        self.btn_filter.grid(column=1, row=0)
+        self.btn_export.grid(column=1, row=1)
+        self.btn_exit.grid(column=1, row=2)
 
         self.master.columnconfigure(0, weight=1)
         self.master.rowconfigure(0, weight=1)
@@ -234,8 +239,51 @@ class gui_Statistics:
         self.frame.columnconfigure(1, weight=1)
         self.frame.rowconfigure(1, weight=1)
 
-    def show_ca(self):
-        pass
+class gui_sir_statistics:
+
+    def __init__(self, master):
+        self.master = master
+        self.frame = ttk.Frame(master, padding=5)
+
+        self.tree = ttk.Treeview(self.frame, column=("c1", "c2", "c3", "c4", "c5", "c6"), show='headings')
+
+        self.tree.heading("#1", text="username")
+        self.tree.heading("#2", text="sus0")
+        self.tree.heading("#3", text="inf0")
+        self.tree.heading("#4", text="rec0")
+        self.tree.heading("#5", text="beta")
+        self.tree.heading("#6", text="gamma")
+
+        self.tree.column('#1', width=100)
+        self.tree.column('#2', width=75)
+        self.tree.column('#3', width=75)
+        self.tree.column('#4', width=75)
+        self.tree.column('#5', width=75)
+        self.tree.column('#6', width=75)
+
+
+        self.btn_filter = ttk.Button(self.frame, text="Filter", command="")
+        self.btn_export = ttk.Button(self.frame, text="Export", command="")
+        self.btn_exit = ttk.Button(self.frame, text="Exit", command="")
+
+        self.frame.grid(column=0, row=0, sticky='nsew')
+
+        self.tree.grid(row=0, sticky='nsew')
+        self.treeview = self.tree
+        self.sir, self.ca = my_sql.full_statistics()
+        for row in self.sir:
+            self.tree.insert("", tk.END, values=row)
+
+        self.btn_filter.grid(column=1, row=0)
+        self.btn_export.grid(column=1, row=1)
+        self.btn_exit.grid(column=1, row=2)
+
+        self.master.columnconfigure(0, weight=1)
+        self.master.rowconfigure(0, weight=1)
+
+        self.frame.columnconfigure(1, weight=1)
+        self.frame.rowconfigure(1, weight=1)
+
 # ---------------------------------------
 
 class gui_First_SIR_Window:
@@ -725,7 +773,7 @@ root.title('Main Window')
 # window = gui_Main_Window(root)
 # window = gui_First_CA_Window(root)
 # root.geometry("700x400")
-window = gui_Statistics(root)
+window = gui_sir_statistics(root)
 current_user = "zebedee"
 
 root.mainloop()
