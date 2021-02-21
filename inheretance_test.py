@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import sub_sql_functions as my_sql
 
+
 class gui_statistics:
 
     def __init__(self, master):
@@ -18,7 +19,7 @@ class gui_statistics:
         self.btn_sir = ttk.Button(self.wrapper2, text="SIR", command=self.open_sir)
         self.btn_filter = ttk.Button(self.wrapper2, text="Filter", command="", state=tk.DISABLED)
         self.btn_export = ttk.Button(self.wrapper2, text="Export", command="", state=tk.DISABLED)
-        self.btn_exit = ttk.Button(self.wrapper2, text="Exit", command="")
+        self.btn_exit = ttk.Button(self.wrapper2, text="Exit", command=self.exit)
         self.lb_text = ttk.Label(self.wrapper0, text="Display statistics for CA or SIR")
         self.lb_filter = ttk.Label(self.wrapper0, text="Filter results by username")
         self.e_usr = ttk.Entry(self.wrapper0)
@@ -66,9 +67,12 @@ class gui_statistics:
 class stats_sir(gui_statistics):
     def __init__(self, master):
         gui_statistics.__init__(self, master)
+        self.data = []
+
         self.btn_filter['state'] = 'normal'
         self.btn_filter['command'] = self.filter
         self.btn_export['state'] = 'normal'
+        self.btn_export['command'] = self.export_data
 
         self.lb_filter.grid(column=0, row=1)
         self.e_usr.grid(column=1, row=1)
@@ -94,6 +98,9 @@ class stats_sir(gui_statistics):
         self.tree.grid(row=0, sticky='nsew')
         self.treeview = self.tree
         self.sir, self.ca = my_sql.full_statistics()
+
+        self.data = self.sir
+
         for row in self.sir:
             self.tree.insert("", tk.END, values=row)
 
@@ -102,15 +109,29 @@ class stats_sir(gui_statistics):
         username = str(self.e_usr.get())
         username = username.lower()
         rows = my_sql.filtered_statistics("sir", username)
+
+        self.data = rows
+        print(self.data)
         for row in rows:
             self.tree.insert("", tk.END, values=row)
+
+    def export_data(self):
+        columns = "Name, sus0, inf0, rec0, beta, gamma"
+        with open("exported_data.csv", "w") as file:
+            file.write("Name, sus0, inf0, rec0, beta, gamma\n")
+            print(self.data)
+            for line in self.data:
+                file.write(str(line)[1:-1] + "\n")
 
 
 class stats_ca(gui_statistics):
     def __init__(self, master):
         gui_statistics.__init__(self, master)
+        self.data = []
+
         self.btn_filter['state'] = 'normal'
         self.btn_export['state'] = 'normal'
+        self.btn_export['command'] = self.export_data
         self.btn_filter['command'] = self.filter
 
         self.lb_filter.grid(column=0, row=1)
@@ -147,6 +168,7 @@ class stats_ca(gui_statistics):
         self.tree.grid(row=0, sticky='nsew')
         self.treeview = self.tree
         self.sir, self.ca = my_sql.full_statistics()
+        self.data = self.ca
         for row in self.ca:
             self.tree.insert("", tk.END, values=row)
 
@@ -155,9 +177,18 @@ class stats_ca(gui_statistics):
         username = str(self.e_usr.get())
         username = username.lower()
         rows = my_sql.filtered_statistics("ca", username)
+        self.data = rows
         for row in rows:
             self.tree.insert("", tk.END, values=row)
 
+    def export_data(self):
+        columns = "Name, sus0, inf0, rec0, beta, gamma"
+        with open("exported_data.csv", "w") as file:
+            file.write(
+                "Name, no_cells, generations, size_x, size_y, inf_radius, num_infected, rec_inf_true, days_inf, use_immunity, days_immune\n")
+            print(self.data)
+            for line in self.data:
+                file.write(str(line)[1:-1] + "\n")
 
 
 root = tk.Tk()

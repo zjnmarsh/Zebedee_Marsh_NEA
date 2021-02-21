@@ -7,13 +7,13 @@ from tkinter import messagebox
 
 import sqlite3
 
-
 import sub_SIR_model as my_sir
 import sub_CA_model as my_ca
 import sub_sql_functions as my_sql
 
 current_user = "None"
 current_id = "1"
+
 
 class gui_Main_Window:
     """GUI of main window where user must login before they can choose SIR or CA model
@@ -28,6 +28,7 @@ class gui_Main_Window:
         self.btn_login = ttk.Button(self.frame, text='Login', command=self.login)
         self.btn_SIR = ttk.Button(self.frame, text='SIR model', command=self.openSIR, state=tk.DISABLED)
         self.btn_CA = ttk.Button(self.frame, text='Cellular Automata', command=self.openCA, state=tk.DISABLED)
+        self.btn_history = ttk.Button(self.frame, text='Export History', command=self.openHistory)
 
         self.frame.grid(row=0, column=0, sticky='nsew')
 
@@ -36,6 +37,7 @@ class gui_Main_Window:
         self.btn_login.grid(column=2, row=0, sticky='n')
         self.btn_SIR.grid(column=1, row=1, columnspan=2, sticky='s')
         self.btn_CA.grid(column=1, row=2, columnspan=2, sticky='s')
+        self.btn_history.grid(column=1, row=3, columnspan=2)
 
         self.master.columnconfigure(0, weight=1)
         self.master.rowconfigure(0, weight=1)
@@ -72,6 +74,13 @@ class gui_Main_Window:
         new_window = gui_First_CA_Window(root2)
         root2.mainloop()
 
+    def openHistory(self):
+        self.master.destroy()
+        root3 = tk.Tk()
+        root3.title('History Viewer')
+        history_window = gui_statistics(root3)
+        root3.mainloop()
+
     def login(self):
         """Gets username from user that was entered into username box, calls enter_username sql function with it and assigns it to the current user global variable
         """
@@ -87,7 +96,6 @@ class gui_Main_Window:
 
         global current_user
         current_user = username
-
 
         self.btn_SIR['state'] = tk.NORMAL
         self.btn_CA['state'] = tk.NORMAL
@@ -177,20 +185,157 @@ class gui_Enter_Email:
 
 class error:
     """Class for producing error box"""
+
     def __init__(self, err_type, message):
         tk.Tk().withdraw()
         title = err_type + " error"
         messagebox.showerror(title, message)
 
+
 # ---------------------------------------
 
-class gui_ca_statistics:
+class gui_statistics:
 
     def __init__(self, master):
         self.master = master
         self.frame = ttk.Frame(master, padding=5)
 
-        self.tree = ttk.Treeview(self.frame, column=("c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9", "c10", "c11", "c12"), show='headings')
+        self.wrapper0 = tk.LabelFrame(self.frame)
+        self.wrapper1 = tk.LabelFrame(self.frame)
+        self.wrapper2 = tk.LabelFrame(self.frame)
+
+        self.tree = ttk.Treeview(self.wrapper1)
+
+        self.btn_ca = ttk.Button(self.wrapper2, text="CA", command=self.open_ca)
+        self.btn_sir = ttk.Button(self.wrapper2, text="SIR", command=self.open_sir)
+        self.btn_filter = ttk.Button(self.wrapper2, text="Filter", command="", state=tk.DISABLED)
+        self.btn_export = ttk.Button(self.wrapper2, text="Export", command="", state=tk.DISABLED)
+        self.btn_exit = ttk.Button(self.wrapper2, text="Exit", command=self.exit)
+        self.lb_text = ttk.Label(self.wrapper0, text="Display statistics for CA or SIR")
+        self.lb_filter = ttk.Label(self.wrapper0, text="Filter results by username")
+        self.e_usr = ttk.Entry(self.wrapper0)
+        self.btn_filter = ttk.Button(self.wrapper0, text="Filter", command="", state=tk.DISABLED)
+
+        self.frame.grid(column=0, row=0, sticky='nsew')
+
+        self.wrapper0.grid(column=0, row=0, columnspan=2)
+        self.wrapper1.grid(column=0, row=1)
+        self.wrapper2.grid(column=1, row=1)
+
+        self.btn_ca.grid(column=0, row=0)
+        self.btn_sir.grid(column=0, row=1)
+        self.btn_export.grid(column=0, row=2)
+        self.btn_exit.grid(column=0, row=3)
+
+        self.lb_text.grid(column=0, row=0, columnspan=3)
+
+        self.master.columnconfigure(0, weight=1)
+        self.master.rowconfigure(0, weight=1)
+
+        self.frame.columnconfigure(1, weight=1)
+        self.frame.rowconfigure(1, weight=1)
+
+    def clear_tree(self):
+        for i in self.tree.get_children():
+            self.tree.delete(i)
+
+    def open_sir(self):
+        self.master.destroy()
+        root1 = tk.Tk()
+        root1.title('SIR Stats')
+        window = stats_sir(root1)
+
+    def open_ca(self):
+        self.master.destroy()
+        root1 = tk.Tk()
+        root1.title('CA Stats')
+        window = stats_ca(root1)
+
+    def exit(self):
+        self.master.destroy()
+        root = tk.Tk()
+        root.title('Main Window')
+        main_window = gui_Main_Window(root)
+        # root.geometry('250x150+0+0')
+        root.mainloop()
+
+
+class stats_sir(gui_statistics):
+    def __init__(self, master):
+        gui_statistics.__init__(self, master)
+        self.data = []
+
+        self.btn_filter['state'] = 'normal'
+        self.btn_filter['command'] = self.filter
+        self.btn_export['state'] = 'normal'
+        self.btn_export['command'] = self.export_data
+
+        self.lb_filter.grid(column=0, row=1)
+        self.e_usr.grid(column=1, row=1)
+        self.btn_filter.grid(column=2, row=1)
+
+        self.tree['column'] = ("c1", "c2", "c3", "c4", "c5", "c6")
+        self.tree['show'] = 'headings'
+
+        self.tree.heading("#1", text="username")
+        self.tree.heading("#2", text="sus0")
+        self.tree.heading("#3", text="inf0")
+        self.tree.heading("#4", text="rec0")
+        self.tree.heading("#5", text="beta")
+        self.tree.heading("#6", text="gamma")
+
+        self.tree.column('#1', width=100)
+        self.tree.column('#2', width=75)
+        self.tree.column('#3', width=75)
+        self.tree.column('#4', width=75)
+        self.tree.column('#5', width=75)
+        self.tree.column('#6', width=75)
+
+        self.tree.grid(row=0, sticky='nsew')
+        self.treeview = self.tree
+        self.sir, self.ca = my_sql.full_statistics()
+
+        self.data = self.sir
+
+        for row in self.sir:
+            self.tree.insert("", tk.END, values=row)
+
+    def filter(self):
+        self.clear_tree()
+        username = str(self.e_usr.get())
+        username = username.lower()
+        rows = my_sql.filtered_statistics("sir", username)
+
+        self.data = rows
+        print(self.data)
+        for row in rows:
+            self.tree.insert("", tk.END, values=row)
+
+    def export_data(self):
+        columns = "Name, sus0, inf0, rec0, beta, gamma"
+        with open("exported_data.csv", "w") as file:
+            file.write("Name, sus0, inf0, rec0, beta, gamma\n")
+            print(self.data)
+            for line in self.data:
+                file.write(str(line)[1:-1] + "\n")
+
+
+class stats_ca(gui_statistics):
+    def __init__(self, master):
+        gui_statistics.__init__(self, master)
+        self.data = []
+
+        self.btn_filter['state'] = 'normal'
+        self.btn_export['state'] = 'normal'
+        self.btn_export['command'] = self.export_data
+        self.btn_filter['command'] = self.filter
+
+        self.lb_filter.grid(column=0, row=1)
+        self.e_usr.grid(column=1, row=1)
+        self.btn_filter.grid(column=2, row=1)
+
+        self.tree['column'] = ("c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9", "c10", "c11", "c12")
+        self.tree['show'] = 'headings'
 
         self.tree.heading("#1", text="username")
         self.tree.heading("#2", text="no_cells")
@@ -216,73 +361,32 @@ class gui_ca_statistics:
         self.tree.column('#10', width=75)
         self.tree.column('#11', width=75)
 
-        self.btn_filter = ttk.Button(self.frame, text="Filter", command="")
-        self.btn_export = ttk.Button(self.frame, text="Export", command="")
-        self.btn_exit = ttk.Button(self.frame, text="Exit", command="")
-
-
-        self.frame.grid(column=0, row=0, sticky='nsew')
-
         self.tree.grid(row=0, sticky='nsew')
         self.treeview = self.tree
         self.sir, self.ca = my_sql.full_statistics()
+        self.data = self.ca
         for row in self.ca:
             self.tree.insert("", tk.END, values=row)
 
-        self.btn_filter.grid(column=1, row=0)
-        self.btn_export.grid(column=1, row=1)
-        self.btn_exit.grid(column=1, row=2)
-
-        self.master.columnconfigure(0, weight=1)
-        self.master.rowconfigure(0, weight=1)
-
-        self.frame.columnconfigure(1, weight=1)
-        self.frame.rowconfigure(1, weight=1)
-
-class gui_sir_statistics:
-
-    def __init__(self, master):
-        self.master = master
-        self.frame = ttk.Frame(master, padding=5)
-
-        self.tree = ttk.Treeview(self.frame, column=("c1", "c2", "c3", "c4", "c5", "c6"), show='headings')
-
-        self.tree.heading("#1", text="username")
-        self.tree.heading("#2", text="sus0")
-        self.tree.heading("#3", text="inf0")
-        self.tree.heading("#4", text="rec0")
-        self.tree.heading("#5", text="beta")
-        self.tree.heading("#6", text="gamma")
-
-        self.tree.column('#1', width=100)
-        self.tree.column('#2', width=75)
-        self.tree.column('#3', width=75)
-        self.tree.column('#4', width=75)
-        self.tree.column('#5', width=75)
-        self.tree.column('#6', width=75)
-
-
-        self.btn_filter = ttk.Button(self.frame, text="Filter", command="")
-        self.btn_export = ttk.Button(self.frame, text="Export", command="")
-        self.btn_exit = ttk.Button(self.frame, text="Exit", command="")
-
-        self.frame.grid(column=0, row=0, sticky='nsew')
-
-        self.tree.grid(row=0, sticky='nsew')
-        self.treeview = self.tree
-        self.sir, self.ca = my_sql.full_statistics()
-        for row in self.sir:
+    def filter(self):
+        self.clear_tree()
+        username = str(self.e_usr.get())
+        username = username.lower()
+        rows = my_sql.filtered_statistics("ca", username)
+        self.data = rows
+        for row in rows:
             self.tree.insert("", tk.END, values=row)
 
-        self.btn_filter.grid(column=1, row=0)
-        self.btn_export.grid(column=1, row=1)
-        self.btn_exit.grid(column=1, row=2)
+    def export_data(self):
+        columns = "Name, sus0, inf0, rec0, beta, gamma"
+        with open("exported_data.csv", "w") as file:
+            file.write(
+                "Name, no_cells, generations, size_x, size_y, inf_radius, num_infected, rec_inf_true, days_inf, use_immunity, days_immune\n")
+            print(self.data)
+            for line in self.data:
+                file.write(str(line)[1:-1] + "\n")
 
-        self.master.columnconfigure(0, weight=1)
-        self.master.rowconfigure(0, weight=1)
 
-        self.frame.columnconfigure(1, weight=1)
-        self.frame.rowconfigure(1, weight=1)
 
 # ---------------------------------------
 
@@ -702,7 +806,6 @@ class gui_CA_Param:
 
         my_sql.ca_enter_param(current_id, arguments)
 
-
         ca = my_ca.cellular_automata(*arguments)  # arguments sent as separate parameters
 
         ca.new_generation()
@@ -734,7 +837,8 @@ class gui_CA_history:
         self.lbl_title = ttk.Label(self.frame, text=f"History of {current_user}")
         self.btn_exit = ttk.Button(self.frame, text="Exit", command=self.exit)
         self.lbl_text = ttk.Label(self.frame, text="Enter number to simulate with same parameters")
-        self.lbl_key = ttk.Label(self.frame, text="Sim Number (cells, generations, x, y, infection radius, number infected, recovered can be infected, days until recovered, use immunity, days of immunity)")
+        self.lbl_key = ttk.Label(self.frame,
+                                 text="Sim Number (cells, generations, x, y, infection radius, number infected, recovered can be infected, days until recovered, use immunity, days of immunity)")
         self.e_sim_num = ttk.Entry(self.frame)
         self.btn_use = ttk.Button(self.frame, text="Use values", command=self.use)
 
@@ -773,7 +877,7 @@ root.title('Main Window')
 # window = gui_Main_Window(root)
 # window = gui_First_CA_Window(root)
 # root.geometry("700x400")
-window = gui_sir_statistics(root)
-current_user = "zebedee"
+window = gui_Main_Window(root)
+# current_user = "zebedee"
 
 root.mainloop()

@@ -181,10 +181,37 @@ def full_statistics():
 
     return sir_rows, ca_rows
 
-sir, ca = full_statistics()
-print(type(sir))
-print(sir)
 
+def filtered_statistics(type, username):
+    conn = sqlite3.connect('my_database.db')
+    c = conn.cursor()
+    if type == "ca":
+        c.execute("""
+                        SELECT users.username, no_cells, generations, size_x, size_y, infection_radius, no_infected, recovered_can_be_infected, days_until_recovered, use_immunity, days_of_immunity
+                        FROM ca_param
+                        JOIN users ON ca_param.user_id = users.user_id
+                        WHERE users.username=:user""", {'user': username})
+        ca_rows = c.fetchall()
+        return ca_rows
+    elif type == "sir":
+        c.execute("""
+                        SELECT users.username, sus0, inf0, rec0, beta, gamma
+                        FROM sir_param
+                        JOIN users ON sir_param.user_id = users.user_id
+                        WHERE users.username=:user""", {'user': username})
+        sir_rows = c.fetchall()
+        return sir_rows
+    else:
+        print("Error, wrong type specified")
+        return "Error"
+
+
+# sir, ca = full_statistics()
+# print(type(sir))
+# print(sir)
+
+# test = filtered_statistics("ca", "zebedee")
+# print(test)
 
 # initial_setup()
 
