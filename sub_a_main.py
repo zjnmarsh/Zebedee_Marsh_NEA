@@ -5,8 +5,6 @@ import pandas as pd
 from tkinter import filedialog
 from tkinter import messagebox
 
-import sqlite3
-
 import sub_SIR_model as my_sir
 import sub_CA_model as my_ca
 import sub_sql_functions as my_sql
@@ -396,7 +394,6 @@ class stats_ca(gui_statistics):
                 file.write(str(line)[1:-1] + "\n")
 
 
-
 # ---------------------------------------
 
 class gui_First_SIR_Window:
@@ -489,7 +486,7 @@ class gui_SIR_Param:
     """GUI for entering parameters for the SIR model"""
 
     def __init__(self, master, num_sim):
-        self.param_list = [[], [], [], [], []]
+        self.param_list = [[], [], [], [], [], []]
         self.counter = 0
 
         self.number_of_simulations = num_sim
@@ -504,6 +501,7 @@ class gui_SIR_Param:
         self.r_name = ttk.Label(self.frame, text='Recovered')
         self.tr_name = ttk.Label(self.frame, text='Transmission rate')
         self.re_name = ttk.Label(self.frame, text='Recovery rate')
+        self.tp_name = ttk.Label(self.frame, text='Time Period')
         self.btn_enter = ttk.Button(self.frame, text='Enter', command=self.enter_param)
         self.btn_close = ttk.Button(self.frame, text='Close', command=self.exit)
 
@@ -513,6 +511,7 @@ class gui_SIR_Param:
         self.e_r = ttk.Entry(self.frame)
         self.e_tr = ttk.Entry(self.frame)
         self.e_re = ttk.Entry(self.frame)
+        self.e_tp = ttk.Entry(self.frame)
 
         # gridding label variables
         self.lbl_name.grid(column=0, row=0, columnspan=2, sticky='n')
@@ -521,15 +520,17 @@ class gui_SIR_Param:
         self.r_name.grid(column=0, row=3, sticky='w')
         self.tr_name.grid(column=0, row=4, sticky='w')
         self.re_name.grid(column=0, row=5, sticky='w')
+        self.tp_name.grid(column=0, row=6, sticky='w')
 
         self.e_s.grid(column=1, row=1, sticky='w')
         self.e_i.grid(column=1, row=2, sticky='w')
         self.e_r.grid(column=1, row=3, sticky='w')
         self.e_tr.grid(column=1, row=4, sticky='w')
         self.e_re.grid(column=1, row=5, sticky='w')
+        self.e_tp.grid(column=1, row=6, sticky='w')
 
-        self.btn_enter.grid(column=1, row=6, columnspan=1)
-        self.btn_close.grid(column=0, row=6, columnspan=1)
+        self.btn_enter.grid(column=1, row=7, columnspan=1)
+        self.btn_close.grid(column=0, row=7, columnspan=1)
 
         self.master.columnconfigure(0, weight=1)
         self.master.rowconfigure(0, weight=1)
@@ -553,12 +554,14 @@ class gui_SIR_Param:
         self.param_list[2].append(float(self.e_r.get()))
         self.param_list[3].append(float(self.e_tr.get()))
         self.param_list[4].append(float(self.e_re.get()))
+        self.param_list[5].append(float(self.e_tp.get()))
 
         self.e_s.delete(0, 'end')
         self.e_i.delete(0, 'end')
         self.e_r.delete(0, 'end')
         self.e_tr.delete(0, 'end')
         self.e_re.delete(0, 'end')
+        self.e_tp.delete(0, 'end')
 
         if self.counter == self.number_of_simulations:
             self.submit_param()
@@ -587,8 +590,7 @@ class gui_SIR_Param:
             queue = my_sir.QueueSimulation(self.number_of_simulations, self.param_list[0], self.param_list[1],
                                            self.param_list[2],
                                            self.param_list[3], self.param_list[4],
-                                           1000, current_id)
-
+                                           self.param_list[5], current_id)
             queue.run_simulation()
 
     def exit(self):
@@ -597,7 +599,6 @@ class gui_SIR_Param:
         sir_win.geometry("+{}+{}".format(200, 200))
         sir_win.title('SIR')
         sir_main = gui_First_SIR_Window(sir_win)
-
 
 
 # ---------------------------------------
@@ -901,7 +902,6 @@ root.title('Main Window')
 # positionRight = int(root.winfo_screenwidth()/2 - windowWidth/2)
 # positionDown = int(root.winfo_screenheight()/2 - windowHeight/2)
 root.geometry("+{}+{}".format(200, 200))
-
 
 # root.geometry("300x100")
 

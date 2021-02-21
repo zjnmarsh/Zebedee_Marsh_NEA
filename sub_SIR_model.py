@@ -9,8 +9,8 @@ class QueueSimulation:
         self.n = n  # number of simulations to be run
         self.parameters = []
         for i in range(n):
-            self.parameters.append([s_list[i], i_list[i], r_list[i], b_list[i], g_list[i], t, i + 1])
-            my_sql.sir_enter_param(current_id, [s_list[i], i_list[i], r_list[i], b_list[i], g_list[i], t])
+            self.parameters.append([s_list[i], i_list[i], r_list[i], b_list[i], g_list[i], t[i], i + 1])
+            my_sql.sir_enter_param(current_id, [s_list[i], i_list[i], r_list[i], b_list[i], g_list[i], t[i]])
         print(self.parameters)
 
     def run_simulation(self):
@@ -96,3 +96,8 @@ class plot_graph:
         plt.plot(self.timearray, self.inf, label="I(t)")
         plt.plot(self.timearray, self.rec, label="R(t)")
         plt.show()
+
+
+# sir_model = SIR_model()
+# sir_model.SIR_model(100,1,0,0.8,0.08, 100,1)
+# plt.show()
