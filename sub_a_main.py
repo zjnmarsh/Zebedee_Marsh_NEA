@@ -313,7 +313,7 @@ class stats_sir(gui_statistics):
 
     def export_data(self):
         columns = "Name, sus0, inf0, rec0, beta, gamma"
-        with open("exported_data.csv", "w") as file:
+        with open("other_files/exported_data.csv", "w") as file:
             file.write("Name, sus0, inf0, rec0, beta, gamma\n")
             print(self.data)
             for line in self.data:
@@ -379,7 +379,7 @@ class stats_ca(gui_statistics):
 
     def export_data(self):
         columns = "Name, sus0, inf0, rec0, beta, gamma"
-        with open("exported_data.csv", "w") as file:
+        with open("other_files/exported_data.csv", "w") as file:
             file.write(
                 "Name, no_cells, generations, size_x, size_y, inf_radius, num_infected, rec_inf_true, days_inf, use_immunity, days_immune\n")
             print(self.data)
@@ -470,7 +470,7 @@ class gui_First_SIR_Window:
         self.master.destroy()
         root3 = tk.Tk()
         root3.title('History')
-        history_window = gui_SIR_history(root3)
+        history_window = SIR_history(root3)
 
 
 class gui_SIR_Param:
@@ -585,54 +585,6 @@ class gui_SIR_Param:
         sir_main = gui_First_SIR_Window(sir_win)
 
 
-class gui_SIR_history:
-    """GUI history window which shows history of values entered for the user currently logged in
-    """
-
-    def __init__(self, master):
-        self.master = master
-        self.frame = ttk.Frame(master, padding=5)
-        self.frame.grid(row=0, column=0, sticky='nsew')
-        self.user_history = my_sql.sir_return_history(current_id)  # user_history is a list of tuples
-        print(self.user_history)
-
-        self.lb_history = tk.Listbox(self.frame, width=50)
-        for i in range(len(self.user_history)):
-            to_insert = str(i) + "  " + str(self.user_history[i])
-            self.lb_history.insert(i, to_insert)
-
-        self.lbl_title = ttk.Label(self.frame, text=f"History of {current_user} user id {current_id}")
-        self.btn_exit = ttk.Button(self.frame, text="Exit", command=self.exit)
-        self.lbl_text = ttk.Label(self.frame, text="Enter number to simulate with same parameters")
-        self.lbl_key = ttk.Label(self.frame, text="Sim Number (Sus, Inf, Rec, Beta, Gamma, Time")
-        self.e_sim_num = ttk.Entry(self.frame)
-        self.btn_use = ttk.Button(self.frame, text="Use values", command=self.use)
-
-        self.lbl_title.grid(column=1, row=1, columnspan=3)
-        self.lbl_text.grid(column=1, row=2, columnspan=3)
-        self.lbl_key.grid(column=1, row=3)
-        self.lb_history.grid(column=1, row=4)
-        self.e_sim_num.grid(column=2, row=4)
-        self.btn_use.grid(column=3, row=4)
-        self.btn_exit.grid(column=2, row=5, columnspan=2)
-
-    def exit(self):
-        self.master.destroy()
-        sir_win = tk.Tk()
-        sir_win.title('SIR')
-        sir_main = gui_First_SIR_Window(sir_win)
-
-    def use(self):
-        """User enter number and set of parameters are retrieved from the database"""
-        sim_number = int(self.e_sim_num.get())
-        sim_param = list(self.user_history[sim_number])
-        print(sim_param)
-
-        queue = my_sir.QueueSimulation(1, [sim_param[0]], [sim_param[1]], [sim_param[2]], [sim_param[3]],
-                                       [sim_param[4]], sim_param[5], current_id)
-
-        queue.run_simulation()
-
 
 # ---------------------------------------
 
@@ -690,7 +642,7 @@ class gui_First_CA_Window:
         self.master.destroy()
         root3 = tk.Tk()
         root3.title('History')
-        history_window = gui_CA_history(root3)
+        history_window = CA_history(root3)
 
     def close(self):
         self.master.destroy()
@@ -818,7 +770,9 @@ class gui_CA_Param:
         main_ca.mainloop()
 
 
-class gui_CA_history:
+# ---------------------------------------
+
+class gui_history:
     """GUI history window which shows history of values entered for the user currently logged in
     """
 
@@ -826,29 +780,46 @@ class gui_CA_history:
         self.master = master
         self.frame = ttk.Frame(master, padding=5)
         self.frame.grid(row=0, column=0, sticky='nsew')
-        self.user_history = my_sql.ca_return_history(current_id)  # user_history is a list of tuples
-        print(self.user_history)
+        # self.user_history = my_sql.ca_return_history(current_id)  # user_history is a list of tuples
+        # print(self.user_history)
 
         self.lb_history = tk.Listbox(self.frame, width=50)
-        for i in range(len(self.user_history)):
-            to_insert = str(i) + "  " + str(self.user_history[i])
-            self.lb_history.insert(i, to_insert)
+        # for i in range(len(self.user_history)):
+        #     to_insert = str(i) + "  " + str(self.user_history[i])
+        #     self.lb_history.insert(i, to_insert)
 
         self.lbl_title = ttk.Label(self.frame, text=f"History of {current_user}")
-        self.btn_exit = ttk.Button(self.frame, text="Exit", command=self.exit)
+        self.btn_exit = ttk.Button(self.frame, text="Exit", command="")
         self.lbl_text = ttk.Label(self.frame, text="Enter number to simulate with same parameters")
         self.lbl_key = ttk.Label(self.frame,
-                                 text="Sim Number (cells, generations, x, y, infection radius, number infected, recovered can be infected, days until recovered, use immunity, days of immunity)")
+                                 text="")
         self.e_sim_num = ttk.Entry(self.frame)
-        self.btn_use = ttk.Button(self.frame, text="Use values", command=self.use)
+        self.btn_use = ttk.Button(self.frame, text="Use values", command="")
 
         self.lbl_title.grid(column=1, row=1, columnspan=3)
         self.lbl_text.grid(column=1, row=2, columnspan=3)
-        self.lbl_key.grid(column=1, row=3)
+        # self.lbl_key.grid(column=1, row=3)
         self.lb_history.grid(column=1, row=4)
         self.e_sim_num.grid(column=2, row=4)
         self.btn_use.grid(column=3, row=4)
         self.btn_exit.grid(column=2, row=5, columnspan=2)
+
+
+class CA_history(gui_history):
+    def __init__(self, master):
+        gui_history.__init__(self, master)
+
+        self.btn_exit['command'] = self.exit
+        self.btn_use['command'] = self.use
+
+        self.user_history = my_sql.ca_return_history(current_id)  # user_history is a list of tuples
+        # print(self.user_history)
+        for i in range(len(self.user_history)):
+            to_insert = str(i) + "  " + str(self.user_history[i])
+            self.lb_history.insert(i, to_insert)
+        self.lbl_key[
+            'text'] = "Sim Number (cells, generations, x, y, infection radius, number infected, recovered can be infected, days until recovered, use immunity, days of immunity)"
+        self.lbl_key.grid(column=1, row=3)
 
     def exit(self):
         self.master.destroy()
@@ -867,8 +838,39 @@ class gui_CA_history:
         ca.new_generation()
 
 
-# ---------------------------------------
+class SIR_history(gui_history):
+    def __init__(self, master):
+        gui_history.__init__(self, master)
 
+        self.btn_exit['command'] = self.exit
+        self.btn_use['command'] = self.use
+
+        self.user_history = my_sql.sir_return_history(current_id)
+        print(self.user_history)
+        for i in range(len(self.user_history)):
+            to_insert = str(i) + "  " + str(self.user_history[i])
+            self.lb_history.insert(i, to_insert)
+        self.lbl_key['text'] = "Sim Number (Sus, Inf, Rec, Beta, Gamma, Time)"
+        self.lbl_key.grid(column=1, row=3)
+
+    def exit(self):
+        self.master.destroy()
+        sir_win = tk.Tk()
+        sir_win.title('SIR')
+        sir_main = gui_First_SIR_Window(sir_win)
+
+    def use(self):
+        sim_number = int(self.e_sim_num.get())
+        sim_param = list(self.user_history[sim_number])
+        print(sim_param)
+
+        queue = my_sir.QueueSimulation(1, [sim_param[0]], [sim_param[1]], [sim_param[2]], [sim_param[3]],
+                                       [sim_param[4]], sim_param[5], current_id)
+
+        queue.run_simulation()
+
+
+# ---------------------------------------
 
 root = tk.Tk()
 root.title('Main Window')

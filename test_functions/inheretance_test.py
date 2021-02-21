@@ -117,7 +117,7 @@ class stats_sir(gui_statistics):
 
     def export_data(self):
         columns = "Name, sus0, inf0, rec0, beta, gamma"
-        with open("exported_data.csv", "w") as file:
+        with open("../other_files/exported_data.csv", "w") as file:
             file.write("Name, sus0, inf0, rec0, beta, gamma\n")
             print(self.data)
             for line in self.data:
@@ -183,7 +183,7 @@ class stats_ca(gui_statistics):
 
     def export_data(self):
         columns = "Name, sus0, inf0, rec0, beta, gamma"
-        with open("exported_data.csv", "w") as file:
+        with open("../other_files/exported_data.csv", "w") as file:
             file.write(
                 "Name, no_cells, generations, size_x, size_y, inf_radius, num_infected, rec_inf_true, days_inf, use_immunity, days_immune\n")
             print(self.data)

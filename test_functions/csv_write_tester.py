@@ -18,7 +18,7 @@ b = [["a","b","c"], ["ad","bd","cd"], ["afds","bfds","cfds"]]
 
 
 
-filename = "../ca_output.txt"
+filename = "../other_files/ca_output.txt"
 final = []
 with open(filename, 'r') as file:
     lines = [line.rstrip('\n') for line in file]
