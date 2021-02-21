@@ -29,6 +29,7 @@ class gui_Main_Window:
         self.btn_SIR = ttk.Button(self.frame, text='SIR model', command=self.openSIR, state=tk.DISABLED)
         self.btn_CA = ttk.Button(self.frame, text='Cellular Automata', command=self.openCA, state=tk.DISABLED)
         self.btn_history = ttk.Button(self.frame, text='Export History', command=self.openHistory)
+        self.btn_exit = ttk.Button(self.frame, text='Exit', command=lambda: self.master.destroy())
 
         self.frame.grid(row=0, column=0, sticky='nsew')
 
@@ -38,6 +39,7 @@ class gui_Main_Window:
         self.btn_SIR.grid(column=1, row=1, columnspan=2, sticky='s')
         self.btn_CA.grid(column=1, row=2, columnspan=2, sticky='s')
         self.btn_history.grid(column=1, row=3, columnspan=2)
+        self.btn_exit.grid(column=1, row=4, columnspan=2)
 
         self.master.columnconfigure(0, weight=1)
         self.master.rowconfigure(0, weight=1)
@@ -62,6 +64,7 @@ class gui_Main_Window:
     def openSIR(self):
         self.master.destroy()
         root2 = tk.Tk()
+        root2.geometry("+{}+{}".format(200, 200))
         root2.title('SIR Model')
         # root2.geometry('1400x900')
         new_window = gui_First_SIR_Window(root2)
@@ -70,6 +73,7 @@ class gui_Main_Window:
     def openCA(self):
         self.master.destroy()
         root2 = tk.Tk()
+        root2.geometry("+{}+{}".format(200, 200))
         root2.title('CA Model')
         new_window = gui_First_CA_Window(root2)
         root2.mainloop()
@@ -77,6 +81,7 @@ class gui_Main_Window:
     def openHistory(self):
         self.master.destroy()
         root3 = tk.Tk()
+        root3.geometry("+{}+{}".format(200, 200))
         root3.title('History Viewer')
         history_window = gui_statistics(root3)
         root3.mainloop()
@@ -109,6 +114,7 @@ class gui_Main_Window:
     def enter_email(self, username):
         print('enter_email')
         root5 = tk.Tk()
+        root5.geometry("+{}+{}".format(200, 200))
         root5.title('Enter email')
         email_window = gui_Enter_Email(root5, username)
         return
@@ -242,18 +248,21 @@ class gui_statistics:
     def open_sir(self):
         self.master.destroy()
         root1 = tk.Tk()
+        root1.geometry("+{}+{}".format(200, 200))
         root1.title('SIR Stats')
         window = stats_sir(root1)
 
     def open_ca(self):
         self.master.destroy()
         root1 = tk.Tk()
+        root1.geometry("+{}+{}".format(200, 200))
         root1.title('CA Stats')
         window = stats_ca(root1)
 
     def exit(self):
         self.master.destroy()
         root = tk.Tk()
+        root.geometry("+{}+{}".format(200, 200))
         root.title('Main Window')
         main_window = gui_Main_Window(root)
         # root.geometry('250x150+0+0')
@@ -427,6 +436,7 @@ class gui_First_SIR_Window:
     def close(self):
         self.master.destroy()
         main_win = tk.Tk()
+        main_win.geometry("+{}+{}".format(200, 200))
         main_win.title('Main Window')
         new_window = gui_Main_Window(main_win)
         main_win.mainloop()
@@ -459,6 +469,7 @@ class gui_First_SIR_Window:
                 self.master.destroy()
                 root3 = tk.Tk()
                 root3.title('Input Parameters')
+                root3.geometry("+{}+{}".format(200, 200))
                 input_window = gui_SIR_Param(root3, self.number_of_simulations)
                 root3.mainloop()
             else:
@@ -469,6 +480,7 @@ class gui_First_SIR_Window:
     def show_history(self):
         self.master.destroy()
         root3 = tk.Tk()
+        root3.geometry("+{}+{}".format(200, 200))
         root3.title('History')
         history_window = SIR_history(root3)
 
@@ -567,6 +579,7 @@ class gui_SIR_Param:
 
         if not pass1:
             root3 = tk.Tk()
+            root3.geometry("+{}+{}".format(200, 200))
             root3.title('Input Parameters')
             input_window = gui_SIR_Param(root3, self.number_of_simulations)
             root3.mainloop()
@@ -581,6 +594,7 @@ class gui_SIR_Param:
     def exit(self):
         self.master.destroy()
         sir_win = tk.Tk()
+        sir_win.geometry("+{}+{}".format(200, 200))
         sir_win.title('SIR')
         sir_main = gui_First_SIR_Window(sir_win)
 
@@ -635,18 +649,21 @@ class gui_First_CA_Window:
     def input(self):
         self.master.destroy()
         root3 = tk.Tk()
+        root3.geometry("+{}+{}".format(200, 200))
         root3.title('Input Parameters')
         input_window = gui_CA_Param(root3)
 
     def show_history(self):
         self.master.destroy()
         root3 = tk.Tk()
+        root3.geometry("+{}+{}".format(200, 200))
         root3.title('History')
         history_window = CA_history(root3)
 
     def close(self):
         self.master.destroy()
         main_win = tk.Tk()
+        main_win.geometry("+{}+{}".format(200, 200))
         main_win.title('Main Window')
         new_window = gui_Main_Window(main_win)
         main_win.mainloop()
@@ -765,6 +782,7 @@ class gui_CA_Param:
     def close(self):
         self.master.destroy()
         main_ca = tk.Tk()
+        main_ca.geometry("+{}+{}".format(200, 200))
         main_ca.title('CA')
         new_window = gui_First_CA_Window(main_ca)
         main_ca.mainloop()
@@ -824,6 +842,7 @@ class CA_history(gui_history):
     def exit(self):
         self.master.destroy()
         main_ca = tk.Tk()
+        main_ca.geometry("+{}+{}".format(200, 200))
         main_ca.title('CA')
         new_window = gui_First_CA_Window(main_ca)
         main_ca.mainloop()
@@ -856,6 +875,7 @@ class SIR_history(gui_history):
     def exit(self):
         self.master.destroy()
         sir_win = tk.Tk()
+        sir_win.geometry("+{}+{}".format(200, 200))
         sir_win.title('SIR')
         sir_main = gui_First_SIR_Window(sir_win)
 
@@ -874,6 +894,15 @@ class SIR_history(gui_history):
 
 root = tk.Tk()
 root.title('Main Window')
+
+# windowWidth = root.winfo_reqwidth()
+# windowHeight = root.winfo_reqheight()
+# print("Width",windowWidth,"Height",windowHeight)
+# positionRight = int(root.winfo_screenwidth()/2 - windowWidth/2)
+# positionDown = int(root.winfo_screenheight()/2 - windowHeight/2)
+root.geometry("+{}+{}".format(200, 200))
+
+
 # root.geometry("300x100")
 
 # window = gui_Main_Window(root)
