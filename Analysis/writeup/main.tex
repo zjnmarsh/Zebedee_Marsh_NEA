@@ -556,1201 +556,428 @@ SELECT * FROM sir_param WHERE user=:curr_user, {'curr_user':in_user}
 
 
 
-\subsection{UI design}
-\includegraphics[width=\textwidth]{a_main_window.png}
-\includegraphics[width=\textwidth]{a_sir_main.png}
-\includegraphics[width=\textwidth]{a_sir_input.png}
-\includegraphics[width=\textwidth]{a_sir_history.png}
-\includegraphics[width=\textwidth]{a_sir_output.png}
-\includegraphics[width=\textwidth]{a_main_window.png}
-\includegraphics[width=\textwidth]{a_ca_main.png}
-\includegraphics[width=\textwidth]{a_ca_input.png}
-\includegraphics[width=\textwidth]{a_ca_history.png}
-\includegraphics[width=\textwidth]{a_ca_output.png}
-\includegraphics[width=\textwidth]{a_open_file.png}
+% \subsection{UI design}
+% \includegraphics[width=\textwidth]{a_main_window.png}
+% \includegraphics[width=\textwidth]{a_sir_main.png}
+% \includegraphics[width=\textwidth]{a_sir_input.png}
+% \includegraphics[width=\textwidth]{a_sir_history.png}
+% \includegraphics[width=\textwidth]{a_sir_output.png}
+% \includegraphics[width=\textwidth]{a_main_window.png}
+% \includegraphics[width=\textwidth]{a_ca_main.png}
+% \includegraphics[width=\textwidth]{a_ca_input.png}
+% \includegraphics[width=\textwidth]{a_ca_history.png}
+% \includegraphics[width=\textwidth]{a_ca_output.png}
+% \includegraphics[width=\textwidth]{a_open_file.png}
 
 
 % \end{comment}
 
 \newpage
-\section{The code}
-
-% \begin{comment}
-
-\subsection{Main Function}
+\section{Technical Solution}
+\subsection{External Libraries}
 \begin{lstlisting}
-# pylint: disable=unused-variable
-import tkinter as tk
-from tkinter import ttk
-from scipy.integrate import odeint
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-import random
-import time
-from matplotlib.animation import FuncAnimation
-import matplotlib
-import csv
-import json
-from tkinter import filedialog
-from tkinter import messagebox
-
-import sub_SIR_model as my_sir
-import sub_CA_model as my_ca
-import sub_sql_functions as my_sql
-
-current_user = "None"
-
-
-class gui_Main_Window:
-    """GUI of main window where user must login before they can choose SIR or CA model
-    """
-
-    def __init__(self, master):
-        self.master = master
-        self.frame = ttk.Frame(master, padding=5)
-
-        # self.lbl_name = ttk.Label(self.frame, text='This is the main page')
-        self.e_user = ttk.Entry(self.frame)
-        self.btn_login = ttk.Button(self.frame, text='Login', command=self.login)
-        self.btn_SIR = ttk.Button(self.frame, text='SIR model', command=self.openSIR, state=tk.DISABLED)
-        self.btn_CA = ttk.Button(self.frame, text='Cellular Automata', command=self.openCA, state=tk.DISABLED)
-
-        self.frame.grid(row=0, column=0, sticky='nsew')
-
-        # self.lbl_name.grid(column=1, row=0, columnspan=3, sticky='n')
-        self.e_user.grid(column=1, row=0, sticky='n')
-        self.btn_login.grid(column=2, row=0, sticky='n')
-        self.btn_SIR.grid(column=1, row=1, columnspan=2, sticky='s')
-        self.btn_CA.grid(column=1, row=2, columnspan=2, sticky='s')
-
-        self.master.columnconfigure(0, weight=1)
-        self.master.rowconfigure(0, weight=1)
-
-        self.frame.columnconfigure(1, weight=1)
-        self.frame.rowconfigure(1, weight=1)
-
-        if current_user != "None":
-            self.pers_login()
-
-    def pers_login(self):
-        """If a user closes an SIR or CA window, this function ensures that they stay logged in"""
-        self.btn_SIR['state'] = tk.NORMAL
-        self.btn_CA['state'] = tk.NORMAL
-        self.e_user.destroy()
-        self.btn_login.destroy()
-        self.lbl_name = ttk.Label(self.frame, text=f'Hello {current_user}')
-        self.lbl_name.grid(column=1, row=0)
-        self.btn_logout = ttk.Button(self.frame, text='logout', command=self.logout)
-        self.btn_logout.grid(column=2, row=0)
-
-    def openSIR(self):
-        self.master.destroy()
-        root2 = tk.Tk()
-        root2.title('SIR Model')
-        # root2.geometry('1400x900')
-        new_window = gui_First_SIR_Window(root2)
-        root2.mainloop()
-
-    def openCA(self):
-        self.master.destroy()
-        root2 = tk.Tk()
-        root2.title('CA Model')
-        new_window = gui_First_CA_Window(root2)
-        root2.mainloop()
-
-    def login(self):
-        """Gets username from user that was entered into username box, calls enter_username sql function with it and assigns it to the current user global variable
-        """
-        username = str(self.e_user.get())
-        my_sql.enter_username(username)
-        global current_user
-        current_user = username
-
-        self.btn_SIR['state'] = tk.NORMAL
-        self.btn_CA['state'] = tk.NORMAL
-        self.e_user.destroy()
-        self.btn_login.destroy()
-        self.lbl_name = ttk.Label(self.frame, text=f'Hello {current_user}')
-        self.lbl_name.grid(column=1, row=0)
-        self.btn_logout = ttk.Button(self.frame, text='logout', command=self.logout)
-        self.btn_logout.grid(column=2, row=0)
-
-    def logout(self):
-        """Logs out user, setting global current_user to none and disabling SIR and CA button until they log in again"""
-        print('logout')
-        self.e_user = ttk.Entry(self.frame)
-        self.btn_login = ttk.Button(self.frame, text='Login', command=self.login)
-        self.e_user.grid(column=1, row=0, sticky='n')
-        self.btn_login.grid(column=2, row=0, sticky='n')
-        self.btn_SIR['state'] = tk.DISABLED
-        self.btn_CA['state'] = tk.DISABLED
-        current_user = "None"
-
-
-class error:
-    """Class for producing error box"""
-    def __init__(self, err_type, message):
-        tk.Tk().withdraw()
-        title = err_type + " error"
-        messagebox.showerror(title, message)
-
-
-# ---------------------------------------
-
-class gui_First_SIR_Window:
-    """GUI where user can enter how many graphs they want to make, and whether they want to manually enter parameters, chose a file or use past parameters in history"""
-
-    def __init__(self, master):
-        self.master = master
-        self.frame = ttk.Frame(master, padding=5)
-
-        self.lbl_name = ttk.Label(self.frame, text='This is the SIR model')
-
-        self.lbl_num_sim = ttk.Label(self.frame, text='Number of simulations')
-        self.e_num_sim = ttk.Entry(self.frame)
-        # self.num_sim.insert(0, 1)
-        self.btn_open_file = ttk.Button(self.frame, text='Load File', command=self.open_file)
-        self.btn_input_param = ttk.Button(self.frame, text='Enter Parameters', command=self.input)
-        self.btn_history = ttk.Button(self.frame, text='Show History', command=self.show_history)
-        self.btn_close = ttk.Button(self.frame, text='Close', command=self.close)
-
-        self.frame.grid(row=0, column=0, sticky='nsew')
-
-        self.lbl_name.grid(column=0, row=0, columnspan=2, sticky='n')
-        self.lbl_num_sim.grid(column=0, row=1)
-        self.e_num_sim.grid(column=1, row=1)
-        # self.num_sim.grid(column=0, row=1)
-        self.btn_open_file.grid(column=0, row=2)
-        self.btn_input_param.grid(column=1, row=2)
-        self.btn_history.grid(column=0, row=3)
-        self.btn_close.grid(column=1, row=3, sticky='s')
-
-        self.master.columnconfigure(0, weight=1)
-        self.master.rowconfigure(0, weight=1)
-
-        self.frame.columnconfigure(1, weight=1)
-        self.frame.rowconfigure(1, weight=1)
-
-    def close(self):
-        self.master.destroy()
-        main_win = tk.Tk()
-        main_win.title('Main Window')
-        new_window = gui_Main_Window(main_win)
-        main_win.mainloop()
-
-    def open_file(self):
-        """Allows user to open file containing results from previous simulation and converts the values into python lists so they can be used by the my_sir.plot_graph function"""
-        print("file dialog")
-        filename = filedialog.askopenfilename()
-        print(filename)
-        df = pd.read_excel(filename)
-        timearray = df['Time'].values.tolist()
-        susceptible = df['S'].values.tolist()
-        infected = df['I'].values.tolist()
-        recovered = df['R'].values.tolist()
-
-        self.master.destroy()
-
-        plot = my_sir.plot_graph(timearray, susceptible, infected, recovered)
-        plot.plot()
-
-    def input(self):
-        """Checks that user as entered a value between 1-10 for the number of simulations. IF the user has not, it will produce an error and ask user to enter a value between 1 and 10."""
-        try:
-            int(self.e_num_sim.get())
-            if 1 <= int(self.e_num_sim.get()) <= 10:
-                self.number_of_simulations = int(self.e_num_sim.get())
-                print(self.number_of_simulations)
-
-                # self.number_of_simulations = 1
-                self.master.destroy()
-                root3 = tk.Tk()
-                root3.title('Input Parameters')
-                input_window = gui_SIR_Param(root3, self.number_of_simulations)
-                root3.mainloop()
-            else:
-                err = error("Entry", "Please enter an integer between 1 and 10")
-        except ValueError:
-            err = error("Entry", "Please enter an integer between 1 and 10")
-
-    def show_history(self):
-        self.master.destroy()
-        root3 = tk.Tk()
-        root3.title('History')
-        history_window = gui_SIR_history(root3)
-
-
-class gui_SIR_Param:
-    """GUI for entering parameters for the SIR model"""
-
-    def __init__(self, master, num_sim):
-        self.param_list = [[], [], [], [], []]
-        self.counter = 0
-
-        self.number_of_simulations = num_sim
-        self.master = master
-        self.frame = ttk.Frame(master, padding=5)
-        self.frame.grid(row=0, column=0, sticky='nsew')
-
-        # label variables
-        self.lbl_name = ttk.Label(self.frame, text='Enter parameters for SIR model')
-        self.s_name = ttk.Label(self.frame, text='Susceptible')
-        self.i_name = ttk.Label(self.frame, text='Infected')
-        self.r_name = ttk.Label(self.frame, text='Recovered')
-        self.tr_name = ttk.Label(self.frame, text='Transmission rate')
-        self.re_name = ttk.Label(self.frame, text='Recovery rate')
-        self.btn_enter = ttk.Button(self.frame, text='Enter', command=self.enter_param)
-        self.btn_close = ttk.Button(self.frame, text='Close', command=self.exit)
-
-        # button variables
-        self.e_s = ttk.Entry(self.frame)
-        self.e_i = ttk.Entry(self.frame)
-        self.e_r = ttk.Entry(self.frame)
-        self.e_tr = ttk.Entry(self.frame)
-        self.e_re = ttk.Entry(self.frame)
-
-        # gridding label variables
-        self.lbl_name.grid(column=0, row=0, columnspan=2, sticky='n')
-        self.s_name.grid(column=0, row=1, sticky='w')
-        self.i_name.grid(column=0, row=2, sticky='w')
-        self.r_name.grid(column=0, row=3, sticky='w')
-        self.tr_name.grid(column=0, row=4, sticky='w')
-        self.re_name.grid(column=0, row=5, sticky='w')
-
-        self.e_s.grid(column=1, row=1, sticky='w')
-        self.e_i.grid(column=1, row=2, sticky='w')
-        self.e_r.grid(column=1, row=3, sticky='w')
-        self.e_tr.grid(column=1, row=4, sticky='w')
-        self.e_re.grid(column=1, row=5, sticky='w')
-
-        self.btn_enter.grid(column=1, row=6, columnspan=1)
-        self.btn_close.grid(column=0, row=6, columnspan=1)
-
-        self.master.columnconfigure(0, weight=1)
-        self.master.rowconfigure(0, weight=1)
-
-        # weight elements for resizing
-        self.frame.columnconfigure(0, weight=1)
-        self.frame.rowconfigure(0, weight=1)
-        self.frame.rowconfigure(1, weight=1)
-        self.frame.rowconfigure(2, weight=1)
-        self.frame.rowconfigure(3, weight=1)
-        self.frame.rowconfigure(4, weight=1)
-        self.frame.rowconfigure(5, weight=1)
-        self.frame.rowconfigure(6, weight=1)
-
-    def enter_param(self):
-        """Appends values user has entered to the main parameter list. If the number of simulations is more than 1, it will remove values in the input boxes so user can enter parameters for next simulaion."""
-        self.counter += 1
-
-        self.param_list[0].append(float(self.e_s.get()))
-        self.param_list[1].append(float(self.e_i.get()))
-        self.param_list[2].append(float(self.e_r.get()))
-        self.param_list[3].append(float(self.e_tr.get()))
-        self.param_list[4].append(float(self.e_re.get()))
-
-        self.e_s.delete(0, 'end')
-        self.e_i.delete(0, 'end')
-        self.e_r.delete(0, 'end')
-        self.e_tr.delete(0, 'end')
-        self.e_re.delete(0, 'end')
-
-        if self.counter == self.number_of_simulations:
-            self.submit_param()
-            self.counter = 0
-
-    def submit_param(self):
-        """Creates queue object from my_sir function and calls the run simulation function
-        """
-        # print(self.param_list)
-        self.master.destroy()
-
-        pass1 = True
-        for sub_list in self.param_list:
-            for value in sub_list:
-                if value < 0:
-                    pass1 = False
-                    err = error("Value", "Negative numbers cannot be used for any of these inputs")
-
-        if not pass1:
-            root3 = tk.Tk()
-            root3.title('Input Parameters')
-            input_window = gui_SIR_Param(root3, self.number_of_simulations)
-            root3.mainloop()
-        else:
-            queue = my_sir.QueueSimulation(self.number_of_simulations, self.param_list[0], self.param_list[1],
-                                            self.param_list[2],
-                                            self.param_list[3], self.param_list[4],
-                                            1000, current_user)
-
-            queue.run_simulation()
-
-    def exit(self):
-        self.master.destroy()
-        sir_win = tk.Tk()
-        sir_win.title('SIR')
-        sir_main = gui_First_SIR_Window(sir_win)
-
-
-class gui_SIR_history:
-    """GUI history window which shows history of values entered for the user currently logged in
-    """
-
-    def __init__(self, master):
-        self.master = master
-        self.frame = ttk.Frame(master, padding=5)
-        self.frame.grid(row=0, column=0, sticky='nsew')
-        self.user_history = my_sql.sir_return_history(current_user)  # user_history is a list of tuples
-        print(self.user_history)
-
-        self.lb_history = tk.Listbox(self.frame, width=50)
-        for i in range(len(self.user_history)):
-            to_insert = str(i) + "  " + str(self.user_history[i][1:])
-            self.lb_history.insert(i, to_insert)
-
-        self.lbl_title = ttk.Label(self.frame, text=f"History of {current_user}")
-        self.btn_exit = ttk.Button(self.frame, text="Exit", command=self.exit)
-        self.lbl_text = ttk.Label(self.frame, text="Enter number to simulate with same parameters")
-        self.e_sim_num = ttk.Entry(self.frame)
-        self.btn_use = ttk.Button(self.frame, text="Use values", command=self.use)
-
-        self.lbl_title.grid(column=1, row=1, columnspan=3)
-        self.lbl_text.grid(column=1, row=2, columnspan=3)
-        self.lb_history.grid(column=1, row=3)
-        self.e_sim_num.grid(column=2, row=3)
-        self.btn_use.grid(column=3, row=3)
-        self.btn_exit.grid(column=2, row=4, columnspan=2)
-
-    def exit(self):
-        self.master.destroy()
-        sir_win = tk.Tk()
-        sir_win.title('SIR')
-        sir_main = gui_First_SIR_Window(sir_win)
-
-    def use(self):
-        """User enter number and set of parameters are retrieved from the database"""
-        sim_number = int(self.e_sim_num.get())
-        sim_param = list(self.user_history[sim_number][1:])
-        print(sim_param)
-
-        queue = my_sir.QueueSimulation(1, [sim_param[0]], [sim_param[1]], [sim_param[2]], [sim_param[3]],
-                                        [sim_param[4]], sim_param[5], current_user)
-
-        queue.run_simulation()
-
-
-# ---------------------------------------
-
-class gui_First_CA_Window:
-    """GUI window where user can enter parameters manually, load file generated or show history of previously used parameters and choose one for the ceccular automata model
-    """
-
-    def __init__(self, master):
-        self.master = master
-        self.frame = ttk.Frame(master, padding=5)
-
-        self.lbl_name = ttk.Label(self.frame, text='This is the Cellular Automata model')
-        self.btn_open_file = ttk.Button(self.frame, text='Load File', command=self.open_file)
-        self.btn_input_param = ttk.Button(self.frame, text='Enter Parameters', command=self.input)
-        self.btn_show_history = ttk.Button(self.frame, text='History', command=self.show_history)
-        self.btn_close = ttk.Button(self.frame, text='Close', command=self.close)
-
-        self.frame.grid(row=0, column=0, sticky='nsew')
-
-        self.lbl_name.grid(column=0, row=0, columnspan=2, sticky='n')
-        self.btn_open_file.grid(column=0, row=1)
-        self.btn_input_param.grid(column=1, row=1)
-        self.btn_show_history.grid(column=0, row=2)
-        self.btn_close.grid(column=1, row=2, sticky='s')
-
-        self.master.columnconfigure(0, weight=1)
-        self.master.rowconfigure(0, weight=1)
-
-        self.frame.columnconfigure(1, weight=1)
-        self.frame.rowconfigure(1, weight=1)
-
-    def open_file(self):
-        # enter file stuff
-        print("Opening file dialog")
-        file = filedialog.askopenfile(mode="r")
-        lines = [line.rstrip('\n') for line in file]
-        file.close()
-
-        if lines[-1] == "":
-            del lines[-1]
-
-        self.master.destroy()
-
-        ca = my_ca.cellular_automata(0, 0, 0, 0, 0, 0, False, 0, False, 0, True, lines)
-        ca.new_generation()
-        self.master.destroy()
-
-    def input(self):
-        self.master.destroy()
-        root3 = tk.Tk()
-        root3.title('Input Parameters')
-        input_window = gui_CA_Param(root3)
-
-    def show_history(self):
-        self.master.destroy()
-        root3 = tk.Tk()
-        root3.title('History')
-        history_window = gui_CA_history(root3)
-
-    def close(self):
-        self.master.destroy()
-        main_win = tk.Tk()
-        main_win.title('Main Window')
-        new_window = gui_Main_Window(main_win)
-        main_win.mainloop()
-
-
-class gui_CA_Param:
-    """GUI interface for inputting cellular automata parameters manually
-    Need to make some entry boxes dependent on checkboxes
-    """
-
-    def __init__(self, master):
-        self.master = master
-        self.frame = ttk.Frame(master, padding=5)
-        self.frame.grid(row=0, column=0, sticky='nsew')
-
-        # label variables
-        self.l_lbl_name = ttk.Label(self.frame, text='Enter parameters for CA model')
-        self.l_no_cells = ttk.Label(self.frame, text='Number of cells')
-        self.l_gen = ttk.Label(self.frame, text='Generations')
-        self.l_size_x = ttk.Label(self.frame, text='Size x')
-        self.l_size_y = ttk.Label(self.frame, text='Size y')
-        self.l_inf_rad = ttk.Label(self.frame, text='Infection radius')
-        self.l_no_inf = ttk.Label(self.frame, text='Number of infected')
-        self.l_r_i = ttk.Label(self.frame, text='Recovered can be infected?')
-        self.l_d_r = ttk.Label(self.frame, text='Days until recovery')
-        self.l_use_imm = ttk.Label(self.frame, text='Use immunity')
-        self.l_d_i = ttk.Label(self.frame, text='Days of immunity')
-
-        # bool values for checkbuttons
-        self.b_r_i = tk.BooleanVar()
-        self.b_u_i = tk.BooleanVar()
-
-        # entry and checkbutton variables
-        self.e_no_cells = ttk.Entry(self.frame)
-        self.e_gen = ttk.Entry(self.frame)
-        self.e_size_x = ttk.Entry(self.frame)
-        self.e_size_y = ttk.Entry(self.frame)
-        self.e_inf_rad = ttk.Entry(self.frame)
-        self.e_no_inf = ttk.Entry(self.frame)
-        self.cb_r_i = ttk.Checkbutton(self.frame, variable=self.b_r_i)
-        self.e_d_r = ttk.Entry(self.frame)
-        self.cb_use_imm = ttk.Checkbutton(self.frame, variable=self.b_u_i)
-        self.e_d_i = ttk.Entry(self.frame)
-
-        self.btn_enter = ttk.Button(self.frame, text='Enter', command=self.enter_param)
-        self.btn_close = ttk.Button(self.frame, text='Close', command=self.close)
-
-        # grid label variables
-        self.l_lbl_name.grid(column=0, row=0, columnspan=2, sticky='n')
-        self.l_no_cells.grid(column=0, row=1, sticky='w')
-        self.l_gen.grid(column=0, row=2, sticky='w')
-        self.l_size_x.grid(column=0, row=3, sticky='w')
-        self.l_size_y.grid(column=0, row=4, sticky='w')
-        self.l_inf_rad.grid(column=0, row=5, sticky='w')
-        self.l_no_inf.grid(column=0, row=6, sticky='w')
-        self.l_r_i.grid(column=0, row=7, sticky='w')
-        self.l_d_r.grid(column=2, row=7, sticky='w')
-        self.l_use_imm.grid(column=0, row=8, sticky='w')
-        self.l_d_i.grid(column=2, row=8, sticky='w')
-
-        # grid entry variables
-        self.e_no_cells.grid(column=2, row=1, sticky='w')
-        self.e_gen.grid(column=2, row=2, sticky='w')
-        self.e_size_x.grid(column=2, row=3, sticky='w')
-        self.e_size_y.grid(column=2, row=4, sticky='w')
-        self.e_inf_rad.grid(column=2, row=5, sticky='w')
-        self.e_no_inf.grid(column=2, row=6, sticky='w')
-        self.cb_r_i.grid(column=1, row=7, sticky='w')
-        self.e_d_r.grid(column=3, row=7, sticky='w')
-        self.cb_use_imm.grid(column=1, row=8, sticky='w')
-        self.e_d_i.grid(column=3, row=8, sticky='w')
-
-        self.btn_enter.grid(column=0, row=9, columnspan=2, sticky='s')
-        self.btn_close.grid(column=2, row=9, columnspan=2, sticky='s')
-
-        # grid main column and tow
-        self.master.columnconfigure(0, weight=1)
-        self.master.rowconfigure(0, weight=1)
-
-        # weight elements for resizing
-        self.frame.columnconfigure(0, weight=1)
-        self.frame.rowconfigure(0, weight=1)
-        self.frame.rowconfigure(1, weight=1)
-        self.frame.rowconfigure(2, weight=1)
-        self.frame.rowconfigure(3, weight=1)
-        self.frame.rowconfigure(4, weight=1)
-        self.frame.rowconfigure(5, weight=1)
-        self.frame.rowconfigure(6, weight=1)
-
-    def enter_param(self):
-        """Gets values that were input, creates a cellular automata object and calls the new_generation function to start the cellular automata function
-        """
-        # should call CA function in this
-        no_cells = int(self.e_no_cells.get())
-        generations = int(self.e_gen.get())
-        size_x = int(self.e_size_x.get())
-        size_y = int(self.e_size_y.get())
-        inf_rad = int(self.e_inf_rad.get())
-        no_inf = int(self.e_no_inf.get())
-        rec_inf = self.b_r_i.get()
-        days_rec = int(self.e_d_r.get())
-        use_imm = self.b_u_i.get()
-        days_imm = int(self.e_d_i.get())
-
-        self.master.destroy()
-
-        arguments = [no_cells, generations, size_x, size_y, inf_rad, no_inf, rec_inf, days_rec, use_imm,
-                        days_imm, False]
-
-        my_sql.ca_enter_param(current_user, arguments)
-
-
-        ca = my_ca.cellular_automata(*arguments)  # arguments sent as separate parameters
-
-        ca.new_generation()
-
-    def close(self):
-        self.master.destroy()
-        main_ca = tk.Tk()
-        main_ca.title('CA')
-        new_window = gui_First_CA_Window(main_ca)
-        main_ca.mainloop()
-
-
-class gui_CA_history:
-    """GUI history window which shows history of values entered for the user currently logged in
-    """
-
-    def __init__(self, master):
-        self.master = master
-        self.frame = ttk.Frame(master, padding=5)
-        self.frame.grid(row=0, column=0, sticky='nsew')
-        self.user_history = my_sql.ca_return_history(current_user)  # user_history is a list of tuples
-        print(self.user_history)
-
-        self.lb_history = tk.Listbox(self.frame, width=50)
-        for i in range(len(self.user_history)):
-            to_insert = str(i) + "  " + str(self.user_history[i][1:])
-            self.lb_history.insert(i, to_insert)
-
-        self.lbl_title = ttk.Label(self.frame, text=f"History of {current_user}")
-        self.btn_exit = ttk.Button(self.frame, text="Exit", command=self.exit)
-        self.lbl_text = ttk.Label(self.frame, text="Enter number to simulate with same parameters")
-        self.e_sim_num = ttk.Entry(self.frame)
-        self.btn_use = ttk.Button(self.frame, text="Use values", command=self.use)
-
-        self.lbl_title.grid(column=1, row=1, columnspan=3)
-        self.lbl_text.grid(column=1, row=2, columnspan=3)
-        self.lb_history.grid(column=1, row=3)
-        self.e_sim_num.grid(column=2, row=3)
-        self.btn_use.grid(column=3, row=3)
-        self.btn_exit.grid(column=2, row=4, columnspan=2)
-
-    def exit(self):
-        self.master.destroy()
-        main_ca = tk.Tk()
-        main_ca.title('CA')
-        new_window = gui_First_CA_Window(main_ca)
-        main_ca.mainloop()
-
-    def use(self):
-        """User enter number and set of parameters are retrieved from the database"""
-        sim_number = int(self.e_sim_num.get())
-        sim_param = list(self.user_history[sim_number][1:])
-        print(sim_param)
-        sim_param.append(False)
-        ca = my_ca.cellular_automata(*sim_param)
-        ca.new_generation()
-
-
-# ---------------------------------------
-
-
-root = tk.Tk()
-root.title('Main Window')
-root.geometry("300x100")
-
-window = gui_Main_Window(root)
-# window = gui_First_CA_Window(root)
-current_user = "zebedee"
-
-root.mainloop()
-    
+    import tkinter as tk
+    from tkinter import ttk
+    import pandas as pd
+    from tkinter import filedialog
+    from tkinter import messagebox
+
+    import sub_SIR_model as my_sir
+    import sub_CA_model as my_ca
+    import sub_sql_functions as my_sql
 \end{lstlisting}
-
-\subsection{CA Model}
-\begin{lstlisting}
-# pylint: disable=unused-variable
-# pylint: enable=too-many-lines
-
-import matplotlib.pyplot as plt
-import random
-from matplotlib.animation import FuncAnimation
-import json
-
-
-class cell:
-    """Each cell will be a class instance of this class. Gives each cell its own attributes"""
-
-    def __init__(self, x, y, infected, d_r, d_i, u_i):
-        self.x = x
-        self.y = y
-        self.infected = infected
-        self.recovered = False
-        self.recover_count = d_r  # default - can be changed - time until infected cell recovers
-        self.immune = False
-        self.immune_count = d_i
-        self.original_immune = d_i
-        self.use_immunity = u_i
-        # self.infection_rate = i
-
-    def cell_test_function(self):
-        return self.x, self.y, self.infected
-
-    def location(self):
-        # print(self.x, self.y)
-        return self.x, self.y
-
-    def recover_generation(self):
-        self.recover_count -= 1
-        if self.recover_count <= 0:
-            self.recovered = True
-            self.infected = False
-            self.recover_count = 10
-            if self.use_immunity:
-                self.immune = True
-
-    def immunity_generation(self):
-        if self.immune:
-            self.immune_count -= 1
-            if self.immune_count <= 0:
-                self.immune = False
-                self.immune_count = self.original_immune
-
-    def movement(self):
-        def nothing():
-            pass
-
-        # mvmt = 5
-        mvmt = random.randint(0, 50)
-
-        def north():
-            self.y -= mvmt
-
-        def northeast():
-            self.x += mvmt
-            self.y -= mvmt
-
-        def east():
-            self.x += mvmt
-
-        def southeast():
-            self.x += mvmt
-            self.y += mvmt
-
-        def south():
-            self.y += mvmt
-
-        def southwest():
-            self.x -= mvmt
-            self.y += mvmt
-
-        def west():
-            self.x -= mvmt
-
-        def northwest():
-            self.x -= mvmt
-            self.y -= mvmt
-
-        instructions = {
-            0: nothing,
-            1: north,
-            2: northeast,
-            3: east,
-            4: southeast,
-            5: south,
-            6: southwest,
-            7: west,
-            8: northwest
-        }
-
-        rand = random.randint(0, 8)
-        instructions[rand]()  # like a switch case condition - for constant time complexity
-        # print(self.x, self.y)
-
-
-class cellular_automata:
-    """Main class to run function"""
-
-    def __init__(self, no_cells, generations, size_x, size_y, infection_radius, infected, r_i, d_r, immunity, d_i,
-                    user_file, *uf_param):
-        """Creates list of how every many cells the user inputs so a list will look like ['cell1','cell2','cell3'...]. Each
-        element in that list will then be used as a dictionary key where the definition will be a class instance of cell. Each
-        class instance will be created with a random x and y coordinate, and an infected status.
-        r_i : recovered can be infected
-        d_r : days until recovery
-        """
-        self.user_file = user_file
-        self.use_immunity = immunity
-        self.number_of_cells = no_cells
-        self.number_of_infected = infected
-        self.infection_radius = infection_radius
-        self.generations = generations
-        self.cell_list = []
-        self.cell_object_dict = {}
-        self.size_x = size_x
-        self.size_y = size_y
-        self.full_list = []
-        self.r_i = r_i  # recovered can be infected
-
-        if len(uf_param) != 0:
-            self.uf_param = uf_param
-            self.lines = list(uf_param)[0]
-
-        for i in range(no_cells):
-            self.cell_list.append(("cell" + str(i)))
-
-        infected_counter = 0
-        for element in self.cell_list:  # creates user inputted number of infected cells first, then creates normal cells
-            infected_counter += 1
-            infected_status = False
-            if infected_counter < self.number_of_infected:
-                infected_status = True
-            rand_x, rand_y = self.rand_coordinate_generator()
-            self.cell_object_dict[element] = cell(rand_x, rand_y,
-                                                    infected_status, d_r, d_i,
-                                                    self.use_immunity)  # creates a dictionary of cell objects
-
-    def rand_coordinate_generator(self):
-        """Generates random coordinates for cells being generated"""
-        rand_x = random.randint(0, self.size_x)
-        rand_y = random.randint(0, self.size_y)
-        return rand_x, rand_y
-
-    def export_data(self, sus_full, inf_full, rec_full, imm_full, lg_values, time_array):
-        """Should export data in a format that it can be analysed and reused
-        gen_imm empty when not using immunity, but shouldn't be a problem"""
-    
-        filename = "ca_output.txt"
-        with open(filename, 'w') as file:
-            file.write(str(sus_full) + "\n")
-            file.write(str(inf_full) + "\n")
-            file.write(str(rec_full) + "\n")
-            file.write(str(imm_full) + "\n")
-            file.write(str(lg_values) + "\n")
-            file.write(str(time_array) + "\n")
-
-    def import_data(self):
-
-        if self.lines[-1] == "":
-            del self.lines[-1]
-
-        result = [json.loads(item) for item in self.lines]
-        # print(result)
-        return result
-
-    def update_position(self):
-        """For each cell object, movement function will be called to see where the cell will move, and the x coordinate list and y coordinate list will be returned of the new generation"""
-        loc_x = []
-        loc_y = []
-        infected = []
-        recovered = []
-        immune = []
-
-        for cell_obj_name in self.cell_list:  # for each cell object name ie. 'cell1', 'cell2' etc, use the name as a dictionary key and run movement function and get location
-            self.cell_object_dict[cell_obj_name].movement()
-            loc_x.append(self.cell_object_dict[cell_obj_name].location()[0])
-            loc_y.append(self.cell_object_dict[cell_obj_name].location()[1])
-            infected.append(self.cell_object_dict[cell_obj_name].infected)
-            recovered.append(self.cell_object_dict[cell_obj_name].recovered)
-            immune.append(self.cell_object_dict[cell_obj_name].immune)
-
-        # print(infected)
-        # print(recovered)
-        # print(immune)
-        # print("------------")
-
-        # self.collect_data()  # this function could be moved into the new generation class function
-
-        return loc_x, loc_y, infected, recovered, immune
-
-    def cells_touch(
-            self):  # need to change to put all infected in a list, THEN compare susceptible otherwise not proper
-        """If another cell in in a certain radius of an infected cell, it will become infected. To be changed"""
-        infected_locations = []  # list of tuples of infected cells
-        recovered_obj = []
-        susceptible_obj = []
-        for cell_name in self.cell_list:
-            if self.cell_object_dict[cell_name].infected:
-                infected_locations.append(self.cell_object_dict[cell_name].location())
-            elif self.cell_object_dict[cell_name].recovered:
-                recovered_obj.append(self.cell_object_dict[cell_name])  # holds recovered both with and without immunity
-            else:
-                susceptible_obj.append(self.cell_object_dict[cell_name])
-
-        def touch(cell_obj):
-            sus_x, sus_y = cell_obj.location()
-            for infected_tuple in infected_locations:
-                if (sus_x - infected_tuple[0]) ** 2 + (
-                        sus_y - infected_tuple[1]) <= self.infection_radius ** 2:  # equation of a circle
-                    # self.cell_object_dict[cell_name].infected = True  # need to chance for chance
-                    # PROBLEM
-                    cell_obj.infected = True
-                    # print(f'{cell_obj} has been infected')
-                    # cell is infected, LISTS ARE NOT UPDATED
-
-        if self.r_i:  # if recovered can be infected - doesn't change immunity status but is currently dependent on it - CHANGE
-            for recovered in recovered_obj:
-                if not recovered.immune:
-                    touch(recovered)
-        for susceptible in susceptible_obj:
-            if not susceptible.immune:
-                touch(susceptible)
-
-    def cell_recovery(self):
-        """Cells automatically recover after a certain period of time"""
-        for cell_name in self.cell_list:
-            cell_obj = self.cell_object_dict[cell_name]
-            if cell_obj.recovered == False and cell_obj.infected == True:
-                cell_obj.recover_generation()
-            elif cell_obj.recovered == True and cell_obj.infected:
-                cell_obj.recover_generation()
-
-    def cell_immunity(self):
-        for cell_name in self.cell_list:
-            cell_obj = self.cell_object_dict[cell_name]
-            if cell_obj.recovered == True and cell_obj.immune == True:
-                cell_obj.immunity_generation()
-
-    def new_generation(self):
-        """Main definition for running program. For the number of generations to simulate, call self.update_position() to get new coordinate lists"""
-
-        # coordinates = []
-
-        sus_full = []
-        inf_full = []
-        rec_full = []
-        imm_full = []
-
-        lg_values = [[], [], []]
-
-        time_array = list(range(0, self.generations))
-
-        if not self.user_file:
-            # if user chosing own file will not need - put in function later
-            for i in range(
-                    self.generations):
-
-                if i % 50 == 0:
-                    print("Generating generation " + str(i))
-
-                x_list, y_list, infected, recovered, immune = self.update_position()
-
-                # check if cells touch here, then can adjust objects if need
-                self.cells_touch()  # adjusts the objects, not any list
-
-                # recovery function
-                self.cell_recovery()
-
-                # immunity function
-                if self.use_immunity:
-                    self.cell_immunity()
-
-                gen_sus = []
-                gen_inf = []
-                gen_rec = []
-                gen_imm = []
-
-                # puts cells in list depending on their status and whether immunity is used
-                if self.use_immunity:
-                    for inf in range(len(self.cell_list)):
-                        if infected[inf]:  # if True
-                            gen_inf.append([x_list[inf], y_list[inf]])
-                        elif immune[inf]:
-                            gen_imm.append([x_list[inf], y_list[inf]])
-                        elif recovered[inf]:
-                            gen_rec.append([x_list[inf], y_list[inf]])
-                        else:
-                            gen_sus.append([x_list[inf], y_list[inf]])
-                else:
-                    for inf in range(len(self.cell_list)):
-                        if infected[inf]:  # if True
-                            gen_inf.append([x_list[inf], y_list[inf]])
-                        elif recovered[inf]:
-                            gen_rec.append([x_list[inf], y_list[inf]])
-                        else:
-                            gen_sus.append([x_list[inf], y_list[inf]])
-                            
-
-                sus_full.append(gen_sus)
-                inf_full.append(gen_inf)
-                rec_full.append(gen_rec)
-                if self.use_immunity:
-                    imm_full.append(gen_imm)
-
-                lg_values[0].append(len(gen_sus))
-                lg_values[1].append(len(gen_inf))
-                lg_values[2].append((len(gen_rec) + len(gen_imm)))
-
-
-        # self.export_to_excel() # will soon be redundant
-        if not self.user_file:
-            self.export_data(sus_full, inf_full, rec_full, imm_full, lg_values, time_array)  # WORKING NOW
-
-        # if using own values, assign them here
-        if self.user_file:
-            sus_full, inf_full, rec_full, imm_full, lg_values, time_array = self.import_data()
-            self.generations = len(time_array)
-            print("Imported data!")
-
-        fig, axs = plt.subplots(2)
-        fig.suptitle('Cellular Automata')
-
-        # animate_graph = Anim(self.generations, sus_full, inf_full, rec_full, imm_full, self.use_immunity, time_array, lg_values)
-
-        def animate(i):  # need to adjust to work with two graphs
-            # https://stackoverflow.com/questions/42621036/how-to-use-funcanimation-to-update-and-animate-multiple-figures-with-matplotlib
-
-            axs[0].cla()
-
-            x_sus_full = [cell[0] for cell in sus_full[i]]
-            y_sus_full = [cell[1] for cell in sus_full[i]]
-            x_inf_full = [cell[0] for cell in inf_full[i]]
-            y_inf_full = [cell[1] for cell in inf_full[i]]
-            x_rec_full = [cell[0] for cell in rec_full[i]]
-            y_rec_full = [cell[1] for cell in rec_full[i]]
-
-            axs[0].scatter(x_sus_full, y_sus_full, color='blue')
-            axs[0].scatter(x_inf_full, y_inf_full, color='red')
-            axs[0].scatter(x_rec_full, y_rec_full, color='purple')
-            if self.use_immunity:
-                axs[0].scatter([cell[0] for cell in imm_full[i]], [cell[1] for cell in imm_full[i]], color='gray')
-
-            # plots line graph
-            axs[1].plot(time_array[0:i], lg_values[0][0:i], label="Susceptible", color="blue")
-            axs[1].plot(time_array[0:i], lg_values[1][0:i], label="Infected", color="red")
-            axs[1].plot(time_array[0:i], lg_values[2][0:i], label="recovered", color="purple")
-
-
-        ani = FuncAnimation(plt.gcf(), animate, frames=self.generations, interval=100, repeat=False)
-
-        # ani.save('video.mp4', writer='ffmpeg', fps=30, dpi=250)
-
-        plt.tight_layout()
-        plt.show()
-
-\end{lstlisting}
-
+\textbf{Tkinter} - For all my GUI code, I use Tkinter to structure my windows. Tkinter provides a good set of widgets including Labels, Entry boxes and Buttons which are easy to structure using Tkinter's Grid geometry manager. Ttk provides newer looking widgets. Tkinter also comes with Filedialog which is used when the user choses a file from a previous simulation, and MEssagebox is used for error nessages.
+\textbf(Pandas) - This is used to create a dataframe to allow simulation results to be exported into an Excel file.
 \subsection{SIR Model}
+\subsubsection{SIR Submit Parameters}
 \begin{lstlisting}
-import matplotlib.pyplot as plt
-import pandas as pd
-import sub_sql_functions as my_sql
+self.param_list = [[], [], [], [], [], []]
 
+def submit_param(self):
+"""Creates queue object from my_sir function and calls the run simulation function
+"""
+# print(self.param_list)
+self.master.destroy()
 
+pass1 = True
+for sub_list in self.param_list:
+    for value in sub_list:
+        if value < 0:
+            pass1 = False
+            err = error("Value", "Negative numbers cannot be used for any of these inputs")
+
+if not pass1:
+    root3 = tk.Tk()
+    root3.geometry("+{}+{}".format(200, 200))
+    root3.title('Input Parameters')
+    input_window = gui_SIR_Param(root3, self.number_of_simulations)
+    root3.mainloop()
+else:
+    queue = my_sir.QueueSimulation(self.number_of_simulations, self.param_list[0], self.param_list[1],
+                                    self.param_list[2],
+                                    self.param_list[3], self.param_list[4],
+                                    self.param_list[5], current_id)
+    queue.run_simulation()
+\end{lstlisting}
+When a user enters the number of SIR graphs they want to produce, if the number is greater than 1 and less than 10, a queue will be created. If they enter 1 there is no queue and if they enter more then 10 they will be asked to enter a lower number.
+If a user enters a number greater than 2 for number of graphs they want to produce, the Enter Parameters window will show up once where the user enters the first set of parameters, and when they click submit another Enter Parameters window will show up. This continues until they've entered all the sets of parameters for the number of graphs they want. Each time submit is pressed, these parameters are placed in a 2D List.
+
+eg. List = [[sus1, sus2], [inf1, inf2], [rec1, rec2], [beta1, beta2], [gamma1, gamma2], [time1, time2]]
+Where sus1, inf1, rec1, beta1, gamma1 and time1 are the first set of parameters, and sus2, inf2, rec2, beta2, gamma2 and time2 are the second set ofparameters
+\subsubsection{SIR Queue Simulation}
+\begin{lstlisting}
 class QueueSimulation:
 
-    def __init__(self, n, s_list, i_list, r_list, b_list, g_list, t, current_user):
-        self.n = n  # number of simulations to be run
-        self.parameters = []
-        for i in range(n):
-            self.parameters.append([s_list[i], i_list[i], r_list[i], b_list[i], g_list[i], t, i + 1])
-            my_sql.sir_enter_param(current_user, [s_list[i], i_list[i], r_list[i], b_list[i], g_list[i], t])
-        print(self.parameters)
+def __init__(self, n, s_list, i_list, r_list, b_list, g_list, t, current_id):
+    self.n = n  # number of simulations to be run
+    self.parameters = []
+    for i in range(n):
+        self.parameters.append([s_list[i], i_list[i], r_list[i], b_list[i], g_list[i], t[i], i + 1])
+        my_sql.sir_enter_param(current_id, [s_list[i], i_list[i], r_list[i], b_list[i], g_list[i], t[i]])
+    print(self.parameters)
 
-    def run_simulation(self):
-        sir_model = SIR_model()
-        for i in range(self.n):
-            sir_model.SIR_model(*self.parameters[i])
-        plt.show()
+def run_simulation(self):
+    sir_model = SIR_model()
+    for i in range(self.n):
+        sir_model.SIR_model(*self.parameters[i])
+    plt.show()
+\end{lstlisting}
+This class takes in the 2D list mentioned in SIR Submit Parameters and groups them into their sets.
 
+eg. List = [[sus1, sus2], [inf1, inf2], [rec1, rec2], [beta1, beta2], [gamma1, gamma2], [time1, time2]] turns into
+Parameters = [[sus1, inf1, rec1, beta1, gamma1, time1],[sus2, inf2, rec2, beta2, gamma2, time2]]
 
-class SIR_model:
+This essential creates a queue of parameters which will then be used to generate values for the SIR Graph.
+\subsubsection{SIR Solver}
+\begin{lstlisting}
+def eqns(param):
+    e = 0
+    S, I, R = param
+    dsdt = (-(beta * S * I) / N) + (e * R)  # rate of change of susceptible individuals
+    didt = ((beta * S * I) / N) - gamma * I  # rate of change of infected individuals
+    drdt = (gamma * I) - (e * R)  # rate of change of recovered individuals
+    return dsdt, didt, drdt
 
-    def __init__(self):
+def solver():  # solves differential equations in eqns
+    param = (s0, i0, r0)
+    solver_result = [[], [], []]
+    for time in timearray:
+        eqns_results = eqns(param)
+        x, y, z = (param[0] + eqns_results[0]), (param[1] + eqns_results[1]), (param[2] + eqns_results[2])
+        solver_result[0].append(x)
+        solver_result[1].append(y)
+        solver_result[2].append(z)
+        param = (x, y, z)
+    return solver_result
+\end{lstlisting}
+\textbf{Eqns} - This function contains the established SIR equations which calculate rate of change of the different states. S is susceptible individuals, I is infected individuals and R is recovered individuals. Beta represents the infection rate and Gamma represents the rate of recovery. The Eqns function takes in the current values of S, I and R, and using the beta and gamma constants calculates the rate of change of each class and returns them.
+\textbf{Solver} - This function solves the differential equations in the eqns function. A time array contains a list of numbers, 1,2,3,4... which represent the time period, or number of generations, to calculate S, I and R values for. For each number in this time period list, the current values of S, I and R are input into the eqns function which calculates the rate of change of each state. This is then returned and added to the S, I and R values to calculate the current S, I and R values for that time period. These new values are appended to a list. This is then repeated, where the current S, I and R values are input into the eqns function, the change calculated and added to the current S, I and R and the values entered into a list. 
+
+The list of values is structured as so: 
+List = [[s1, i1, r1], [s2, i2, r2], [s3, i3, r3]...]
+Where the letter represents the state, whether susceptible, infected or recovered, and the number represents the generation it belongs to.
+Once all the S, I, R values have been calculated for each generation, it is plotted using MatPlotLib
+
+\subsubsection{SIR Plot}
+\begin{lstlisting}
+plt.plot(timearray, solver_result[0], label="S(t)")
+plt.plot(timearray, solver_result[1], label="I(t)")
+plt.plot(timearray, solver_result[2], label="R(t)")
+\end{lstlisting}
+Each generation is plotted in a TKinter line graph.
+\subsection{CA Model}
+\subsubsection{CA Cell Class}
+\begin{lstlisting}
+class cell:
+"""Each cell will be a class instance of this class. Gives each cell its own attributes"""
+
+def __init__(self, x, y, infected, d_r, d_i, u_i):
+    self.x = x
+    self.y = y
+    self.infected = infected
+    self.recovered = False
+    self.recover_count = d_r  # default - can be changed - time until infected cell recovers
+    self.original_recover = d_r
+    self.immune = False
+    self.immune_count = d_i
+    self.original_immune = d_i
+    self.use_immunity = u_i
+    # self.infection_rate = i
+
+def cell_test_function(self):
+    return self.x, self.y, self.infected
+
+def location(self):
+    # print(self.x, self.y)
+    return self.x, self.y
+
+def recover_generation(self):
+    self.recover_count -= 1
+    if self.recover_count <= 0:
+        self.recovered = True
+        self.infected = False
+        self.recover_count = self.original_recover
+        if self.use_immunity:
+            self.immune = True
+
+def immunity_generation(self):
+    if self.immune:
+        self.immune_count -= 1
+        if self.immune_count <= 0:
+            self.immune = False
+            self.immune_count = self.original_immune
+
+def movement(self):
+    def nothing():
         pass
 
-    def SIR_model(self, s0, i0, r0, beta, gamma, t, f, *args, **kwargs):
-        """
-        :param s0: number of susceptible people
-        :param i0: number of infected people
-        :param r0: number of recovered people
-        :param beta: transmission rate of an individual
-        :param gamma: recovery rate of an individual
-        :param t: how long the simulation should run for
-        :param f: how many graphs should be calculated simultaneously
-        """
+    # mvmt = 5
+    mvmt = random.randint(0, 50)
 
-        plt.figure(f)  # names the graph
-        N = s0 + i0 + r0  # total population
+    def north():
+        self.y -= mvmt
 
-        timearray = list(range(1, int(t)))  # creates time array
+    def northeast():
+        self.x += mvmt
+        self.y -= mvmt
 
-        def eqns(param):
-            # e = random.uniform(0, 1)
-            e = 0
-            S, I, R = param
-            dsdt = (-(beta * S * I) / N) + (e * R)  # rate of change of susceptible individuals
-            didt = ((beta * S * I) / N) - gamma * I  # rate of change of infected individuals
-            drdt = (gamma * I) - (e * R)  # rate of change of recovered individuals
-            return dsdt, didt, drdt
+    def east():
+        self.x += mvmt
 
-        def solver():  # solves differential equations in eqns
-            param = (s0, i0, r0)
-            solver_result = [[], [], []]
-            for time in timearray:
-                eqns_results = eqns(param)
-                x, y, z = (param[0] + eqns_results[0]), (param[1] + eqns_results[1]), (param[2] + eqns_results[2])
-                solver_result[0].append(x)
-                solver_result[1].append(y)
-                solver_result[2].append(z)
-                param = (x, y, z)
-            return solver_result
+    def southeast():
+        self.x += mvmt
+        self.y += mvmt
 
-        solver_result = solver()
+    def south():
+        self.y += mvmt
 
-        # print(solver_result)
+    def southwest():
+        self.x -= mvmt
+        self.y += mvmt
 
-        def export_to_excel():  # exports calculated results to excel
-            data = {'Time': timearray,
-                    'S': solver_result[0],
-                    'I': solver_result[1],
-                    'R': solver_result[2]}
+    def west():
+        self.x -= mvmt
 
-            df = pd.DataFrame(data, columns=['Time', 'S', 'I', 'R'])
-            name = "output" + str(f) + ".xls"
-            df.to_excel(name, sheet_name='output')
+    def northwest():
+        self.x -= mvmt
+        self.y -= mvmt
 
-        export_to_excel()
-        plt.plot(timearray, solver_result[0], label="S(t)")
-        plt.plot(timearray, solver_result[1], label="I(t)")
-        plt.plot(timearray, solver_result[2], label="R(t)")
+    instructions = {
+        0: nothing,
+        1: north,
+        2: northeast,
+        3: east,
+        4: southeast,
+        5: south,
+        6: southwest,
+        7: west,
+        8: northwest
+    }
+
+    rand = random.randint(0, 8)
+    instructions[rand]()  # like a switch case condition - for constant time complexity
+    # print(self.x, self.y)
+\end{lstlisting}
+Each cell will be an instance of this cell class. Each cell will therefore be independent and have it's own parameters, including
+\begin{itemize}
+    \item It's own X and Y coordinates within the specified range by the user
+    \item Whether it's infected
+    \item Whether it's a recovered cell (ie has been infected) and if not how many generations until it recovers
+    \item Whether it's immune (ie has been infected but is immune) and if so for how long
+\end{itemize}
+
+To calculate whether or not the cell is recovered or whether it's immune, there are two functions. 
+
+\textbf{Recovery}
+If a cell is infected, it will have a value stating the number of days it will be infected for. This value is entered by the user when entering parameters for the simulation. For each generation, if a cell is infected, it's recover\_count variable will count down until it reaches 0. Once it reaches 0, the cell will no longer be infected but now recovered, and may have immunity if the user as set it. The recover\_count variable will then reset in case the user has enabled recovered cells to be infected again.
+
+\textbf{Immunity}
+Much like the recovery function, if the user has set it, cells can have an immunity after they've recovered. This immunity will last for a specified number of generations in the immunity\_count variable. For each generation, this variable will count down until it reaches 0, where a cell no longer is immune. The immunity\_count variable is reset to it's original value.
 
 
-class plot_graph:
+\textbf{Movement function}
+This function changes the position of a cell randomly. A random mvmt number between 0 and 50 is generated which determinues how far a cell moves. Another random number between 0 and 8 is generated to determine the direction in which this cell moves. The different directions are stored in a dictionary to enable it to act like a switch case condtion which results in constant time complexity, saving a bit of time and processing.
 
-    def __init__(self, ta, s, i, r):
-        # deconstruct file here
-        self.timearray = ta
-        self.sus = s
-        self.inf = i
-        self.rec = r
+\subsubsection{CA Initial Cell Creation}
+\begin{lstlisting}
+for i in range(no_cells):
+    self.cell_list.append(("cell" + str(i)))
+s
+infected_counter = 0
+for element in self.cell_list:  # creates user inputted number of infected cells first, then creates normal cells
+    infected_counter += 1
+    infected_status = False
+    if infected_counter < self.number_of_infected:
+        infected_status = True
+    rand_x, rand_y = self.rand_coordinate_generator()
+    self.cell_object_dict[element] = cell(rand_x, rand_y,
+                                            infected_status, d_r, d_i,
+                                            self.use_immunity)  # creates a dictionary of cell objects
 
-    def plot(self):
-        plt.plot(self.timearray, self.sus, label="S(t)")
-        plt.plot(self.timearray, self.inf, label="I(t)")
-        plt.plot(self.timearray, self.rec, label="R(t)")
-        plt.show()
-    
+def rand_coordinate_generator(self):
+    """Generates random coordinates for cells being generated"""
+    rand_x = random.randint(0, self.size_x)
+    rand_y = random.randint(0, self.size_y)
+    return rand_x, rand_y
+\end{lstlisting}
+This code from the main cellular automata class creates the initial cells. The total number of cells to create and the number of infected cells are input into the function. Initially, a list is created containing cell names "cell1", "cell2", "cell3" etc. Then, the function starts creating cell object instances of the cell class. For each cell in the initial cell list:
+\begin{itemize}
+    \item While the current number of infected cells is less than the number of infected cells wanted, the cell will be classed as infected
+    \item A set of random coordinates will be generated within the specified x and y coordinatse by the user
+    \item A cell object with these parameters and the specified days until recovery and days immune will be created and stored in a dictionary
+\end{itemize}
+\subsubsection{CA New Generation}
+\begin{lstlisting}
+def new_generation(self):
+"""Main definition for running program. For the number of generations to simulate, call self.update_position() to get new coordinate lists"""
+
+# coordinates = []
+
+sus_full = []
+inf_full = []
+rec_full = []
+imm_full = []
+
+lg_values = [[], [], []]
+
+time_array = list(range(0, self.generations))
+
+if not self.user_file:
+    # if user chosing own file will not need - put in function later
+    for i in range(
+            self.generations):
+
+        if i % 50 == 0:
+            print("Generating generation " + str(i))
+
+        x_list, y_list, infected, recovered, immune = self.update_position()
+
+        # check if cells touch here, then can adjust objects if need
+        self.cells_touch()  # adjusts the objects, not any list
+
+        # recovery function
+        self.cell_recovery()
+
+        # immunity function
+        if self.use_immunity:
+            self.cell_immunity()
+
+        gen_sus = []
+        gen_inf = []
+        gen_rec = []
+        gen_imm = []
+
+        # puts cells in list depending on their status and whether immunity is used
+        if self.use_immunity:
+            for inf in range(len(self.cell_list)):
+                if infected[inf]:  # if True
+                    gen_inf.append([x_list[inf], y_list[inf]])
+                elif immune[inf]:
+                    gen_imm.append([x_list[inf], y_list[inf]])
+                elif recovered[inf]:
+                    gen_rec.append([x_list[inf], y_list[inf]])
+                else:
+                    gen_sus.append([x_list[inf], y_list[inf]])
+        else:
+            for inf in range(len(self.cell_list)):
+                if infected[inf]:  # if True
+                    gen_inf.append([x_list[inf], y_list[inf]])
+                elif recovered[inf]:
+                    gen_rec.append([x_list[inf], y_list[inf]])
+                else:
+                    gen_sus.append([x_list[inf], y_list[inf]])
+                    
+
+        sus_full.append(gen_sus)
+        inf_full.append(gen_inf)
+        rec_full.append(gen_rec)
+        if self.use_immunity:
+            imm_full.append(gen_imm)
+
+        lg_values[0].append(len(gen_sus))
+        lg_values[1].append(len(gen_inf))
+        lg_values[2].append((len(gen_rec) + len(gen_imm)))
+
+\end{lstlisting}
+This function is the main function of the CA class and calculates the state of each cell object for each generation. The way this happens is as follows:
+\begin{itemize}
+    \item Positions of cells are updated via the self.update\_position() function
+    \item Susceptible cells within a specified distance of infected cells have a chance at getting infected via the self.cells\_touch() function
+    \item Infected cells have their days until recovery variable counted down via the self.cell\_recovery() function. If this countdown reaches 0, the cell will no longer be infected
+    \item If the user has opted to give cells immunity when they have recovered, this immunity count variable is counted down and if it reaches 0 the cell becomes susceptible
+    \item The coordinates of cells in the different states (susceptible, recovered, infected) are placed in lists for Matplotlib to plot. 
+\end{itemize}
+\textbf{How cell coordinates are entered into the list}
+The coordinates of each cell is placed in it's respective list for each generation, and each generation list is appended to a master list which is plotted by Matplotlib. For example:
+
+generation\_1\_infected\_list = [[x1, y1], [x2, y2]] 
+
+where x1 and y1 are x and y coordinates of cell 1 and x2 and y2 are x and y coordinates of cell 2
+
+generation\_2\_infected\_list = [[x1, y1], [x6, y6]]
+
+infected\_full\_list = [[[x1, y1], [x2, y2]], [[x1, y1], [x6, y6]]]
+
+
+
+\subsection{The code}
+
+\subsubsection{Main Function}
+\begin{lstlisting}
+INSERT CODE HERE
 \end{lstlisting}
 
-\subsection{SQL Functions}
+\subsubsection{CA Model}
 \begin{lstlisting}
-    import sqlite3
-    import os.path
-    
-    
-    def initial_setup():
-        """Sets up clean database with users table and ca_param table. Users table contains username and
-        whether user can see all parameters previously used, and ca_param table contains the history of
-        parameters used as well as the user who executed them"""
-        conn = sqlite3.connect('my_database.db')
-        c = conn.cursor()
-        # c.execute("DROP TABLE users")
-        # c.execute("DROP TABLE ca_param")
-        c.execute("CREATE TABLE users (username text PRIMARY KEY, see_all integer)")
-    
-        c.execute("""CREATE TABLE ca_param (
-                    user string,
-                    no_cells integer,
-                    generations integer,
-                    size_x integer,
-                    size_y integer,
-                    infection_radius integer,
-                    no_infected integer,
-                    recovered_can_be_infected integer,
-                    days_until_recovered integer,
-                    use_immunity integer,
-                    days_of_immunity integer    
-                    )""")
-        c.execute("INSERT INTO users VALUES (:username, :see_all)", {'username': 'admin', 'see_all': 1})
-    
-        c.execute("""CREATE TABLE sir_param (
-                    user string,
-                    sus0 integer,
-                    inf0 integer,
-                    rec0 integer,
-                    beta integer,
-                    gamma integer,
-                    time integer
-                    )""")
-    
-        conn.commit()
-        conn.close()
-    
-    
-    def enter_username(in_user):
-        """If new username entered, it will create a record in the users table for that user, if username
-        entered already exists nothing happens. Username is returned"""
-        conn = sqlite3.connect('my_database.db')
-        c = conn.cursor()
-        c.execute("INSERT OR IGNORE INTO users VALUES (:username, :see_all)",
-                  {'username': in_user, 'see_all': 0})  # don't add if duplicate username
-        conn.commit()
-        conn.close()
-        return in_user
-    
-    
-    def ca_enter_param(in_user, up):
-        """Inserts new parameters entered by the user into the CA parameter database"""
-        conn = sqlite3.connect('my_database.db')
-        c = conn.cursor()
-        c.execute("""INSERT INTO ca_param VALUES (:user, :no_cells, :generations, :size_x, :size_y,
-                                                :infection_radius, :no_infected, :recovered_can_be_infected,
-                                                :days_until_recovered, :use_immunity, :days_of_immunity)""",
-                  {'user': in_user, 'no_cells': up[0], 'generations': up[1], 'size_x': up[2], 'size_y': up[3],
-                   'infection_radius': up[4], 'no_infected': up[5], 'recovered_can_be_infected': up[6],
-                   'days_until_recovered': up[7], 'use_immunity': up[8], 'days_of_immunity': up[9]})
-        conn.commit()
-        conn.close()
-    
-    
-    def ca_return_history(in_user):
-        """Returns entered parameter history depending on current user"""
-        conn = sqlite3.connect('my_database.db')
-        c = conn.cursor()
-        c.execute("SELECT * FROM ca_param WHERE user=:curr_user", {'curr_user': in_user})
-        # conn.close()
-        return c.fetchall()
-    
-    
-    def sir_enter_param(in_user, up):
-        """Inters new parameters entered by the user into the SIR parameter database"""
-        conn = sqlite3.connect('my_database.db')
-        c = conn.cursor()
-        c.execute("""INSERT INTO sir_param VALUES (:user, :sus0, :inf0, :rec0, :beta, :gamma, :time)""",
-                  {'user': in_user, 'sus0': up[0], 'inf0': up[1], 'rec0': up[2], 'beta': up[3], 'gamma': up[4], 'time': up[5]
-                   })
-        conn.commit()
-        conn.close()
-    
-    def sir_return_history(in_user):
-        conn = sqlite3.connect('my_database.db')
-        c = conn.cursor()
-        c.execute("SELECT * FROM sir_param WHERE user=:curr_user", {'curr_user':in_user})
-        return c.fetchall()
+INSERT CODE HERE
+\end{lstlisting}
+
+\subsubsection{SIR Model}
+\begin{lstlisting}
+INSERT CODE HERE
+\end{lstlisting}
+
+\subsubsection{SQL Functions}
+\begin{lstlisting}
+INSERT CODE HERE
 \end{lstlisting}
 
 
 \newpage
+\section{Evaluation}
+\subsection{Evaluating against initial objectives}
+\textbf{Initial objectives}
+\begin{itemize}
+    \item Simulate the spread of a disease using the SIR model
+\end{itemize}
+I have achieved this as shown in the testing video where an SIR graph can be produced through a variety of methods. This methods result in a matplotlib window showing a line graph with 3 lines representing susceptible, infected, and recovered. Unfortunatly the graph produced is quite simple due to way I have implemented this model. This model only takes in account the number of susceptible, infected and recovered individuals, as well as the transmission rate and recovery rate, which means it ignores factors such as natural birth and death rate, as well as different susceptibilities of individuals. To improve this simulation, I would add the ability to enter more custom parameters such as infectibility, natural birth and death rate, as well as death rate from the virus. A variable transmission rate and recovery rate may also make this simulation more realistic as in the real world, both rates are variable and can depend on things such as  whether a vaccine has been rolled out or if a disease has mutated into a more contagious varient.
+
+\begin{itemize}
+    \item Simulate the spread of a disease using the Cellular Automata model
+\end{itemize}
+This has been achived as shown in the testing video, where two animated graphs are shown as the user submits the parameters for it. I feel like this objective has been comfortably met as my algorithm manages to simulate disease spread in the way cellular automata intends, with individual cells acting the way they should if they come into contact with an infected cell. I am very pleased with the way this is represented to the user, as two matplotlib graphs, one a scatter graph and the other a line graph. The scatter graph shows which state a cell is in and allows the user to visualise clearly how close one cell is from another, which I believe is the best way to show this simulation. The line graph below it shows how the total number of cells in a group, susceptible, infected or recovered, changes with time, which I think is a nice addition and shows the similarities between the CA model and SIR model.
+
+If i had more time on this project, I don't think I'd need to improve the core functionality of this model but I would add a feature that would allow the cellular automata model to run indefinitely, and there'd be options such as introduce a new virus or introduce a vaccine. This way, the code would be able to generate values such as a cells coordinates and whether it's infected as it's being animated on a matplotlib graph, which would allow the simulation to go on for how ever long a person would want. Another improvement I'd like to make is similar to one on my SIR model whether there could be natural birth and death rates, as currently there are only a set number of cells which doesn't change throughout the simulation.
+
+\begin{itemize}
+    \item Input custom parameters or use default values (from a previous disease) including infection rate, incubation period and death rate for the SIR model
+    \item Input custom parameters or use default values (from a previous disease) relating to the number and infectivity of cells for the CA model
+\end{itemize}
+The ability to input custom parameters is there as shown in the testing where a user can enter a number of parameters relating to the simulation, but I have not been able to add default values from a previous disease. This was due to a time constraint, as I 
+
+\textbf{THIS NEEDS TO BE COMPELTED}
+
+\begin{itemize}
+    \item Set a quarantine period or introduce a vaccine (therefore limiting disease transmission)
+    \item Click on a graph and show statistics from that point in time
+    \item Export graphs produced as png
+    \item Upload past simulation results into the program to generate a graph from that previous simulation
+    \item Be able to compare graphs of two different diseases
+\end{itemize}
+
+\section{Testing}
+Testing video available at https://youtu.be/JWIhQDoZN2M
+
 
 % \bibliography{references}{}
 % \bibliographystyle{plain}
