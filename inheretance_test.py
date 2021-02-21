@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import ttk
 import sub_sql_functions as my_sql
 
-
 class gui_statistics:
 
     def __init__(self, master):
@@ -21,6 +20,9 @@ class gui_statistics:
         self.btn_export = ttk.Button(self.wrapper2, text="Export", command="", state=tk.DISABLED)
         self.btn_exit = ttk.Button(self.wrapper2, text="Exit", command="")
         self.lb_text = ttk.Label(self.wrapper0, text="Display statistics for CA or SIR")
+        self.lb_filter = ttk.Label(self.wrapper0, text="Filter results by username")
+        self.e_usr = ttk.Entry(self.wrapper0)
+        self.btn_filter = ttk.Button(self.wrapper0, text="Filter", command="", state=tk.DISABLED)
 
         self.frame.grid(column=0, row=0, sticky='nsew')
 
@@ -30,10 +32,10 @@ class gui_statistics:
 
         self.btn_ca.grid(column=0, row=0)
         self.btn_sir.grid(column=0, row=1)
-        self.btn_filter.grid(column=0, row=2)
-        self.btn_export.grid(column=0, row=3)
-        self.btn_exit.grid(column=0, row=4)
-        self.lb_text.grid(column=0, row=0)
+        self.btn_export.grid(column=0, row=2)
+        self.btn_exit.grid(column=0, row=3)
+
+        self.lb_text.grid(column=0, row=0, columnspan=3)
 
         self.master.columnconfigure(0, weight=1)
         self.master.rowconfigure(0, weight=1)
@@ -65,9 +67,12 @@ class stats_sir(gui_statistics):
     def __init__(self, master):
         gui_statistics.__init__(self, master)
         self.btn_filter['state'] = 'normal'
+        self.btn_filter['command'] = self.filter
         self.btn_export['state'] = 'normal'
-        self.btn_filter['command'] = self.clear_tree
-        # self.tree = ttk.Treeview(self.wrapper1, column=("c1", "c2", "c3", "c4", "c5", "c6"), show='headings')
+
+        self.lb_filter.grid(column=0, row=1)
+        self.e_usr.grid(column=1, row=1)
+        self.btn_filter.grid(column=2, row=1)
 
         self.tree['column'] = ("c1", "c2", "c3", "c4", "c5", "c6")
         self.tree['show'] = 'headings'
@@ -92,17 +97,25 @@ class stats_sir(gui_statistics):
         for row in self.sir:
             self.tree.insert("", tk.END, values=row)
 
+    def filter(self):
+        self.clear_tree()
+        username = str(self.e_usr.get())
+        username = username.lower()
+        rows = my_sql.filtered_statistics("sir", username)
+        for row in rows:
+            self.tree.insert("", tk.END, values=row)
+
 
 class stats_ca(gui_statistics):
     def __init__(self, master):
         gui_statistics.__init__(self, master)
         self.btn_filter['state'] = 'normal'
         self.btn_export['state'] = 'normal'
-        self.btn_filter['command'] = self.clear_tree
+        self.btn_filter['command'] = self.filter
 
-        # self.tree = ttk.Treeview(self.wrapper1,
-        #                          column=("c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9", "c10", "c11", "c12"),
-        #                          show='headings')
+        self.lb_filter.grid(column=0, row=1)
+        self.e_usr.grid(column=1, row=1)
+        self.btn_filter.grid(column=2, row=1)
 
         self.tree['column'] = ("c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9", "c10", "c11", "c12")
         self.tree['show'] = 'headings'
@@ -136,6 +149,15 @@ class stats_ca(gui_statistics):
         self.sir, self.ca = my_sql.full_statistics()
         for row in self.ca:
             self.tree.insert("", tk.END, values=row)
+
+    def filter(self):
+        self.clear_tree()
+        username = str(self.e_usr.get())
+        username = username.lower()
+        rows = my_sql.filtered_statistics("ca", username)
+        for row in rows:
+            self.tree.insert("", tk.END, values=row)
+
 
 
 root = tk.Tk()
