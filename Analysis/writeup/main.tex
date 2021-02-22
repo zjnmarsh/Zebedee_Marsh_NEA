@@ -202,7 +202,7 @@ drdt = gamma * I  # rate of change of recovered individuals
 return dsdt, didt, drdt
 \end{lstlisting}
 
-\subsection{External library testing TBD}
+\subsection{External library testing}
 \subsubsection{Tkinter}
 My intial prototying for tkinter was done with the help of a YouTube video which focused on having multiple tkinter pages in a single file.
 Link: https://youtu.be/jBUpjijYtCk
@@ -437,8 +437,6 @@ game_loop()
 pygame.quit()
 \end{lstlisting}
 
-
-\subsection{SQL database TDB}
 
 \newpage
 % \section{Research of existing solutions TDB}
@@ -917,31 +915,1610 @@ where x1 and y1 are x and y coordinates of cell 1 and x2 and y2 are x and y coor
 generation\_2\_infected\_list = [[x1, y1], [x6, y6]]
 
 infected\_full\_list = [[[x1, y1], [x2, y2]], [[x1, y1], [x6, y6]]]
+\subsubsection{CA Cells Touch}
+\begin{lstlisting}
+def update_position(self):
+    """For each cell object, movement function will be called to see where the cell will move, and the x coordinate list and y coordinate list will be returned of the new generation"""
+    loc_x = []
+    loc_y = []
+    infected = []
+    recovered = []
+    immune = []
 
+    for cell_obj_name in self.cell_list:  # for each cell object name ie. 'cell1', 'cell2' etc, use the name as a dictionary key and run movement function and get location
+        self.cell_object_dict[cell_obj_name].movement()
+        loc_x.append(self.cell_object_dict[cell_obj_name].location()[0])
+        loc_y.append(self.cell_object_dict[cell_obj_name].location()[1])
+        infected.append(self.cell_object_dict[cell_obj_name].infected)
+        recovered.append(self.cell_object_dict[cell_obj_name].recovered)
+        immune.append(self.cell_object_dict[cell_obj_name].immune)
 
+    return loc_x, loc_y, infected, recovered, immune
+\end{lstlisting}
+This function creates 5 parallel lists for each cell in a generation. For each every cell, the 5 lists that are created are:
+\begin{itemize}
+    \item loc\_x which represents the x coordinate
+    \item loc\_y which represents the y coordinate
+    \item infected status
+    \item recovered status and
+    \item imuune status
+\end{itemize}
 
+\subsubsection{CA Cell Recovery}
+\begin{lstlisting}
+def cell_recovery(self):
+    """Cells automatically recover after a certain period of time"""
+    for cell_name in self.cell_list:
+        cell_obj = self.cell_object_dict[cell_name]
+        if cell_obj.recovered == False and cell_obj.infected == True:
+            cell_obj.recover_generation()
+        elif cell_obj.recovered == True and cell_obj.infected:
+            cell_obj.recover_generation()
+\end{lstlisting}
+For each cell, if it is not recovered and infected, the time until it recovers is decreased. Likewise, if the cell is recovered and infected (ie. it had been infected before, recovered and is now infected again) the time until it recovers will also be decreased
+
+\subsubsection{CA Cell Immunity}
+\begin{lstlisting}
+def cell_immunity(self):
+    for cell_name in self.cell_list:
+        cell_obj = self.cell_object_dict[cell_name]
+        if cell_obj.recovered == True and cell_obj.immune == True:
+            cell_obj.immunity_generation()
+\end{lstlisting}
+For each cell, if it is recovered and currently has immunity, the immunity\_generation() will be called to decrease the immunity count variable.
+\subsection{History}
+\subsubsection{Username Filter}
+\begin{lstlisting}
+def filtered_statistics(type, username):
+	"""Joins the users table and either the ca_param or sir_param table, enabling the user to get results filtered by username"""
+    conn = sqlite3.connect('my_database.db')
+    c = conn.cursor()
+    if type == "ca":
+        c.execute("""
+                        SELECT users.username, no_cells, generations, size_x, size_y, infection_radius, no_infected, recovered_can_be_infected, days_until_recovered, use_immunity, days_of_immunity
+                        FROM ca_param
+                        JOIN users ON ca_param.user_id = users.user_id
+                        WHERE users.username=:user""", {'user': username})
+        ca_rows = c.fetchall()
+        return ca_rows
+    elif type == "sir":
+        c.execute("""
+                        SELECT users.username, sus0, inf0, rec0, beta, gamma
+                        FROM sir_param
+                        JOIN users ON sir_param.user_id = users.user_id
+                        WHERE users.username=:user""", {'user': username})
+        sir_rows = c.fetchall()
+        return sir_rows
+    else:
+        print("Error, wrong type specified")
+        return "Error"
+\end{lstlisting}
+This SQL code connects the user table and either the ca\_param or sir\_param table using the user\_id number. This enables the user to filter the results based on username, which can then be exported.
+\newpage
 \subsection{The code}
 
 \subsubsection{Main Function}
 \begin{lstlisting}
-INSERT CODE HERE
+# pylint: disable=unused-variable
+import tkinter as tk
+from tkinter import ttk
+import pandas as pd
+from tkinter import filedialog
+from tkinter import messagebox
+
+import sub_SIR_model as my_sir
+import sub_CA_model as my_ca
+import sub_sql_functions as my_sql
+
+current_user = "None"
+current_id = "1"
+
+
+class gui_Main_Window:
+    """GUI of main window where user must login before they can choose SIR or CA model
+    """
+
+    def __init__(self, master):
+        self.master = master
+        self.frame = ttk.Frame(master, padding=5)
+
+        # self.lbl_name = ttk.Label(self.frame, text='This is the main page')
+        self.e_user = ttk.Entry(self.frame)
+        self.btn_login = ttk.Button(self.frame, text='Login', command=self.login)
+        self.btn_SIR = ttk.Button(self.frame, text='SIR model', command=self.openSIR, state=tk.DISABLED)
+        self.btn_CA = ttk.Button(self.frame, text='Cellular Automata', command=self.openCA, state=tk.DISABLED)
+        self.btn_history = ttk.Button(self.frame, text='Export History', command=self.openHistory)
+        self.btn_exit = ttk.Button(self.frame, text='Exit', command=lambda: self.master.destroy())
+
+        self.frame.grid(row=0, column=0, sticky='nsew')
+
+        # self.lbl_name.grid(column=1, row=0, columnspan=3, sticky='n')
+        self.e_user.grid(column=1, row=0, sticky='n')
+        self.btn_login.grid(column=2, row=0, sticky='n')
+        self.btn_SIR.grid(column=1, row=1, columnspan=2, sticky='s')
+        self.btn_CA.grid(column=1, row=2, columnspan=2, sticky='s')
+        self.btn_history.grid(column=1, row=3, columnspan=2)
+        self.btn_exit.grid(column=1, row=4, columnspan=2)
+
+        self.master.columnconfigure(0, weight=1)
+        self.master.rowconfigure(0, weight=1)
+
+        self.frame.columnconfigure(1, weight=1)
+        self.frame.rowconfigure(1, weight=1)
+
+        if current_user != "None":
+            self.pers_login()
+
+    def pers_login(self):
+        """If a user closes an SIR or CA window, this function ensures that they stay logged in"""
+        self.btn_SIR['state'] = tk.NORMAL
+        self.btn_CA['state'] = tk.NORMAL
+        self.e_user.destroy()
+        self.btn_login.destroy()
+        self.lbl_name = ttk.Label(self.frame, text=f'Hello {current_user}')
+        self.lbl_name.grid(column=1, row=0)
+        self.btn_logout = ttk.Button(self.frame, text='logout', command=self.logout)
+        self.btn_logout.grid(column=2, row=0)
+
+    def openSIR(self):
+        self.master.destroy()
+        root2 = tk.Tk()
+        root2.geometry("+{}+{}".format(200, 200))
+        root2.title('SIR Model')
+        # root2.geometry('1400x900')
+        new_window = gui_First_SIR_Window(root2)
+        root2.mainloop()
+
+    def openCA(self):
+        self.master.destroy()
+        root2 = tk.Tk()
+        root2.geometry("+{}+{}".format(200, 200))
+        root2.title('CA Model')
+        new_window = gui_First_CA_Window(root2)
+        root2.mainloop()
+
+    def openHistory(self):
+        self.master.destroy()
+        root3 = tk.Tk()
+        root3.geometry("+{}+{}".format(200, 200))
+        root3.title('History Viewer')
+        history_window = gui_statistics(root3)
+        root3.mainloop()
+
+    def login(self):
+        """Gets username from user that was entered into username box, calls enter_username sql function with it and assigns it to the current user global variable
+        """
+        username = str(self.e_user.get())
+        username = username.lower()
+        exists = my_sql.username_exists(username)
+        if not exists:
+            self.enter_email(username)
+        else:
+            user_id = my_sql.get_id(username)
+            global current_id
+            current_id = user_id
+
+        global current_user
+        current_user = username
+
+        self.btn_SIR['state'] = tk.NORMAL
+        self.btn_CA['state'] = tk.NORMAL
+        self.e_user.destroy()
+        self.btn_login.destroy()
+        self.lbl_name = ttk.Label(self.frame, text=f'Hello {current_user}')
+        self.lbl_name.grid(column=1, row=0)
+        self.btn_logout = ttk.Button(self.frame, text='logout', command=self.logout)
+        self.btn_logout.grid(column=2, row=0)
+
+    def enter_email(self, username):
+        print('enter_email')
+        root5 = tk.Tk()
+        root5.geometry("+{}+{}".format(200, 200))
+        root5.title('Enter email')
+        email_window = gui_Enter_Email(root5, username)
+        return
+
+    def logout(self):
+        """Logs out user, setting global current_user to none and disabling SIR and CA button until they log in again"""
+        print('logout')
+        self.e_user = ttk.Entry(self.frame)
+        self.btn_login = ttk.Button(self.frame, text='Login', command=self.login)
+        self.e_user.grid(column=1, row=0, sticky='n')
+        self.btn_login.grid(column=2, row=0, sticky='n')
+        self.btn_SIR['state'] = tk.DISABLED
+        self.btn_CA['state'] = tk.DISABLED
+        current_user = "None"
+
+
+class gui_Enter_Email:
+    def __init__(self, master, username):
+        self.username = username
+        self.email = ""
+        self.fn = ""
+        self.ln = ""
+
+        self.master = master
+        self.frame = ttk.Frame(master, padding=5)
+
+        self.lbl_email = ttk.Label(self.frame, text='Email')
+        self.lbl_fn = ttk.Label(self.frame, text='First Name')
+        self.lbl_ln = ttk.Label(self.frame, text='Last Name')
+
+        self.e_email = ttk.Entry(self.frame, text="Email")
+        self.e_fn = ttk.Entry(self.frame, text="First Name")
+        self.e_ln = ttk.Entry(self.frame, text="Last Name")
+
+        self.btn_enter = ttk.Button(self.frame, text="Submit", command=self.submit)
+
+        self.frame.grid(row=0, column=0, sticky='nswe')
+
+        self.lbl_email.grid(column=0, row=0)
+        self.lbl_fn.grid(column=0, row=1)
+        self.lbl_ln.grid(column=0, row=2)
+        self.e_email.grid(column=1, row=0)
+        self.e_fn.grid(column=1, row=1)
+        self.e_ln.grid(column=1, row=2)
+
+        self.btn_enter.grid(column=0, row=3, columnspan=2)
+
+        self.master.columnconfigure(0, weight=1)
+        self.master.rowconfigure(0, weight=1)
+
+        self.frame.columnconfigure(1, weight=1)
+        self.frame.rowconfigure(1, weight=1)
+
+    def submit(self):
+        self.email = str(self.e_email.get())
+        self.fn = str(self.e_fn.get())
+        self.ln = str(self.e_ln.get())
+        self.id = self.generate_id()
+        my_sql.enter_username(self.username, self.id, self.email, self.fn, self.ln)
+        global current_id
+        current_id = self.id
+        self.master.destroy()
+
+    def generate_id(self):
+        alphabet = list('abcdefghijklmnopqrstuvwxyz0123456789')
+        usr_list = [x for x in self.username]
+        id = []
+        for letter in usr_list:
+            id.append(str(alphabet.index(letter)))
+        user_id = "".join(id)
+        # print(user_id)
+        return user_id
+
+
+class error:
+    """Class for producing error box"""
+
+    def __init__(self, err_type, message):
+        tk.Tk().withdraw()
+        title = err_type + " error"
+        messagebox.showerror(title, message)
+
+
+# ---------------------------------------
+
+class gui_statistics:
+
+    def __init__(self, master):
+        self.master = master
+        self.frame = ttk.Frame(master, padding=5)
+
+        self.wrapper0 = tk.LabelFrame(self.frame)
+        self.wrapper1 = tk.LabelFrame(self.frame)
+        self.wrapper2 = tk.LabelFrame(self.frame)
+
+        self.tree = ttk.Treeview(self.wrapper1)
+
+        self.btn_ca = ttk.Button(self.wrapper2, text="CA", command=self.open_ca)
+        self.btn_sir = ttk.Button(self.wrapper2, text="SIR", command=self.open_sir)
+        self.btn_filter = ttk.Button(self.wrapper2, text="Filter", command="", state=tk.DISABLED)
+        self.btn_export = ttk.Button(self.wrapper2, text="Export", command="", state=tk.DISABLED)
+        self.btn_exit = ttk.Button(self.wrapper2, text="Exit", command=self.exit)
+        self.lb_text = ttk.Label(self.wrapper0, text="Display statistics for CA or SIR")
+        self.lb_filter = ttk.Label(self.wrapper0, text="Filter results by username")
+        self.e_usr = ttk.Entry(self.wrapper0)
+        self.btn_filter = ttk.Button(self.wrapper0, text="Filter", command="", state=tk.DISABLED)
+
+        self.frame.grid(column=0, row=0, sticky='nsew')
+
+        self.wrapper0.grid(column=0, row=0, columnspan=2)
+        self.wrapper1.grid(column=0, row=1)
+        self.wrapper2.grid(column=1, row=1)
+
+        self.btn_ca.grid(column=0, row=0)
+        self.btn_sir.grid(column=0, row=1)
+        self.btn_export.grid(column=0, row=2)
+        self.btn_exit.grid(column=0, row=3)
+
+        self.lb_text.grid(column=0, row=0, columnspan=3)
+
+        self.master.columnconfigure(0, weight=1)
+        self.master.rowconfigure(0, weight=1)
+
+        self.frame.columnconfigure(1, weight=1)
+        self.frame.rowconfigure(1, weight=1)
+
+    def clear_tree(self):
+        for i in self.tree.get_children():
+            self.tree.delete(i)
+
+    def open_sir(self):
+        self.master.destroy()
+        root1 = tk.Tk()
+        root1.geometry("+{}+{}".format(200, 200))
+        root1.title('SIR Stats')
+        window = stats_sir(root1)
+
+    def open_ca(self):
+        self.master.destroy()
+        root1 = tk.Tk()
+        root1.geometry("+{}+{}".format(200, 200))
+        root1.title('CA Stats')
+        window = stats_ca(root1)
+
+    def exit(self):
+        self.master.destroy()
+        root = tk.Tk()
+        root.geometry("+{}+{}".format(200, 200))
+        root.title('Main Window')
+        main_window = gui_Main_Window(root)
+        # root.geometry('250x150+0+0')
+        root.mainloop()
+
+
+class stats_sir(gui_statistics):
+    def __init__(self, master):
+        gui_statistics.__init__(self, master)
+        self.data = []
+
+        self.btn_filter['state'] = 'normal'
+        self.btn_filter['command'] = self.filter
+        self.btn_export['state'] = 'normal'
+        self.btn_export['command'] = self.export_data
+
+        self.lb_filter.grid(column=0, row=1)
+        self.e_usr.grid(column=1, row=1)
+        self.btn_filter.grid(column=2, row=1)
+
+        self.tree['column'] = ("c1", "c2", "c3", "c4", "c5", "c6")
+        self.tree['show'] = 'headings'
+
+        self.tree.heading("#1", text="username")
+        self.tree.heading("#2", text="sus0")
+        self.tree.heading("#3", text="inf0")
+        self.tree.heading("#4", text="rec0")
+        self.tree.heading("#5", text="beta")
+        self.tree.heading("#6", text="gamma")
+
+        self.tree.column('#1', width=100)
+        self.tree.column('#2', width=75)
+        self.tree.column('#3', width=75)
+        self.tree.column('#4', width=75)
+        self.tree.column('#5', width=75)
+        self.tree.column('#6', width=75)
+
+        self.tree.grid(row=0, sticky='nsew')
+        self.treeview = self.tree
+        self.sir, self.ca = my_sql.full_statistics()
+
+        self.data = self.sir
+
+        for row in self.sir:
+            self.tree.insert("", tk.END, values=row)
+
+    def filter(self):
+        self.clear_tree()
+        username = str(self.e_usr.get())
+        username = username.lower()
+        rows = my_sql.filtered_statistics("sir", username)
+
+        self.data = rows
+        print(self.data)
+        for row in rows:
+            self.tree.insert("", tk.END, values=row)
+
+    def export_data(self):
+        columns = "Name, sus0, inf0, rec0, beta, gamma"
+        with open("other_files/exported_data.csv", "w") as file:
+            file.write("Name, sus0, inf0, rec0, beta, gamma\n")
+            print(self.data)
+            for line in self.data:
+                file.write(str(line)[1:-1] + "\n")
+
+
+class stats_ca(gui_statistics):
+    def __init__(self, master):
+        gui_statistics.__init__(self, master)
+        self.data = []
+
+        self.btn_filter['state'] = 'normal'
+        self.btn_export['state'] = 'normal'
+        self.btn_export['command'] = self.export_data
+        self.btn_filter['command'] = self.filter
+
+        self.lb_filter.grid(column=0, row=1)
+        self.e_usr.grid(column=1, row=1)
+        self.btn_filter.grid(column=2, row=1)
+
+        self.tree['column'] = ("c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9", "c10", "c11", "c12")
+        self.tree['show'] = 'headings'
+
+        self.tree.heading("#1", text="username")
+        self.tree.heading("#2", text="no_cells")
+        self.tree.heading("#3", text="generations")
+        self.tree.heading("#4", text="size x")
+        self.tree.heading("#5", text="size y")
+        self.tree.heading("#6", text="inf radius")
+        self.tree.heading("#7", text="number inf")
+        self.tree.heading("#8", text="rec inf true")
+        self.tree.heading("#9", text="days inf")
+        self.tree.heading("#10", text="use immunity")
+        self.tree.heading("#11", text="days immune")
+
+        self.tree.column('#1', width=100)
+        self.tree.column('#2', width=100)
+        self.tree.column('#3', width=100)
+        self.tree.column('#4', width=100)
+        self.tree.column('#5', width=100)
+        self.tree.column('#6', width=75)
+        self.tree.column('#7', width=75)
+        self.tree.column('#8', width=75)
+        self.tree.column('#9', width=75)
+        self.tree.column('#10', width=75)
+        self.tree.column('#11', width=75)
+
+        self.tree.grid(row=0, sticky='nsew')
+        self.treeview = self.tree
+        self.sir, self.ca = my_sql.full_statistics()
+        self.data = self.ca
+        for row in self.ca:
+            self.tree.insert("", tk.END, values=row)
+
+    def filter(self):
+        self.clear_tree()
+        username = str(self.e_usr.get())
+        username = username.lower()
+        rows = my_sql.filtered_statistics("ca", username)
+        self.data = rows
+        for row in rows:
+            self.tree.insert("", tk.END, values=row)
+
+    def export_data(self):
+        columns = "Name, sus0, inf0, rec0, beta, gamma"
+        with open("other_files/exported_data.csv", "w") as file:
+            file.write(
+                "Name, no_cells, generations, size_x, size_y, inf_radius, num_infected, rec_inf_true, days_inf, use_immunity, days_immune\n")
+            print(self.data)
+            for line in self.data:
+                file.write(str(line)[1:-1] + "\n")
+
+
+# ---------------------------------------
+
+class gui_First_SIR_Window:
+    """GUI where user can enter how many graphs they want to make, and whether they want to manually enter parameters, chose a file or use past parameters in history"""
+
+    def __init__(self, master):
+        self.master = master
+        self.frame = ttk.Frame(master, padding=5)
+
+        self.lbl_name = ttk.Label(self.frame, text='This is the SIR model')
+
+        self.lbl_num_sim = ttk.Label(self.frame, text='Number of simulations')
+        self.e_num_sim = ttk.Entry(self.frame)
+        # self.num_sim.insert(0, 1)
+        self.btn_open_file = ttk.Button(self.frame, text='Load File', command=self.open_file)
+        self.btn_input_param = ttk.Button(self.frame, text='Enter Parameters', command=self.input)
+        self.btn_history = ttk.Button(self.frame, text='Show History', command=self.show_history)
+        self.btn_close = ttk.Button(self.frame, text='Close', command=self.close)
+
+        self.frame.grid(row=0, column=0, sticky='nsew')
+
+        self.lbl_name.grid(column=0, row=0, columnspan=2, sticky='n')
+        self.lbl_num_sim.grid(column=0, row=1)
+        self.e_num_sim.grid(column=1, row=1)
+        # self.num_sim.grid(column=0, row=1)
+        self.btn_open_file.grid(column=0, row=2)
+        self.btn_input_param.grid(column=1, row=2)
+        self.btn_history.grid(column=0, row=3)
+        self.btn_close.grid(column=1, row=3, sticky='s')
+
+        self.master.columnconfigure(0, weight=1)
+        self.master.rowconfigure(0, weight=1)
+
+        self.frame.columnconfigure(1, weight=1)
+        self.frame.rowconfigure(1, weight=1)
+
+    def close(self):
+        self.master.destroy()
+        main_win = tk.Tk()
+        main_win.geometry("+{}+{}".format(200, 200))
+        main_win.title('Main Window')
+        new_window = gui_Main_Window(main_win)
+        main_win.mainloop()
+
+    def open_file(self):
+        """Allows user to open file containing results from previous simulation and converts the values into python lists so they can be used by the my_sir.plot_graph function"""
+        print("file dialog")
+        filename = filedialog.askopenfilename()
+        print(filename)
+        df = pd.read_excel(filename)
+        timearray = df['Time'].values.tolist()
+        susceptible = df['S'].values.tolist()
+        infected = df['I'].values.tolist()
+        recovered = df['R'].values.tolist()
+
+        # self.master.destroy()
+
+        plot = my_sir.plot_graph(timearray, susceptible, infected, recovered)
+        plot.plot()
+
+    def input(self):
+        """Checks that user as entered a value between 1-10 for the number of simulations. IF the user has not, it will produce an error and ask user to enter a value between 1 and 10."""
+        try:
+            int(self.e_num_sim.get())
+            if 1 <= int(self.e_num_sim.get()) <= 10:
+                self.number_of_simulations = int(self.e_num_sim.get())
+                print(self.number_of_simulations)
+
+                # self.number_of_simulations = 1
+                self.master.destroy()
+                root3 = tk.Tk()
+                root3.title('Input Parameters')
+                root3.geometry("+{}+{}".format(200, 200))
+                input_window = gui_SIR_Param(root3, self.number_of_simulations)
+                root3.mainloop()
+            else:
+                err = error("Entry", "Please enter an integer between 1 and 10")
+        except ValueError:
+            err = error("Entry", "Please enter an integer between 1 and 10")
+
+    def show_history(self):
+        self.master.destroy()
+        root3 = tk.Tk()
+        root3.geometry("+{}+{}".format(200, 200))
+        root3.title('History')
+        history_window = SIR_history(root3)
+
+
+class gui_SIR_Param:
+    """GUI for entering parameters for the SIR model"""
+
+    def __init__(self, master, num_sim):
+        self.param_list = [[], [], [], [], [], []]
+        self.counter = 0
+
+        self.number_of_simulations = num_sim
+        self.master = master
+        self.frame = ttk.Frame(master, padding=5)
+        self.frame.grid(row=0, column=0, sticky='nsew')
+
+        # label variables
+        self.lbl_name = ttk.Label(self.frame, text='Enter parameters for SIR model')
+        self.s_name = ttk.Label(self.frame, text='Susceptible')
+        self.i_name = ttk.Label(self.frame, text='Infected')
+        self.r_name = ttk.Label(self.frame, text='Recovered')
+        self.tr_name = ttk.Label(self.frame, text='Transmission rate')
+        self.re_name = ttk.Label(self.frame, text='Recovery rate')
+        self.tp_name = ttk.Label(self.frame, text='Time Period')
+        self.btn_enter = ttk.Button(self.frame, text='Enter', command=self.enter_param)
+        self.btn_close = ttk.Button(self.frame, text='Close', command=self.exit)
+
+        # button variables
+        self.e_s = ttk.Entry(self.frame)
+        self.e_i = ttk.Entry(self.frame)
+        self.e_r = ttk.Entry(self.frame)
+        self.e_tr = ttk.Entry(self.frame)
+        self.e_re = ttk.Entry(self.frame)
+        self.e_tp = ttk.Entry(self.frame)
+
+        # gridding label variables
+        self.lbl_name.grid(column=0, row=0, columnspan=2, sticky='n')
+        self.s_name.grid(column=0, row=1, sticky='w')
+        self.i_name.grid(column=0, row=2, sticky='w')
+        self.r_name.grid(column=0, row=3, sticky='w')
+        self.tr_name.grid(column=0, row=4, sticky='w')
+        self.re_name.grid(column=0, row=5, sticky='w')
+        self.tp_name.grid(column=0, row=6, sticky='w')
+
+        self.e_s.grid(column=1, row=1, sticky='w')
+        self.e_i.grid(column=1, row=2, sticky='w')
+        self.e_r.grid(column=1, row=3, sticky='w')
+        self.e_tr.grid(column=1, row=4, sticky='w')
+        self.e_re.grid(column=1, row=5, sticky='w')
+        self.e_tp.grid(column=1, row=6, sticky='w')
+
+        self.btn_enter.grid(column=1, row=7, columnspan=1)
+        self.btn_close.grid(column=0, row=7, columnspan=1)
+
+        self.master.columnconfigure(0, weight=1)
+        self.master.rowconfigure(0, weight=1)
+
+        # weight elements for resizing
+        self.frame.columnconfigure(0, weight=1)
+        self.frame.rowconfigure(0, weight=1)
+        self.frame.rowconfigure(1, weight=1)
+        self.frame.rowconfigure(2, weight=1)
+        self.frame.rowconfigure(3, weight=1)
+        self.frame.rowconfigure(4, weight=1)
+        self.frame.rowconfigure(5, weight=1)
+        self.frame.rowconfigure(6, weight=1)
+
+    def enter_param(self):
+        """Appends values user has entered to the main parameter list. If the number of simulations is more than 1, it will remove values in the input boxes so user can enter parameters for next simulaion."""
+        self.counter += 1
+
+        self.param_list[0].append(float(self.e_s.get()))
+        self.param_list[1].append(float(self.e_i.get()))
+        self.param_list[2].append(float(self.e_r.get()))
+        self.param_list[3].append(float(self.e_tr.get()))
+        self.param_list[4].append(float(self.e_re.get()))
+        self.param_list[5].append(float(self.e_tp.get()))
+
+        self.e_s.delete(0, 'end')
+        self.e_i.delete(0, 'end')
+        self.e_r.delete(0, 'end')
+        self.e_tr.delete(0, 'end')
+        self.e_re.delete(0, 'end')
+        self.e_tp.delete(0, 'end')
+
+        if self.counter == self.number_of_simulations:
+            self.submit_param()
+            self.counter = 0
+
+    def submit_param(self):
+        """Creates queue object from my_sir function and calls the run simulation function
+        """
+        # print(self.param_list)
+        self.master.destroy()
+
+        pass1 = True
+        for sub_list in self.param_list:
+            for value in sub_list:
+                if value < 0:
+                    pass1 = False
+                    err = error("Value", "Negative numbers cannot be used for any of these inputs")
+
+        if not pass1:
+            root3 = tk.Tk()
+            root3.geometry("+{}+{}".format(200, 200))
+            root3.title('Input Parameters')
+            input_window = gui_SIR_Param(root3, self.number_of_simulations)
+            root3.mainloop()
+        else:
+            queue = my_sir.QueueSimulation(self.number_of_simulations, self.param_list[0], self.param_list[1],
+                                            self.param_list[2],
+                                            self.param_list[3], self.param_list[4],
+                                            self.param_list[5], current_id)
+            queue.run_simulation()
+
+    def exit(self):
+        self.master.destroy()
+        sir_win = tk.Tk()
+        sir_win.geometry("+{}+{}".format(200, 200))
+        sir_win.title('SIR')
+        sir_main = gui_First_SIR_Window(sir_win)
+
+
+# ---------------------------------------
+
+class gui_First_CA_Window:
+    """GUI window where user can enter parameters manually, load file generated or show history of previously used parameters and choose one for the ceccular automata model
+    """
+
+    def __init__(self, master):
+        self.master = master
+        self.frame = ttk.Frame(master, padding=5)
+
+        self.lbl_name = ttk.Label(self.frame, text='This is the Cellular Automata model')
+        self.btn_open_file = ttk.Button(self.frame, text='Load File', command=self.open_file)
+        self.btn_input_param = ttk.Button(self.frame, text='Enter Parameters', command=self.input)
+        self.btn_show_history = ttk.Button(self.frame, text='History', command=self.show_history)
+        self.btn_close = ttk.Button(self.frame, text='Close', command=self.close)
+
+        self.frame.grid(row=0, column=0, sticky='nsew')
+
+        self.lbl_name.grid(column=0, row=0, columnspan=2, sticky='n')
+        self.btn_open_file.grid(column=0, row=1)
+        self.btn_input_param.grid(column=1, row=1)
+        self.btn_show_history.grid(column=0, row=2)
+        self.btn_close.grid(column=1, row=2, sticky='s')
+
+        self.master.columnconfigure(0, weight=1)
+        self.master.rowconfigure(0, weight=1)
+
+        self.frame.columnconfigure(1, weight=1)
+        self.frame.rowconfigure(1, weight=1)
+
+    def open_file(self):
+        # enter file stuff
+        print("Opening file dialog")
+        file = filedialog.askopenfile(mode="r")
+        lines = [line.rstrip('\n') for line in file]
+        file.close()
+
+        if lines[-1] == "":
+            del lines[-1]
+
+        # self.master.destroy()
+
+        ca = my_ca.cellular_automata(0, 0, 0, 0, 0, 0, False, 0, False, 0, True, lines)
+        ca.new_generation()
+        # self.master.destroy()
+
+    def input(self):
+        self.master.destroy()
+        root3 = tk.Tk()
+        root3.geometry("+{}+{}".format(200, 200))
+        root3.title('Input Parameters')
+        input_window = gui_CA_Param(root3)
+
+    def show_history(self):
+        self.master.destroy()
+        root3 = tk.Tk()
+        root3.geometry("+{}+{}".format(200, 200))
+        root3.title('History')
+        history_window = CA_history(root3)
+
+    def close(self):
+        self.master.destroy()
+        main_win = tk.Tk()
+        main_win.geometry("+{}+{}".format(200, 200))
+        main_win.title('Main Window')
+        new_window = gui_Main_Window(main_win)
+        main_win.mainloop()
+
+
+class gui_CA_Param:
+    """GUI interface for inputting cellular automata parameters manually
+    Need to make some entry boxes dependent on checkboxes
+    """
+
+    def __init__(self, master):
+        self.master = master
+        self.frame = ttk.Frame(master, padding=5)
+        self.frame.grid(row=0, column=0, sticky='nsew')
+
+        # label variables
+        self.l_lbl_name = ttk.Label(self.frame, text='Enter parameters for CA model')
+        self.l_no_cells = ttk.Label(self.frame, text='Number of cells')
+        self.l_gen = ttk.Label(self.frame, text='Generations')
+        self.l_size_x = ttk.Label(self.frame, text='Size x')
+        self.l_size_y = ttk.Label(self.frame, text='Size y')
+        self.l_inf_rad = ttk.Label(self.frame, text='Infection radius')
+        self.l_no_inf = ttk.Label(self.frame, text='Number of infected')
+        self.l_r_i = ttk.Label(self.frame, text='Recovered can be infected?')
+        self.l_d_r = ttk.Label(self.frame, text='Days until recovery')
+        self.l_use_imm = ttk.Label(self.frame, text='Use immunity')
+        self.l_d_i = ttk.Label(self.frame, text='Days of immunity')
+
+        # bool values for checkbuttons
+        self.b_r_i = tk.BooleanVar()
+        self.b_u_i = tk.BooleanVar()
+
+        # entry and checkbutton variables
+        self.e_no_cells = ttk.Entry(self.frame)
+        self.e_gen = ttk.Entry(self.frame)
+        self.e_size_x = ttk.Entry(self.frame)
+        self.e_size_y = ttk.Entry(self.frame)
+        self.e_inf_rad = ttk.Entry(self.frame)
+        self.e_no_inf = ttk.Entry(self.frame)
+        self.cb_r_i = ttk.Checkbutton(self.frame, variable=self.b_r_i)
+        self.e_d_r = ttk.Entry(self.frame)
+        self.cb_use_imm = ttk.Checkbutton(self.frame, variable=self.b_u_i)
+        self.e_d_i = ttk.Entry(self.frame)
+
+        self.btn_enter = ttk.Button(self.frame, text='Enter', command=self.enter_param)
+        self.btn_close = ttk.Button(self.frame, text='Close', command=self.close)
+
+        # grid label variables
+        self.l_lbl_name.grid(column=0, row=0, columnspan=2, sticky='n')
+        self.l_no_cells.grid(column=0, row=1, sticky='w')
+        self.l_gen.grid(column=0, row=2, sticky='w')
+        self.l_size_x.grid(column=0, row=3, sticky='w')
+        self.l_size_y.grid(column=0, row=4, sticky='w')
+        self.l_inf_rad.grid(column=0, row=5, sticky='w')
+        self.l_no_inf.grid(column=0, row=6, sticky='w')
+        self.l_r_i.grid(column=0, row=7, sticky='w')
+        self.l_d_r.grid(column=2, row=7, sticky='w')
+        self.l_use_imm.grid(column=0, row=8, sticky='w')
+        self.l_d_i.grid(column=2, row=8, sticky='w')
+
+        # grid entry variables
+        self.e_no_cells.grid(column=2, row=1, sticky='w')
+        self.e_gen.grid(column=2, row=2, sticky='w')
+        self.e_size_x.grid(column=2, row=3, sticky='w')
+        self.e_size_y.grid(column=2, row=4, sticky='w')
+        self.e_inf_rad.grid(column=2, row=5, sticky='w')
+        self.e_no_inf.grid(column=2, row=6, sticky='w')
+        self.cb_r_i.grid(column=1, row=7, sticky='w')
+        self.e_d_r.grid(column=3, row=7, sticky='w')
+        self.cb_use_imm.grid(column=1, row=8, sticky='w')
+        self.e_d_i.grid(column=3, row=8, sticky='w')
+
+        self.btn_enter.grid(column=0, row=9, columnspan=2, sticky='s')
+        self.btn_close.grid(column=2, row=9, columnspan=2, sticky='s')
+
+        # grid main column and tow
+        self.master.columnconfigure(0, weight=1)
+        self.master.rowconfigure(0, weight=1)
+
+        # weight elements for resizing
+        self.frame.columnconfigure(0, weight=1)
+        self.frame.rowconfigure(0, weight=1)
+        self.frame.rowconfigure(1, weight=1)
+        self.frame.rowconfigure(2, weight=1)
+        self.frame.rowconfigure(3, weight=1)
+        self.frame.rowconfigure(4, weight=1)
+        self.frame.rowconfigure(5, weight=1)
+        self.frame.rowconfigure(6, weight=1)
+
+    def enter_param(self):
+        """Gets values that were input, creates a cellular automata object and calls the new_generation function to start the cellular automata function
+        """
+        # should call CA function in this
+        no_cells = int(self.e_no_cells.get())
+        generations = int(self.e_gen.get())
+        size_x = int(self.e_size_x.get())
+        size_y = int(self.e_size_y.get())
+        inf_rad = int(self.e_inf_rad.get())
+        no_inf = int(self.e_no_inf.get())
+        rec_inf = self.b_r_i.get()
+        days_rec = int(self.e_d_r.get())
+        use_imm = self.b_u_i.get()
+        days_imm = int(self.e_d_i.get())
+
+        # self.master.destroy()
+
+        arguments = [no_cells, generations, size_x, size_y, inf_rad, no_inf, rec_inf, days_rec, use_imm,
+                        days_imm, False]
+
+        my_sql.ca_enter_param(current_id, arguments)
+
+        ca = my_ca.cellular_automata(*arguments)  # arguments sent as separate parameters
+
+        ca.new_generation()
+
+    def close(self):
+        self.master.destroy()
+        main_ca = tk.Tk()
+        main_ca.geometry("+{}+{}".format(200, 200))
+        main_ca.title('CA')
+        new_window = gui_First_CA_Window(main_ca)
+        main_ca.mainloop()
+
+
+# ---------------------------------------
+
+class gui_history:
+    """GUI history window which shows history of values entered for the user currently logged in
+    """
+
+    def __init__(self, master):
+        self.master = master
+        self.frame = ttk.Frame(master, padding=5)
+        self.frame.grid(row=0, column=0, sticky='nsew')
+        # self.user_history = my_sql.ca_return_history(current_id)  # user_history is a list of tuples
+        # print(self.user_history)
+
+        self.lb_history = tk.Listbox(self.frame, width=50)
+        # for i in range(len(self.user_history)):
+        #     to_insert = str(i) + "  " + str(self.user_history[i])
+        #     self.lb_history.insert(i, to_insert)
+
+        self.lbl_title = ttk.Label(self.frame, text=f"History of {current_user}")
+        self.btn_exit = ttk.Button(self.frame, text="Exit", command="")
+        self.lbl_text = ttk.Label(self.frame, text="Enter number to simulate with same parameters")
+        self.lbl_key = ttk.Label(self.frame,
+                                    text="")
+        self.e_sim_num = ttk.Entry(self.frame)
+        self.btn_use = ttk.Button(self.frame, text="Use values", command="")
+
+        self.lbl_title.grid(column=1, row=1, columnspan=3)
+        self.lbl_text.grid(column=1, row=2, columnspan=3)
+        # self.lbl_key.grid(column=1, row=3)
+        self.lb_history.grid(column=1, row=4)
+        self.e_sim_num.grid(column=2, row=4)
+        self.btn_use.grid(column=3, row=4)
+        self.btn_exit.grid(column=2, row=5, columnspan=2)
+
+
+class CA_history(gui_history):
+    def __init__(self, master):
+        gui_history.__init__(self, master)
+
+        self.btn_exit['command'] = self.exit
+        self.btn_use['command'] = self.use
+
+        self.user_history = my_sql.ca_return_history(current_id)  # user_history is a list of tuples
+        # print(self.user_history)
+        for i in range(len(self.user_history)):
+            to_insert = str(i) + "  " + str(self.user_history[i])
+            self.lb_history.insert(i, to_insert)
+        self.lbl_key[
+            'text'] = "Sim Number (cells, generations, x, y, infection radius, number infected, recovered can be infected, days until recovered, use immunity, days of immunity)"
+        self.lbl_key.grid(column=1, row=3)
+
+    def exit(self):
+        self.master.destroy()
+        main_ca = tk.Tk()
+        main_ca.geometry("+{}+{}".format(200, 200))
+        main_ca.title('CA')
+        new_window = gui_First_CA_Window(main_ca)
+        main_ca.mainloop()
+
+    def use(self):
+        """User enter number and set of parameters are retrieved from the database"""
+        sim_number = int(self.e_sim_num.get())
+        sim_param = list(self.user_history[sim_number])
+        print(sim_param)
+        sim_param.append(False)
+        ca = my_ca.cellular_automata(*sim_param)
+        ca.new_generation()
+
+
+class SIR_history(gui_history):
+    def __init__(self, master):
+        gui_history.__init__(self, master)
+
+        self.btn_exit['command'] = self.exit
+        self.btn_use['command'] = self.use
+
+        self.user_history = my_sql.sir_return_history(current_id)
+        print(self.user_history)
+        for i in range(len(self.user_history)):
+            to_insert = str(i) + "  " + str(self.user_history[i])
+            self.lb_history.insert(i, to_insert)
+        self.lbl_key['text'] = "Sim Number (Sus, Inf, Rec, Beta, Gamma, Time)"
+        self.lbl_key.grid(column=1, row=3)
+
+    def exit(self):
+        self.master.destroy()
+        sir_win = tk.Tk()
+        sir_win.geometry("+{}+{}".format(200, 200))
+        sir_win.title('SIR')
+        sir_main = gui_First_SIR_Window(sir_win)
+
+    def use(self):
+        sim_number = int(self.e_sim_num.get())
+        sim_param = list(self.user_history[sim_number])
+        print(sim_param)
+
+        queue = my_sir.QueueSimulation(1, [sim_param[0]], [sim_param[1]], [sim_param[2]], [sim_param[3]],
+                                        [sim_param[4]], sim_param[5], current_id)
+
+        queue.run_simulation()
+
+
+# ---------------------------------------
+
+root = tk.Tk()
+root.title('Main Window')
+
+root.geometry("+{}+{}".format(200, 200))
+
+window = gui_Main_Window(root)
+root.mainloop()
+    
 \end{lstlisting}
+\newpage
 
 \subsubsection{CA Model}
 \begin{lstlisting}
-INSERT CODE HERE
+# pylint: disable=unused-variable
+# pylint: enable=too-many-lines
+
+import matplotlib.pyplot as plt
+import random
+from matplotlib.animation import FuncAnimation
+import json
+
+
+class cell:
+    """Each cell will be a class instance of this class. Gives each cell its own attributes"""
+
+    def __init__(self, x, y, infected, d_r, d_i, u_i):
+        self.x = x
+        self.y = y
+        self.infected = infected
+        self.recovered = False
+        self.recover_count = d_r  # default - can be changed - time until infected cell recovers
+        self.original_recover = d_r
+        self.immune = False
+        self.immune_count = d_i
+        self.original_immune = d_i
+        self.use_immunity = u_i
+        # self.infection_rate = i
+
+    def cell_test_function(self):
+        return self.x, self.y, self.infected
+
+    def location(self):
+        # print(self.x, self.y)
+        return self.x, self.y
+
+    def recover_generation(self):
+        self.recover_count -= 1
+        if self.recover_count <= 0:
+            self.recovered = True
+            self.infected = False
+            self.recover_count = self.original_recover
+            if self.use_immunity:
+                self.immune = True
+
+    def immunity_generation(self):
+        if self.immune:
+            self.immune_count -= 1
+            if self.immune_count <= 0:
+                self.immune = False
+                self.immune_count = self.original_immune
+
+    def movement(self):
+        def nothing():
+            pass
+
+        # mvmt = 5
+        mvmt = random.randint(0, 50)
+
+        def north():
+            self.y -= mvmt
+
+        def northeast():
+            self.x += mvmt
+            self.y -= mvmt
+
+        def east():
+            self.x += mvmt
+
+        def southeast():
+            self.x += mvmt
+            self.y += mvmt
+
+        def south():
+            self.y += mvmt
+
+        def southwest():
+            self.x -= mvmt
+            self.y += mvmt
+
+        def west():
+            self.x -= mvmt
+
+        def northwest():
+            self.x -= mvmt
+            self.y -= mvmt
+
+        instructions = {
+            0: nothing,
+            1: north,
+            2: northeast,
+            3: east,
+            4: southeast,
+            5: south,
+            6: southwest,
+            7: west,
+            8: northwest
+        }
+
+        rand = random.randint(0, 8)
+        instructions[rand]()  # like a switch case condition - for constant time complexity
+        # print(self.x, self.y)
+
+
+class cellular_automata:
+    """Main class to run function"""
+
+    def __init__(self, no_cells, generations, size_x, size_y, infection_radius, infected, r_i, d_r, immunity, d_i,
+                    user_file, *uf_param):
+        """Creates list of how every many cells the user inputs so a list will look like ['cell1','cell2','cell3'...]. Each
+        element in that list will then be used as a dictionary key where the definition will be a class instance of cell. Each
+        class instance will be created with a random x and y coordinate, and an infected status.
+        r_i : recovered can be infected
+        d_r : days until recovery
+        """
+        self.user_file = user_file
+        self.use_immunity = immunity
+        self.number_of_cells = no_cells
+        self.number_of_infected = infected
+        self.infection_radius = infection_radius
+        self.generations = generations
+        self.cell_list = []
+        self.cell_object_dict = {}
+        self.size_x = size_x
+        self.size_y = size_y
+        self.full_list = []
+        self.r_i = r_i  # recovered can be infected
+
+        if len(uf_param) != 0:
+            self.uf_param = uf_param
+            self.lines = list(uf_param)[0]
+
+        for i in range(no_cells):
+            self.cell_list.append(("cell" + str(i)))
+
+        infected_counter = 0
+        for element in self.cell_list:  # creates user inputted number of infected cells first, then creates normal cells
+            infected_counter += 1
+            infected_status = False
+            if infected_counter < self.number_of_infected:
+                infected_status = True
+            rand_x, rand_y = self.rand_coordinate_generator()
+            self.cell_object_dict[element] = cell(rand_x, rand_y,
+                                                    infected_status, d_r, d_i,
+                                                    self.use_immunity)  # creates a dictionary of cell objects
+
+    def rand_coordinate_generator(self):
+        """Generates random coordinates for cells being generated"""
+        rand_x = random.randint(0, self.size_x)
+        rand_y = random.randint(0, self.size_y)
+        return rand_x, rand_y
+
+    def export_data(self, sus_full, inf_full, rec_full, imm_full, lg_values, time_array):
+        """Should export data in a format that it can be analysed and reused
+        gen_imm empty when not using immunity, but shouldn't be a problem"""
+    
+        filename = "other_files/ca_output.txt"
+        with open(filename, 'w') as file:
+            file.write(str(sus_full) + "\n")
+            file.write(str(inf_full) + "\n")
+            file.write(str(rec_full) + "\n")
+            file.write(str(imm_full) + "\n")
+            file.write(str(lg_values) + "\n")
+            file.write(str(time_array) + "\n")
+
+    def import_data(self):
+
+        if self.lines[-1] == "":
+            del self.lines[-1]
+
+        result = [json.loads(item) for item in self.lines]
+        # print(result)
+        return result
+
+    def update_position(self):
+        """For each cell object, movement function will be called to see where the cell will move, and the x coordinate list and y coordinate list will be returned of the new generation"""
+        loc_x = []
+        loc_y = []
+        infected = []
+        recovered = []
+        immune = []
+
+        for cell_obj_name in self.cell_list:  # for each cell object name ie. 'cell1', 'cell2' etc, use the name as a dictionary key and run movement function and get location
+            self.cell_object_dict[cell_obj_name].movement()
+            loc_x.append(self.cell_object_dict[cell_obj_name].location()[0])
+            loc_y.append(self.cell_object_dict[cell_obj_name].location()[1])
+            infected.append(self.cell_object_dict[cell_obj_name].infected)
+            recovered.append(self.cell_object_dict[cell_obj_name].recovered)
+            immune.append(self.cell_object_dict[cell_obj_name].immune)
+
+        return loc_x, loc_y, infected, recovered, immune
+
+    def cells_touch(
+            self):  # need to change to put all infected in a list, THEN compare susceptible otherwise not proper
+        """If another cell in in a certain radius of an infected cell, it will become infected. To be changed"""
+        infected_locations = []  # list of tuples of infected cells
+        recovered_obj = []
+        susceptible_obj = []
+        for cell_name in self.cell_list:
+            if self.cell_object_dict[cell_name].infected:
+                infected_locations.append(self.cell_object_dict[cell_name].location())
+            elif self.cell_object_dict[cell_name].recovered:
+                recovered_obj.append(self.cell_object_dict[cell_name])  # holds recovered both with and without immunity
+            else:
+                susceptible_obj.append(self.cell_object_dict[cell_name])
+
+        def touch(cell_obj):
+            sus_x, sus_y = cell_obj.location()
+            for infected_tuple in infected_locations:
+                if (sus_x - infected_tuple[0]) ** 2 + (
+                        sus_y - infected_tuple[1]) <= self.infection_radius ** 2:  # equation of a circle
+                    # self.cell_object_dict[cell_name].infected = True  # need to chance for chance
+                    # PROBLEM
+                    cell_obj.infected = True
+                    # print(f'{cell_obj} has been infected')
+                    # cell is infected, LISTS ARE NOT UPDATED
+
+        if self.r_i:  # if recovered can be infected - doesn't change immunity status but is currently dependent on it - CHANGE
+            for recovered in recovered_obj:
+                if not recovered.immune:
+                    touch(recovered)
+        for susceptible in susceptible_obj:
+            if not susceptible.immune:
+                touch(susceptible)
+
+    def cell_recovery(self):
+        """Cells automatically recover after a certain period of time"""
+        for cell_name in self.cell_list:
+            cell_obj = self.cell_object_dict[cell_name]
+            if cell_obj.recovered == False and cell_obj.infected == True:
+                cell_obj.recover_generation()
+            elif cell_obj.recovered == True and cell_obj.infected:
+                cell_obj.recover_generation()
+
+    def cell_immunity(self):
+        for cell_name in self.cell_list:
+            cell_obj = self.cell_object_dict[cell_name]
+            if cell_obj.recovered == True and cell_obj.immune == True:
+                cell_obj.immunity_generation()
+
+    def new_generation(self):
+        """Main definition for running program. For the number of generations to simulate, call self.update_position() to get new coordinate lists"""
+
+        # coordinates = []
+
+        sus_full = []
+        inf_full = []
+        rec_full = []
+        imm_full = []
+
+        lg_values = [[], [], []]
+
+        time_array = list(range(0, self.generations))
+
+        if not self.user_file:
+            # if user chosing own file will not need - put in function later
+            for i in range(
+                    self.generations):
+
+                if i % 50 == 0:
+                    print("Generating generation " + str(i))
+
+                x_list, y_list, infected, recovered, immune = self.update_position()
+
+                # check if cells touch here, then can adjust objects if need
+                self.cells_touch()  # adjusts the objects, not any list
+
+                # recovery function
+                self.cell_recovery()
+
+                # immunity function
+                if self.use_immunity:
+                    self.cell_immunity()
+
+                gen_sus = []
+                gen_inf = []
+                gen_rec = []
+                gen_imm = []
+
+                # puts cells in list depending on their status and whether immunity is used
+                if self.use_immunity:
+                    for inf in range(len(self.cell_list)):
+                        if infected[inf]:  # if True
+                            gen_inf.append([x_list[inf], y_list[inf]])
+                        elif immune[inf]:
+                            gen_imm.append([x_list[inf], y_list[inf]])
+                        elif recovered[inf]:
+                            gen_rec.append([x_list[inf], y_list[inf]])
+                        else:
+                            gen_sus.append([x_list[inf], y_list[inf]])
+                else:
+                    for inf in range(len(self.cell_list)):
+                        if infected[inf]:  # if True
+                            gen_inf.append([x_list[inf], y_list[inf]])
+                        elif recovered[inf]:
+                            gen_rec.append([x_list[inf], y_list[inf]])
+                        else:
+                            gen_sus.append([x_list[inf], y_list[inf]])
+                            
+
+                sus_full.append(gen_sus)
+                inf_full.append(gen_inf)
+                rec_full.append(gen_rec)
+                if self.use_immunity:
+                    imm_full.append(gen_imm)
+
+                lg_values[0].append(len(gen_sus))
+                lg_values[1].append(len(gen_inf))
+                lg_values[2].append((len(gen_rec) + len(gen_imm)))
+
+
+        # self.export_to_excel() # will soon be redundant
+        if not self.user_file:
+            self.export_data(sus_full, inf_full, rec_full, imm_full, lg_values, time_array)  # WORKING NOW
+
+        # if using own values, assign them here
+        if self.user_file:
+            sus_full, inf_full, rec_full, imm_full, lg_values, time_array = self.import_data()
+            self.generations = len(time_array)
+            print("Imported data!")
+
+        fig, axs = plt.subplots(2)
+        fig.suptitle('Cellular Automata')
+
+        # animate_graph = Anim(self.generations, sus_full, inf_full, rec_full, imm_full, self.use_immunity, time_array, lg_values)
+
+        def animate(i):  # need to adjust to work with two graphs
+
+            axs[0].cla()
+
+            x_sus_full = [cell[0] for cell in sus_full[i]]
+            y_sus_full = [cell[1] for cell in sus_full[i]]
+            x_inf_full = [cell[0] for cell in inf_full[i]]
+            y_inf_full = [cell[1] for cell in inf_full[i]]
+            x_rec_full = [cell[0] for cell in rec_full[i]]
+            y_rec_full = [cell[1] for cell in rec_full[i]]
+
+            axs[0].scatter(x_sus_full, y_sus_full, color='blue')
+            axs[0].scatter(x_inf_full, y_inf_full, color='red')
+            axs[0].scatter(x_rec_full, y_rec_full, color='purple')
+            if self.use_immunity:
+                axs[0].scatter([cell[0] for cell in imm_full[i]], [cell[1] for cell in imm_full[i]], color='gray')
+
+            # plots line graph
+            axs[1].plot(time_array[0:i], lg_values[0][0:i], label="Susceptible", color="blue")
+            axs[1].plot(time_array[0:i], lg_values[1][0:i], label="Infected", color="red")
+            axs[1].plot(time_array[0:i], lg_values[2][0:i], label="recovered", color="purple")
+
+
+        ani = FuncAnimation(plt.gcf(), animate, frames=self.generations, interval=100, repeat=False)
+
+        # ani.save('video.mp4', writer='ffmpeg', fps=30, dpi=250)
+
+        plt.tight_layout()
+        plt.show()
+    
 \end{lstlisting}
+\newpage
 
 \subsubsection{SIR Model}
 \begin{lstlisting}
-INSERT CODE HERE
+import matplotlib.pyplot as plt
+import pandas as pd
+import sub_sql_functions as my_sql
+
+
+class QueueSimulation:
+
+    def __init__(self, n, s_list, i_list, r_list, b_list, g_list, t, current_id):
+        self.n = n  # number of simulations to be run
+        self.parameters = []
+        for i in range(n):
+            self.parameters.append([s_list[i], i_list[i], r_list[i], b_list[i], g_list[i], t[i], i + 1])
+            my_sql.sir_enter_param(current_id, [s_list[i], i_list[i], r_list[i], b_list[i], g_list[i], t[i]])
+        print(self.parameters)
+
+    def run_simulation(self):
+        sir_model = SIR_model()
+        for i in range(self.n):
+            sir_model.SIR_model(*self.parameters[i])
+        plt.show()
+
+
+class SIR_model:
+
+    def __init__(self):
+        pass
+
+    def SIR_model(self, s0, i0, r0, beta, gamma, t, f, *args, **kwargs):
+        """
+        :param s0: number of susceptible people
+        :param i0: number of infected people
+        :param r0: number of recovered people
+        :param beta: transmission rate of an individual
+        :param gamma: recovery rate of an individual
+        :param t: how long the simulation should run for
+        :param f: how many graphs should be calculated simultaneously
+        """
+
+        plt.figure(f)  # names the graph
+        N = s0 + i0 + r0  # total population
+
+        timearray = list(range(1, int(t)))  # creates time array
+
+        def eqns(param):
+            # e = random.uniform(0, 1)
+            e = 0
+            S, I, R = param
+            dsdt = (-(beta * S * I) / N) + (e * R)  # rate of change of susceptible individuals
+            didt = ((beta * S * I) / N) - gamma * I  # rate of change of infected individuals
+            drdt = (gamma * I) - (e * R)  # rate of change of recovered individuals
+            return dsdt, didt, drdt
+
+        def solver():  # solves differential equations in eqns
+            param = (s0, i0, r0)
+            solver_result = [[], [], []]
+            for time in timearray:
+                eqns_results = eqns(param)
+                x, y, z = (param[0] + eqns_results[0]), (param[1] + eqns_results[1]), (param[2] + eqns_results[2])
+                solver_result[0].append(x)
+                solver_result[1].append(y)
+                solver_result[2].append(z)
+                param = (x, y, z)
+            return solver_result
+
+        solver_result = solver()
+
+        # print(solver_result)
+
+        def export_to_excel():  # exports calculated results to excel
+            data = {'Time': timearray,
+                    'S': solver_result[0],
+                    'I': solver_result[1],
+                    'R': solver_result[2]}
+
+            df = pd.DataFrame(data, columns=['Time', 'S', 'I', 'R'])
+            name = "output" + str(f) + ".xls"
+            df.to_excel(name, sheet_name='output')
+
+        export_to_excel()
+        plt.plot(timearray, solver_result[0], label="S(t)")
+        plt.plot(timearray, solver_result[1], label="I(t)")
+        plt.plot(timearray, solver_result[2], label="R(t)")
+
+
+class plot_graph:
+
+    def __init__(self, ta, s, i, r):
+        # deconstruct file here
+        self.timearray = ta
+        self.sus = s
+        self.inf = i
+        self.rec = r
+
+    def plot(self):
+        plt.plot(self.timearray, self.sus, label="S(t)")
+        plt.plot(self.timearray, self.inf, label="I(t)")
+        plt.plot(self.timearray, self.rec, label="R(t)")
+        plt.show()
 \end{lstlisting}
+\newpage
 
 \subsubsection{SQL Functions}
 \begin{lstlisting}
-INSERT CODE HERE
-\end{lstlisting}
+import sqlite3
 
+def initial_setup2():
+    """Sets up clean database with users table and ca_param table. Users table contains username and
+    whether user can see all parameters previously used, and ca_param table contains the history of
+    parameters used as well as the user who executed them"""
+    conn = sqlite3.connect('my_database.db')
+    c = conn.cursor()
+    # c.execute("DROP TABLE users")
+    # c.execute("DROP TABLE ca_param")
+    c.execute("CREATE TABLE users (username text PRIMARY KEY, user_id integer, see_all integer,  email string, first_name string, last_name string)")
+
+    c.execute("""CREATE TABLE ca_param (
+                user_id integer,
+                no_cells integer,
+                generations integer,
+                size_x integer,
+                size_y integer,
+                infection_radius integer,
+                no_infected integer,
+                recovered_can_be_infected integer,
+                days_until_recovered integer,
+                use_immunity integer,
+                days_of_immunity integer    
+                )""")
+    c.execute("INSERT INTO users VALUES (:username, :user_id, :see_all, :email, :first_name, :last_name)", {'username': 'admin', 'user_id': 1, 'see_all': 1, 'email': "None", 'first_name': "None", 'last_name': "None"})
+
+    c.execute("""CREATE TABLE sir_param (
+                user_id integer,
+                sus0 integer,
+                inf0 integer,
+                rec0 integer,
+                beta integer,
+                gamma integer,
+                time integer
+                )""")
+
+    conn.commit()
+    conn.close()
+
+def username_exists(in_user):
+    conn = sqlite3.connect('my_database.db')
+    c = conn.cursor()
+
+    # check if username already in table
+    c.execute("SELECT EXISTS(SELECT * from users WHERE username=:input_user)", {'input_user': in_user})
+    exists = c.fetchone()[0]
+    return exists
+
+
+def enter_username(in_user, id, email, fn, ln):
+    """If new username entered, it will create a record in the users table for that user, if username
+    entered already exists nothing happens. Username is returned"""
+    conn = sqlite3.connect('my_database.db')
+    c = conn.cursor()
+    c.execute("INSERT INTO users VALUES (:username, :user_id, :see_all, :email, :first_name, :last_name)",
+                {'username': in_user, 'user_id' : id, 'see_all': 0, 'email': email, 'first_name': fn, 'last_name': ln})  # don't add if duplicate username
+    conn.commit()
+    conn.close()
+    return in_user
+
+
+def get_id(in_user):
+    conn = sqlite3.connect('my_database.db')
+    c = conn.cursor()
+    c.execute("SELECT user_id from users WHERE username=:curr_user", {'curr_user': in_user})
+    return c.fetchone()[0]
+
+def ca_enter_param(in_id, up):
+    """Inserts new parameters entered by the user into the CA parameter database"""
+    conn = sqlite3.connect('my_database.db')
+    c = conn.cursor()
+    c.execute("""INSERT INTO ca_param VALUES (:user_id, :no_cells, :generations, :size_x, :size_y,
+                                            :infection_radius, :no_infected, :recovered_can_be_infected,
+                                            :days_until_recovered, :use_immunity, :days_of_immunity)""",
+                {'user_id': in_id, 'no_cells': up[0], 'generations': up[1], 'size_x': up[2], 'size_y': up[3],
+                'infection_radius': up[4], 'no_infected': up[5], 'recovered_can_be_infected': up[6],
+                'days_until_recovered': up[7], 'use_immunity': up[8], 'days_of_immunity': up[9]})
+    conn.commit()
+    conn.close()
+
+
+def ca_return_history(in_id):
+    """Returns entered parameter history depending on current user"""
+    conn = sqlite3.connect('my_database.db')
+    c = conn.cursor()
+    c.execute("SELECT no_cells, generations, size_x, size_y, infection_radius, no_infected, recovered_can_be_infected, days_until_recovered, use_immunity, days_of_immunity FROM ca_param WHERE user_id=:curr_id", {'curr_id': in_id})
+    # conn.close()
+    return c.fetchall()
+
+
+def sir_enter_param(in_user, up):
+    """Inters new parameters entered by the user into the SIR parameter database"""
+    conn = sqlite3.connect('my_database.db')
+    c = conn.cursor()
+    c.execute("""INSERT INTO sir_param VALUES (:user_id, :sus0, :inf0, :rec0, :beta, :gamma, :time)""",
+                {'user_id': in_user, 'sus0': up[0], 'inf0': up[1], 'rec0': up[2], 'beta': up[3], 'gamma': up[4],
+                'time': up[5]
+                })
+    conn.commit()
+    conn.close()
+
+
+def sir_return_history(in_id):
+    conn = sqlite3.connect('my_database.db')
+    c = conn.cursor()
+    c.execute("SELECT sus0, inf0, rec0, beta, gamma, time FROM sir_param WHERE user_id=:curr_id", {'curr_id': in_id})
+    return c.fetchall()
+
+
+def full_statistics():
+    conn = sqlite3.connect('my_database.db')
+    c = conn.cursor()
+    c.execute("""
+                    SELECT users.username, no_cells, generations, size_x, size_y, infection_radius, no_infected, recovered_can_be_infected, days_until_recovered, use_immunity, days_of_immunity
+                    FROM ca_param
+                    JOIN users ON ca_param.user_id = users.user_id""")
+    ca_rows = c.fetchall()
+
+    c.execute("""
+                    SELECT users.username, sus0, inf0, rec0, beta, gamma
+                    FROM sir_param
+                    JOIN users ON sir_param.user_id = users.user_id""")
+    sir_rows = c.fetchall()
+
+    return sir_rows, ca_rows
+
+
+def filtered_statistics(type, username):
+    """Joins the users table and either the ca_param or sir_param table, enabling the user to get results filtered by username"""
+    conn = sqlite3.connect('my_database.db')
+    c = conn.cursor()
+    if type == "ca":
+        c.execute("""
+                        SELECT users.username, no_cells, generations, size_x, size_y, infection_radius, no_infected, recovered_can_be_infected, days_until_recovered, use_immunity, days_of_immunity
+                        FROM ca_param
+                        JOIN users ON ca_param.user_id = users.user_id
+                        WHERE users.username=:user""", {'user': username})
+        ca_rows = c.fetchall()
+        return ca_rows
+    elif type == "sir":
+        c.execute("""
+                        SELECT users.username, sus0, inf0, rec0, beta, gamma
+                        FROM sir_param
+                        JOIN users ON sir_param.user_id = users.user_id
+                        WHERE users.username=:user""", {'user': username})
+        sir_rows = c.fetchall()
+        return sir_rows
+    else:
+        print("Error, wrong type specified")
+        return "Error"
+\end{lstlisting}
 
 \newpage
 \section{Evaluation}
@@ -963,12 +2540,19 @@ If i had more time on this project, I don't think I'd need to improve the core f
     \item Input custom parameters or use default values (from a previous disease) including infection rate, incubation period and death rate for the SIR model
     \item Input custom parameters or use default values (from a previous disease) relating to the number and infectivity of cells for the CA model
 \end{itemize}
-The ability to input custom parameters is there as shown in the testing where a user can enter a number of parameters relating to the simulation, but I have not been able to add default values from a previous disease. This was due to a time constraint, as I 
+The ability to input custom parameters is there as shown in the testing where a user can enter a number of parameters relating to the simulation, but I have not been able to add default values from a previous disease. This was due to a time constraint, as if I had more time i'd be able to research values from previous diseases.
+
+This would be easy to implement as shown in the Show History part of my application, which shows the history of parameters used by the current logged in user. With some tweaking, this could be adjusted to hold parameters of previous diseases.
+
+\begin{itemize}
+    \item Set a quarantine period or introduce a vaccine (therefore limiting disease transmission)
+\end{itemize}
+This was something I wanted to implement as I thought it would look interesting, espiecially on the cellular automata graph, but unfortunately due to time constraints I was not able to do this. The way my code works at the moment is that all values are calculated beforehand, so positions of cells, whether they're infected or not etc are calculated in advanced. Originally I planned on being able to click a button while the CA graph was in progress, and it would directly change 
 
 \textbf{THIS NEEDS TO BE COMPELTED}
 
 \begin{itemize}
-    \item Set a quarantine period or introduce a vaccine (therefore limiting disease transmission)
+    
     \item Click on a graph and show statistics from that point in time
     \item Export graphs produced as png
     \item Upload past simulation results into the program to generate a graph from that previous simulation
